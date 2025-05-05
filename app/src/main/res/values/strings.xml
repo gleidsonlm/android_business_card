@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Business Card</string>
+    <string name="full_name">Gleidson Medeiros</string>
+    <string name="title">Keep Learning!</string>
+    <string name="link_text_wa">WhatsApp</string>
+    <string name="link_url_wa">https://web.whatsapp.com/send/?phone=+558391446999</string>
+    <string name="link_text_email">Email</string>
+    <string name="link_url_email">mailto:gleidsonlm@gmail.com</string>
+    <string name="link_text_in">LinkedIn</string>
+    <string name="link_url_in">https://www.linkedin.com/in/gleidsonlm/</string>
+    <string name="link_text_call">Phone</string>
+    <string name="link_url_call">tel:+5583991446999</string>
+</resources>
