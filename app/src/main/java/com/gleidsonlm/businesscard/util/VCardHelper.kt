@@ -42,7 +42,6 @@ object VCardHelper {
 
         // Phone
         if (userData.phoneNumber.isNotBlank()) {
-//            vcard.addTelephone(Telephone(userData.phoneNumber))
             vcard.addTelephoneNumber(Telephone(userData.phoneNumber))
         }
 
@@ -56,7 +55,7 @@ object VCardHelper {
         if (userData.company.isNotBlank()) {
             val organization = Organization() // Create Organization property
             organization.getValues().add(userData.company)
-            vcard.addOrganization(organization)
+            vcard.organization = organization
         }
 
         // Website URL
@@ -65,9 +64,7 @@ object VCardHelper {
                 val websiteUrl = Url(userData.website)
                 vcard.addUrl(websiteUrl)
             } catch (e: IllegalArgumentException) {
-                // Handle invalid URL if necessary, e.g., log it or skip adding
-                System.err.println("Invalid URL format for website: ${userData.website}")
-                System.err.println("Error message: ${e.message}")
+                Log.e("VCardHelper", "Invalid URL format for website: ${userData.website}", e)
             }
         }
 
