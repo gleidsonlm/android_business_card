@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <cache-path name="my_images" path="images/" />
+    <!-- Using cache-path for temporary image files.
+         Alternatively, files-path could be used for more permanent app files.
+         The 'path' attribute specifies a subdirectory within the cache directory.
+    -->
+</paths>

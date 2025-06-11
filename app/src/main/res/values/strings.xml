@@ -10,4 +10,8 @@
     <string name="link_url_in">https://www.linkedin.com/in/gleidsonlm/</string>
     <string name="link_text_call">Phone</string>
     <string name="link_url_call">tel:+5583991446999</string>
+    <string name="user_avatar_content_description">User Avatar</string>
+    <string name="qr_code_content_description">Contact QR Code</string>
+    <string name="qr_code_placeholder_text">Enter details to generate QR Code</string>
+    <string name="share_vcard_button">Share vCard</string>
 </resources>

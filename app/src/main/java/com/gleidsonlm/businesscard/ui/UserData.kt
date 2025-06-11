@@ -6,5 +6,6 @@ data class UserData(
     val phoneNumber: String,
     val emailAddress: String,
     val company: String,
-    val website: String
+    val website: String,
+    val avatarUri: String? = null
 )
