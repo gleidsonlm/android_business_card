@@ -13,7 +13,7 @@ android {
         minSdk = 30
         targetSdk = 35
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -43,6 +43,12 @@ android {
 
 dependencies {
 
+    implementation(libs.gson)
+    implementation(libs.googlecode.ez.vcard)
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0") {
+        exclude(group = "com.android.support")
+    }
+    implementation(libs.core)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
