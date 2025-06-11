@@ -43,6 +43,12 @@ android {
 
 dependencies {
 
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("net.sourceforge.ezagile:ez-vcard:0.11.4")
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0") {
+        exclude(group = "com.android.support")
+    }
+    implementation("com.google.zxing:core:3.5.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
