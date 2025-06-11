@@ -1,18 +1,18 @@
 package com.gleidsonlm.businesscard.util
 
-import com.gleidsonlm.businesscard.ui.UserData
-import ezvcard.Ezvcard
-import ezvcard.VCard
-import ezvcard.property.StructuredName
-import ezvcard.property.Telephone
-import ezvcard.property.Url
-import ezvcard.property.Email // Added Email import
-import ezvcard.property.Organization // Added Organization import
 import android.graphics.Bitmap
 import android.util.Log
+import com.gleidsonlm.businesscard.ui.UserData
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.WriterException
 import com.journeyapps.barcodescanner.BarcodeEncoder
+import ezvcard.Ezvcard
+import ezvcard.VCard
+import ezvcard.property.Email
+import ezvcard.property.Organization
+import ezvcard.property.StructuredName
+import ezvcard.property.Telephone
+import ezvcard.property.Url
 
 object VCardHelper {
 
@@ -42,7 +42,8 @@ object VCardHelper {
 
         // Phone
         if (userData.phoneNumber.isNotBlank()) {
-            vcard.addTelephone(Telephone(userData.phoneNumber))
+//            vcard.addTelephone(Telephone(userData.phoneNumber))
+            vcard.addTelephoneNumber(Telephone(userData.phoneNumber))
         }
 
         // Email
@@ -54,7 +55,7 @@ object VCardHelper {
         // Organization (Company)
         if (userData.company.isNotBlank()) {
             val organization = Organization() // Create Organization property
-            organization.addValue(userData.company)
+            organization.getValues().add(userData.company)
             vcard.addOrganization(organization)
         }
 
@@ -66,6 +67,7 @@ object VCardHelper {
             } catch (e: IllegalArgumentException) {
                 // Handle invalid URL if necessary, e.g., log it or skip adding
                 System.err.println("Invalid URL format for website: ${userData.website}")
+                System.err.println("Error message: ${e.message}")
             }
         }
 
