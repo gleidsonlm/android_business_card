@@ -2,19 +2,15 @@
     <string name="app_name">Business Card</string>
     <string name="full_name">Your Name</string>
     <string name="title">Your Title</string>
-    <string name="link_text_wa">WhatsApp</string>
-    <string name="link_url_wa">https://web.whatsapp.com/send/?phone=+558391446999</string>
     <string name="link_text_email">Email</string>
-    <string name="link_url_email">mailto:gleidsonlm@gmail.com</string>
-    <string name="link_text_in">LinkedIn</string>
-    <string name="link_url_in">https://www.linkedin.com/in/gleidsonlm/</string>
+    <string name="link_text_url">Site</string>
     <string name="link_text_call">Phone</string>
-    <string name="link_url_call">tel:+5583991446999</string>
-    <string name="user_avatar_content_description">User Avatar</string>
     <string name="qr_code_content_description">Contact QR Code</string>
     <string name="qr_code_placeholder_text">Enter details to generate QR Code</string>
     <string name="share_vcard_button">Share vCard</string>
     <string name="cont_desc_user_avatar">User avatar</string>
     <string name="no_data_preview">No data for preview</string>
     <string name="no_data_fill_form">Please fill the form to see your card</string>
+    <string name="edit">Edit</string>
+    <string name="share_vcard">Share vCard</string>
 </resources>

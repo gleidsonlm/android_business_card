@@ -4,8 +4,8 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.gleidsonlm.businesscard.ui.UserData
 import com.gleidsonlm.businesscard.data.repository.UserRepository
+import com.gleidsonlm.businesscard.ui.UserData
 import com.gleidsonlm.businesscard.util.toSha256
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -99,14 +99,14 @@ class UserInputViewModel(private val userRepository: UserRepository) : ViewModel
     fun onGalleryImageSelected(uri: Uri?) {
         uri?.let {
             _avatarUri.value = it.toString()
-            Log.i("UserInputViewModel", "Avatar URI updated from gallery: ${it.toString()}")
+            Log.i("UserInputViewModel", "Avatar URI updated from gallery: $it")
         }
     }
 
     fun onPhotoTaken(uri: Uri?) {
         uri?.let {
             _avatarUri.value = it.toString()
-            Log.i("UserInputViewModel", "Avatar URI updated from camera: ${it.toString()}")
+            Log.i("UserInputViewModel", "Avatar URI updated from camera: $it")
         }
     }
 }
