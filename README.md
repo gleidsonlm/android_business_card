@@ -21,14 +21,11 @@ This application allows users to create, store, and share their personal busines
 
 ## 📸 Screenshots & Demo
 
-*(This section is a placeholder. It's highly recommended to add screenshots of the main screens and perhaps a short GIF demonstrating the app flow.)*
-
-**Key Screens to Showcase:**
-*   Main business card display (with integrated QR code, avatar, and info).
-*   User input screen (showing fields and avatar selection options).
-*   Image picker (gallery).
-*   Camera interface (if possible to demo).
-*   Sharing vCard intent.
+![App before user information](http://gleidsonlm.com.br/app-bussiness-card/2025-06-13_08-25-06.png)
+![User input screen](http://gleidsonlm.com.br/app-bussiness-card/2025-06-13_08-25-18.png)
+![Camera interface](http://gleidsonlm.com.br/app-bussiness-card/2025-06-13_08-38-14.png)
+![Sharing vCard intent](http://gleidsonlm.com.br/app-bussiness-card/2025-06-13_08-30-11.png)
+![Main business card display](http://gleidsonlm.com.br/app-bussiness-card/2025-06-13_08-38-27.png)
 
 ## 🚀 Tech Stack & Learning Journey
 
