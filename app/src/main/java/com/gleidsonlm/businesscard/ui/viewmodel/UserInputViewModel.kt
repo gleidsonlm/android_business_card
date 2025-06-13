@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gleidsonlm.businesscard.ui.UserData
 import com.gleidsonlm.businesscard.data.repository.UserRepository
-import com.gleidsonlm.businesscard.util.toMd5
+import com.gleidsonlm.businesscard.util.toSha256
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -83,7 +83,7 @@ class UserInputViewModel(private val userRepository: UserRepository) : ViewModel
 
     fun fetchGravatarClicked(email: String) {
         if (email.isNotBlank()) {
-            val emailHash = email.toMd5()
+            val emailHash = email.toSha256()
             if (emailHash.isNotBlank()) {
                 val gravatarUrl = "https://www.gravatar.com/avatar/$emailHash?s=200&d=mp"
                 _avatarUri.value = gravatarUrl
