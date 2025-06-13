@@ -14,4 +14,7 @@
     <string name="qr_code_content_description">Contact QR Code</string>
     <string name="qr_code_placeholder_text">Enter details to generate QR Code</string>
     <string name="share_vcard_button">Share vCard</string>
+    <string name="cont_desc_user_avatar">User avatar</string>
+    <string name="no_data_preview">No data for preview</string>
+    <string name="no_data_fill_form">Please fill the form to see your card</string>
 </resources>

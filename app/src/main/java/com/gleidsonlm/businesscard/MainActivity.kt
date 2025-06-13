@@ -178,13 +178,7 @@ private fun BusinessCardApp(businessCardViewModel: BusinessCardViewModel) { // A
                 .fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            BusinessCardFace(
-                fullName = userData?.fullName ?: stringResource(id = R.string.full_name),
-                title = userData?.title ?: stringResource(id = R.string.title),
-                email = userData?.emailAddress ?: stringResource(id = R.string.link_text_email),
-                phoneNumber = userData?.phoneNumber ?: stringResource(id = R.string.link_text_call),
-                photoUri = userData?.avatarUri
-            )
+            BusinessCardFace(userData = userData)
         }
 
         Column(
