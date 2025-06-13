@@ -4,9 +4,9 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -56,21 +56,12 @@ fun UserInputScreen(viewModel: UserInputViewModel, onSaveCompleted: () -> Unit) 
     // if there's existing data to show. This is handled in MainActivity.
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
+        contract = ActivityResultContracts.PickVisualMedia()
     ) { uri: Uri? ->
         viewModel.onGalleryImageSelected(uri)
     }
 
     val context = LocalContext.current
-    val requestPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            imagePickerLauncher.launch("image/*") // For gallery permission
-        } else {
-            Log.w("Permission", "Storage permission denied.")
-        }
-    }
 
     var tempCameraUri by remember { mutableStateOf<Uri?>(null) }
 
@@ -130,21 +121,8 @@ fun UserInputScreen(viewModel: UserInputViewModel, onSaveCompleted: () -> Unit) 
             }
             Button(
                 onClick = {
-                    viewModel.selectImageFromGalleryClicked() // Call ViewModel
-                    val permissionToRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        Manifest.permission.READ_MEDIA_IMAGES
-                    } else {
-                        Manifest.permission.READ_EXTERNAL_STORAGE
-                    }
-
-                    when (ContextCompat.checkSelfPermission(context, permissionToRequest)) {
-                        PackageManager.PERMISSION_GRANTED -> {
-                            imagePickerLauncher.launch("image/*")
-                        }
-                        else -> {
-                            requestPermissionLauncher.launch(permissionToRequest)
-                        }
-                    }
+                    viewModel.selectImageFromGalleryClicked()
+                    imagePickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
