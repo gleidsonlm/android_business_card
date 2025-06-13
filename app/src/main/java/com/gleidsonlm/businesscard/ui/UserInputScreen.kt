@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.collectAsState // Added import
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -37,42 +38,34 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
 import com.gleidsonlm.businesscard.R
+import com.gleidsonlm.businesscard.ui.viewmodel.UserInputViewModel // Added import
 import java.io.File
-import java.math.BigInteger
-import java.security.MessageDigest
-
-// MD5 Helper function
-private fun String.toMd5(): String {
-    return try {
-        val md = MessageDigest.getInstance("MD5")
-        val messageDigest = md.digest(this.trim().lowercase().toByteArray())
-        val no = BigInteger(1, messageDigest)
-        var hashtext = no.toString(16)
-        while (hashtext.length < 32) {
-            hashtext = "0$hashtext"
-        }
-        hashtext
-    } catch (e: Exception) {
-        Log.e("MD5", "Error generating MD5 hash", e)
-        "" // Return empty string or handle error as appropriate
-    }
-}
+import com.gleidsonlm.businesscard.util.toMd5
 
 @Composable
-fun UserInputScreen(existingData: UserData?, onSaveClicked: (UserData) -> Unit) {
-    var fullName by remember { mutableStateOf(existingData?.fullName ?: "") }
-    var title by remember { mutableStateOf(existingData?.title ?: "") }
-    var phoneNumber by remember { mutableStateOf(existingData?.phoneNumber ?: "") }
-    var emailAddress by remember { mutableStateOf(existingData?.emailAddress ?: "") }
-    var company by remember { mutableStateOf(existingData?.company ?: "") }
-    var website by remember { mutableStateOf(existingData?.website ?: "") }
-    var avatarUri by remember { mutableStateOf(existingData?.avatarUri) }
+fun UserInputScreen(viewModel: UserInputViewModel, onSaveCompleted: () -> Unit) {
+    // Collect states from ViewModel
+    val fullName by viewModel.fullName.collectAsState()
+    val title by viewModel.title.collectAsState()
+    val phoneNumber by viewModel.phoneNumber.collectAsState()
+    val emailAddress by viewModel.emailAddress.collectAsState()
+    val company by viewModel.company.collectAsState()
+    val website by viewModel.website.collectAsState()
+    val avatarUri by viewModel.avatarUri.collectAsState()
+
+    // It's important that loadExistingData is called before this composable is shown
+    // if there's existing data to show. This is handled in MainActivity.
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
-            avatarUri = it.toString()
+            // This will be handled by ViewModel method later e.g., viewModel.onGalleryImageSelected(it)
+            // For now, direct update if needed, or let ViewModel handle via a click method
+            // viewModel.onAvatarUriChanged(it.toString()) // Example of a direct update method
+            // For Step 1.5, the click handlers will call empty ViewModel methods.
+            // The actual URI update will be part of Step 2.1.
+            // For now, we can log or do nothing, as per plan.
         }
     }
 
@@ -104,7 +97,9 @@ fun UserInputScreen(existingData: UserData?, onSaveClicked: (UserData) -> Unit) 
     ) { success: Boolean ->
         if (success) {
             tempCameraUri?.let { uri ->
-                avatarUri = uri.toString()
+                // Similar to gallery, actual update via ViewModel method later.
+                // viewModel.onAvatarUriChanged(uri.toString())
+                // For Step 1.5, the click handlers call empty ViewModel methods.
             }
         }
         tempCameraUri = null // Reset after use
@@ -135,7 +130,7 @@ fun UserInputScreen(existingData: UserData?, onSaveClicked: (UserData) -> Unit) 
                 contentAlignment = Alignment.Center
             ) {
                 AsyncImage(
-                    model = avatarUri ?: R.drawable.avatar,
+                    model = avatarUri ?: R.drawable.avatar, // Reads from ViewModel state
                     contentDescription = "Avatar Preview",
                     modifier = Modifier
                         .size(100.dp)
@@ -147,6 +142,7 @@ fun UserInputScreen(existingData: UserData?, onSaveClicked: (UserData) -> Unit) 
             }
             Button(
                 onClick = {
+                    viewModel.selectImageFromGalleryClicked() // Call ViewModel
                     val permissionToRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         Manifest.permission.READ_MEDIA_IMAGES
                     } else {
@@ -169,6 +165,7 @@ fun UserInputScreen(existingData: UserData?, onSaveClicked: (UserData) -> Unit) 
             Spacer(modifier = Modifier.height(8.dp)) // Spacer between gallery and photo buttons
             Button(
                 onClick = {
+                    viewModel.takePhotoClicked() // Call ViewModel
                     when (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)) {
                         PackageManager.PERMISSION_GRANTED -> {
                             val newUri = createImageUri(context)
@@ -187,19 +184,19 @@ fun UserInputScreen(existingData: UserData?, onSaveClicked: (UserData) -> Unit) 
             Spacer(modifier = Modifier.height(8.dp)) // Spacer between photo and gravatar buttons
             Button(
                 onClick = {
+                    viewModel.fetchGravatarClicked(emailAddress) // Pass current emailAddress state
                     if (emailAddress.isNotBlank()) {
                         val emailHash = emailAddress.toMd5()
                         if (emailHash.isNotBlank()) {
                             val gravatarUrl = "https://www.gravatar.com/avatar/$emailHash?s=200&d=mp"
-                            avatarUri = gravatarUrl // Update the avatarUri state
+                            // This direct update will be removed once fetchGravatarClicked is implemented
+                            // viewModel.onAvatarUriChanged(gravatarUrl) // Example
                             Log.i("Gravatar", "Attempting to load Gravatar from: $gravatarUrl")
                         } else {
                             Log.w("Gravatar", "Email hash is blank, cannot fetch Gravatar.")
-                            // Optionally, inform the user that hashing failed
                         }
                     } else {
                         Log.w("Gravatar", "Email address is blank, cannot fetch Gravatar.")
-                        // Optionally, inform the user to enter an email
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -209,58 +206,50 @@ fun UserInputScreen(existingData: UserData?, onSaveClicked: (UserData) -> Unit) 
             Spacer(modifier = Modifier.height(16.dp))
             OutlinedTextField(
                 value = fullName,
-                onValueChange = { fullName = it },
+                onValueChange = { viewModel.onFieldChange("fullName", it) },
                 label = { Text("Full Name") },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = title,
-                onValueChange = { title = it },
+                onValueChange = { viewModel.onFieldChange("title", it) },
                 label = { Text("Title") },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = phoneNumber,
-                onValueChange = { phoneNumber = it },
+                onValueChange = { viewModel.onFieldChange("phoneNumber", it) },
                 label = { Text("Phone Number") },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = emailAddress,
-                onValueChange = { emailAddress = it },
+                onValueChange = { viewModel.onFieldChange("emailAddress", it) },
                 label = { Text("Email Address") },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = company,
-                onValueChange = { company = it },
+                onValueChange = { viewModel.onFieldChange("company", it) },
                 label = { Text("Company") },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = website,
-                onValueChange = { website = it },
+                onValueChange = { viewModel.onFieldChange("website", it) },
                 label = { Text("Website") },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = {
-                    val userData = UserData(
-                        fullName = fullName,
-                        title = title,
-                        phoneNumber = phoneNumber,
-                        emailAddress = emailAddress,
-                        company = company,
-                        website = website,
-                        avatarUri = avatarUri
-                    )
-                    onSaveClicked(userData)
+                viewModel.saveUserData() // Call ViewModel's save method
+                onSaveCompleted()      // Notify MainActivity
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -270,8 +259,9 @@ fun UserInputScreen(existingData: UserData?, onSaveClicked: (UserData) -> Unit) 
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun UserInputScreenPreview() {
-    UserInputScreen(existingData = null, onSaveClicked = {})
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun UserInputScreenPreview() {
+//    // UserInputScreen(viewModel = UserInputViewModel(), onSaveCompleted = {}) // ViewModel needs Hilt or manual repo
+//    Text("Preview for UserInputScreen needs ViewModel instance.")
+//}
