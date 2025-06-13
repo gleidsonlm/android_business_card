@@ -124,7 +124,11 @@ class MainActivity : ComponentActivity() {
                                 businessCardViewModel = businessCardViewModel // Pass ViewModel
                             )
                             Button(
-                                onClick = { showInputScreen = true },
+                                onClick = {
+                                    val currentCardData = businessCardViewModel.currentData.value
+                                    userInputViewModel.loadExistingData(currentCardData)
+                                    showInputScreen = true
+                                },
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)
                                     .padding(16.dp)
