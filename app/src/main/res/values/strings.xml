@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Business Card</string>
-    <string name="full_name">Gleidson Medeiros</string>
-    <string name="title">Keep Learning!</string>
+    <string name="full_name">Your Name</string>
+    <string name="title">Your Title</string>
     <string name="link_text_wa">WhatsApp</string>
     <string name="link_url_wa">https://web.whatsapp.com/send/?phone=+558391446999</string>
     <string name="link_text_email">Email</string>
