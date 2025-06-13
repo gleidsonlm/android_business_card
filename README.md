@@ -38,13 +38,17 @@ This project was an opportunity to work with and learn several important Android
     *   Custom Composables for UI modularity.
     *   Responsive layout design (e.g., weighted sections).
 *   **Data Handling & Persistence:**
-    *   **SharedPreferences:** For simple key-value data storage.
+    *   **SharedPreferences:** For simple key-value data storage. (Soon to be Jetpack DataStore as per ongoing refactoring)
     *   **Gson:** For serializing/deserializing data objects (UserData) to JSON.
+*   **Architecture:**
+    *   **MVVM (Model-View-ViewModel):** Currently being refactored towards this pattern.
+    *   **Repository Pattern:** For abstracting data sources.
+    *   **Dependency Injection (Hilt):** Planned for managing dependencies.
 *   **Android Core Components & APIs:**
-    *   **Activity Result APIs:** (`rememberLauncherForActivityResult` for image picking, camera, permissions).
+    *   **Activity Result APIs:** (`rememberLauncherForActivityResult` with `PickVisualMedia`, `TakePicture` for image picking, camera, permissions).
     *   **Intents:** For sharing data (`ACTION_SEND`) and launching external activities (image picker, camera, web links).
     *   **FileProvider:** For securely sharing content URIs with the camera app.
-    *   **Runtime Permissions:** Requesting and handling permissions for gallery and camera.
+    *   **Runtime Permissions:** Requesting and handling permissions for camera (gallery permissions handled by `PickVisualMedia`).
 *   **Image Loading:**
     *   **Coil (Compose Image Loader):** For asynchronously loading and displaying images from URIs/URLs (gallery, camera, Gravatar).
 *   **Data Formatting & Libraries:**
@@ -62,16 +66,18 @@ This project demonstrates an ability to integrate various components, manage app
 3.  Let Android Studio sync Gradle dependencies.
 4.  Build and run the app on an Android emulator or a physical device.
 
-## 🔮 Future Enhancements
+## 🔮 Future Enhancements (Post-Refactoring)
 
-*   **More Robust Image Persistence:** Copy selected gallery/camera images to app-specific storage for more reliable long-term access.
-*   **Material You Theming:** Implement dynamic theming based on user's wallpaper (Android 12+).
-*   **Improved Error Handling:** More user-friendly error messages and states.
-*   **Tablet Layout:** Create an optimized layout for tablet devices.
-*   **Direct File Saving for vCard:** Option to save the .vcf file directly to device storage.
-*   **Widget:** A home screen widget for the business card.
-*   **Unit & UI Tests:** Adding a suite of tests to ensure code quality and reliability.
+*   **Complete MVVM Refactoring:** Fully implement ViewModels, Repository, and Hilt DI.
+*   **Jetpack DataStore:** Migrate from SharedPreferences to Jetpack DataStore for data persistence.
+*   **More Robust Image Persistence:** Copy selected gallery/camera images to app-specific storage.
+*   **Material You Theming:** Implement dynamic theming.
+*   **Improved Error Handling & User Feedback:** Comprehensive error states and messages.
+*   **Tablet Layout:** Optimized layout for tablets.
+*   **Direct File Saving for vCard:** Option to save .vcf file.
+*   **Widget:** Home screen widget.
+*   **Unit & UI Tests:** Comprehensive test suite.
 
 ---
 
-*This project, including this README, was developed with the significant assistance of Jules, an AI software engineering agent from Google.*
+*This project, including this README, is being developed with the significant assistance of Jules, an AI software engineering agent from Google.*
