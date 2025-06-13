@@ -40,7 +40,6 @@ import coil.compose.AsyncImage
 import com.gleidsonlm.businesscard.R
 import com.gleidsonlm.businesscard.ui.viewmodel.UserInputViewModel // Added import
 import java.io.File
-import com.gleidsonlm.businesscard.util.toMd5
 
 @Composable
 fun UserInputScreen(viewModel: UserInputViewModel, onSaveCompleted: () -> Unit) {
@@ -59,14 +58,7 @@ fun UserInputScreen(viewModel: UserInputViewModel, onSaveCompleted: () -> Unit) 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        uri?.let {
-            // This will be handled by ViewModel method later e.g., viewModel.onGalleryImageSelected(it)
-            // For now, direct update if needed, or let ViewModel handle via a click method
-            // viewModel.onAvatarUriChanged(it.toString()) // Example of a direct update method
-            // For Step 1.5, the click handlers will call empty ViewModel methods.
-            // The actual URI update will be part of Step 2.1.
-            // For now, we can log or do nothing, as per plan.
-        }
+        viewModel.onGalleryImageSelected(uri)
     }
 
     val context = LocalContext.current
@@ -96,11 +88,7 @@ fun UserInputScreen(viewModel: UserInputViewModel, onSaveCompleted: () -> Unit) 
         contract = ActivityResultContracts.TakePicture()
     ) { success: Boolean ->
         if (success) {
-            tempCameraUri?.let { uri ->
-                // Similar to gallery, actual update via ViewModel method later.
-                // viewModel.onAvatarUriChanged(uri.toString())
-                // For Step 1.5, the click handlers call empty ViewModel methods.
-            }
+            viewModel.onPhotoTaken(tempCameraUri)
         }
         tempCameraUri = null // Reset after use
     }
@@ -185,19 +173,6 @@ fun UserInputScreen(viewModel: UserInputViewModel, onSaveCompleted: () -> Unit) 
             Button(
                 onClick = {
                     viewModel.fetchGravatarClicked(emailAddress) // Pass current emailAddress state
-                    if (emailAddress.isNotBlank()) {
-                        val emailHash = emailAddress.toMd5()
-                        if (emailHash.isNotBlank()) {
-                            val gravatarUrl = "https://www.gravatar.com/avatar/$emailHash?s=200&d=mp"
-                            // This direct update will be removed once fetchGravatarClicked is implemented
-                            // viewModel.onAvatarUriChanged(gravatarUrl) // Example
-                            Log.i("Gravatar", "Attempting to load Gravatar from: $gravatarUrl")
-                        } else {
-                            Log.w("Gravatar", "Email hash is blank, cannot fetch Gravatar.")
-                        }
-                    } else {
-                        Log.w("Gravatar", "Email address is blank, cannot fetch Gravatar.")
-                    }
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {

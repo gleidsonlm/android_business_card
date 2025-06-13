@@ -1,9 +1,12 @@
 package com.gleidsonlm.businesscard.ui.viewmodel
 
+import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gleidsonlm.businesscard.ui.UserData
 import com.gleidsonlm.businesscard.data.repository.UserRepository
+import com.gleidsonlm.businesscard.util.toMd5
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -79,6 +82,31 @@ class UserInputViewModel(private val userRepository: UserRepository) : ViewModel
     }
 
     fun fetchGravatarClicked(email: String) {
-        // Will be implemented later
+        if (email.isNotBlank()) {
+            val emailHash = email.toMd5()
+            if (emailHash.isNotBlank()) {
+                val gravatarUrl = "https://www.gravatar.com/avatar/$emailHash?s=200&d=mp"
+                _avatarUri.value = gravatarUrl
+                Log.i("UserInputViewModel", "Set avatar URI to Gravatar URL: $gravatarUrl")
+            } else {
+                Log.w("UserInputViewModel", "Email hash is blank, cannot fetch Gravatar for email: $email")
+            }
+        } else {
+            Log.w("UserInputViewModel", "Email address is blank, cannot fetch Gravatar.")
+        }
+    }
+
+    fun onGalleryImageSelected(uri: Uri?) {
+        uri?.let {
+            _avatarUri.value = it.toString()
+            Log.i("UserInputViewModel", "Avatar URI updated from gallery: ${it.toString()}")
+        }
+    }
+
+    fun onPhotoTaken(uri: Uri?) {
+        uri?.let {
+            _avatarUri.value = it.toString()
+            Log.i("UserInputViewModel", "Avatar URI updated from camera: ${it.toString()}")
+        }
     }
 }
