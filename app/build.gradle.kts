@@ -2,9 +2,20 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.google.firebase.crashlytics)
 }
 
 android {
+    signingConfigs {
+        create("com.gleidsonlm.businesscard.release") {
+            storeFile =
+                file("/home/gleidsonlm/AndroidStudioProjects/Keystores/com.gleidsonlm.businesscard.release.jks")
+            storePassword = "6bca22d164a05766eff175522eece435"
+            keyPassword = "6bca22d164a05766eff175522eece435"
+            keyAlias = "com.gleidsonlm.businesscard.release"
+        }
+    }
     namespace = "com.gleidsonlm.businesscard"
     compileSdk = 35
 
@@ -12,21 +23,17 @@ android {
         applicationId = "com.gleidsonlm.businesscard"
         minSdk = 30
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.1"
+        versionCode = 3
+        versionName = "June 18, 2025"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig = signingConfigs.getByName("com.gleidsonlm.businesscard.release")
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            isShrinkResources = false
+            isMinifyEnabled = false
             isDebuggable = false
-            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
@@ -59,6 +66,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.firebase.crashlytics)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
