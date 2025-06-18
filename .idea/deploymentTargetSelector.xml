@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="GleidsonLM Card">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-06-11T18:47:14.296257119Z">
+        <DropdownSelection timestamp="2025-06-17T14:17:45.881051685Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=ZF523BZWPM" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=/home/gleidsonlm/.android/avd/Small_Phone.avd" />
             </handle>
           </Target>
         </DropdownSelection>
