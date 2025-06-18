@@ -10,5 +10,4 @@
 local.properties
 app/build
 app/debug
-app/release/app-release
 app/google-services.json
