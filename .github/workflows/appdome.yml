@@ -28,17 +28,53 @@ jobs:
       - uses: actions/checkout@v2
         with:
           path: main
-          
-      - name: Appdome build-2secure
-        uses: Appdome/github_build-2secure@latest
+
+      # Preparing the Keystore file from GitHub secrets
+      - name: Keystore file provision
+        run: |
+          echo "Keystore file provision"
+          printf "%s" "${{ secrets.KEYSTORE_BASE64 }}" > ${{ github.workspace }}/keystore_base64
+          base64 -d < ${{ github.workspace }}/keystore_base64.txt > ${{ github.workspace }}/keystore.jks
+
+      # Cloning appdome-api-python github repository
+      - name: Cloning appdome-api-python github repository
+        uses: actions/checkout@master
         with:
+          repository: Appdome/appdome-api-python
+          ref: refs/heads/main
+          path: appdome
+
+      # Run appdome api for Android apps
+      - name: Appdome workflow for Android apps
+        env: # creating needed environment variables using GitHub secrets
           APPDOME_API_TOKEN: ${{secrets.APPDOME_API_KEY}}
           TEAM_ID: ${{secrets.TEAM_ID}} # Your team id in appdome
           APP_FILE: ${{github.workspace}}/app/build/outputs/bundle/release/app-release.aab # none_protected_application can be pass as path/on/repository OR https://download_link
           FUSION_SET_ID: ${{secrets.FUSION_SET_ID}} #"Appdome Fusion Set_Id Android/iOS"
-          SIGN_OPTIONS: "SIGN_ON_APPDOME"
-          BUILD_WITH_LOGS: true # Optional
-          KEYSTORE_FILE: ${{secrets.KEYSTORE_BASE64}}
+          KEYSTORE_FILE: ${{github.workspace}}/keystore.jks
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
           KEYSTORE_ALIAS: ${{secrets.KEYSTORE_ALIAS}}
           KEYSTORE_KEY_PASSWORD: ${{secrets.KEYSTORE_KEY_PASSWORD}}
+        run: |
+          mkdir outputs
+          pip3 install -r appdome/requirements.txt
+          python3 appdome/appdome-api-python/appdome_api.py \
+                  --api_key $APPDOME_API_TOKEN
+                  --fusion_set_id $FUSION_SET_ID
+                  --team_id $TEAM_ID
+                  --app $APP_FILE \
+                  --sign_on_appdome \
+                  --keystore $KEYSTORE_FILE \
+                  --keystore_pass $KEYSTORE_PASSWORD \
+                  --keystore_alias $KEYSTORE_ALIAS \
+                  --key_pass $KEYSTORE_KEY_PASSWORD \
+                  --output outputs/app-release.aab \
+                  --certificate_output outputs/appdome-certificate.pdf
+          ls outputs
+
+      # Upload fuse output as an artifacts
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: workflow-artifacts
+          path: outputs # path to output folder
