@@ -15,10 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Setup Java JDK
-    - uses: actions/checkout@v4
+      uses: actions/checkout@v4
     
     - name: Azul Zulu OpenJDK
-    - uses: actions/setup-java@v4
+      uses: actions/setup-java@v4
       with:
         java-version: '21'
         distribution: 'zulu'
