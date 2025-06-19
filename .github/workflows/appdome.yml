@@ -34,7 +34,7 @@ jobs:
         run: |
           echo "Keystore file provision"
           printf "%s" "${{ secrets.KEYSTORE_BASE64 }}" > ${{ github.workspace }}/keystore_base64
-          base64 -d < ${{ github.workspace }}/keystore_base64.txt > ${{ github.workspace }}/keystore.jks
+          base64 -d < ${{ github.workspace }}/keystore_base64 > ${{ github.workspace }}/keystore.jks
 
       # Cloning appdome-api-python github repository
       - name: Cloning appdome-api-python github repository
