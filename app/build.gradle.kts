@@ -7,15 +7,6 @@ plugins {
 }
 
 android {
-    signingConfigs {
-        create("com.gleidsonlm.businesscard.release") {
-            storeFile =
-                file("/home/gleidsonlm/AndroidStudioProjects/Keystores/com.gleidsonlm.businesscard.release.jks")
-            storePassword = "6bca22d164a05766eff175522eece435"
-            keyPassword = "6bca22d164a05766eff175522eece435"
-            keyAlias = "com.gleidsonlm.businesscard.release"
-        }
-    }
     namespace = "com.gleidsonlm.businesscard"
     compileSdk = 35
 
@@ -25,8 +16,6 @@ android {
         targetSdk = 35
         versionCode = 3
         versionName = "June 18, 2025"
-
-        signingConfig = signingConfigs.getByName("com.gleidsonlm.businesscard.release")
     }
 
     buildTypes {
