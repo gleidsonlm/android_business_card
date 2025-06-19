@@ -59,9 +59,9 @@ jobs:
           mkdir outputs
           pip3 install -r appdome/requirements.txt
           python3 appdome/appdome-api-python/appdome_api.py \
-                  --api_key $APPDOME_API_TOKEN
-                  --fusion_set_id $FUSION_SET_ID
-                  --team_id $TEAM_ID
+                  --api_key $APPDOME_API_TOKEN \
+                  --fusion_set_id $FUSION_SET_ID \
+                  --team_id $TEAM_ID \
                   --app $APP_FILE \
                   --sign_on_appdome \
                   --keystore $KEYSTORE_FILE \
