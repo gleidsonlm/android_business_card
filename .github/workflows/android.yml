@@ -14,6 +14,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v4
+      with: # path: main
+        path: gleidsonlm-actions-android-build-1
+      
     - name: Setup Java JDK
       uses: actions/checkout@v4
     
@@ -27,7 +31,7 @@ jobs:
     - name: Load Google Service file
       env:
         GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
-        run: echo $GOOGLE_SERVICES_JSON | base64 -di > app/google-services.json
+        run: echo $GOOGLE_SERVICES_JSON | base64 -di > ${{ github.workspace }}/app/google-services.json
     
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
