@@ -25,9 +25,15 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           path: main
+
+          
+      # Debug
+      - name: Debug - List files in the output directory
+        run: find ${{github.workspace}}/app/build/ -type d
+
 
       # Preparing the Keystore file from GitHub secrets
       - name: Keystore file provision
@@ -36,8 +42,10 @@ jobs:
           printf "%s" "${{ secrets.KEYSTORE_BASE64 }}" > ${{ github.workspace }}/keystore_base64
           base64 -d < ${{ github.workspace }}/keystore_base64 > ${{ github.workspace }}/keystore.jks
 
+      # Downloading the bundle file from GitHub
+      
       # Cloning appdome-api-python github repository
-      - name: Cloning appdome-api-python github repository
+      - name: Cloning appdome-api-python GitHub repository
         uses: actions/checkout@master
         with:
           repository: Appdome/appdome-api-python
