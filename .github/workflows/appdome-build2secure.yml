@@ -52,6 +52,14 @@ jobs:
       - name: Generate bundle *.aab file
         run: ./gradlew bundle
 
+      # Provide the Keystore file from GitHub secrets
+      - name: Keystore file provision
+        run: |
+          touch ${{ github.workspace }}/keystore_base64
+          touch ${{ github.workspace }}/keystore.jks
+          printf "%s" "${{ secrets.KEYSTORE_BASE64 }}" > ${{ github.workspace }}/keystore_base64
+          base64 -d < ${{ github.workspace }}/keystore_base64 > ${{ github.workspace }}/keystore.jks
+
       # Appdome Build-2secure action https://github.com/marketplace/actions/appdome-build-2secure
       # https://www.appdome.com/how-to/devsecops-automation-mobile-cicd/mobile-app-security-anti-fraud-cicd/use-appdomes-github-action/
       - name: Appdome build-2secure
@@ -61,7 +69,7 @@ jobs:
           FUSION_SET_ID: "${{ secrets.TEAM_ID }}"
           SIGN_OPTIONS: "SIGN_ON_APPDOME"
           APPDOME_API_TOKEN: "${{ secrets.APPDOME_API_TOKEN }}"
-          KEYSTORE_FILE: "${{ secrets.KEYSTORE_BASE64 }}"
+          KEYSTORE_FILE: "${{ github.workspace }}/keystore.jks"
           KEYSTORE_PASSWORD: "${{ secrets.KEYSTORE_PASSWORD }}"
           KEYSTORE_ALIAS: "${{ secrets.KEYSTORE_ALIAS }}"
           KEYSTORE_KEY_PASSWORD: "${{ secrets.KEYSTORE_KEY_PASSWORD }}"
