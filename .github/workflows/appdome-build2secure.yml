@@ -1,0 +1,77 @@
+# This is a basic workflow for integrating appdome-api-python with your github project
+# File location should be under .github/workflows/
+name: Appdome Workflow
+
+# Potential fix for Workflow does not contain permissions
+permissions:
+  contents: write
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  # push:
+  #   branches: [ "master" ]
+  # pull_request:
+  #   branches: [ "master" ]
+  workflow_dispatch:  # Allows you to run this workflow manually from the Actions tab
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # A demo job that builds an application to use with appdome
+  appdome:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+      
+      # Set up Java OpenJDK 21 with gradle cache          
+      - name: Azul Zulu OpenJDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'zulu'
+          cache: gradle
+
+      # Provision the Google Services Json
+      - name: Load Google Service file
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          touch ${{ github.workspace }}/app/google-services-base64
+          touch ${{ github.workspace }}/app/google-services.json
+          printf "%s" "${{ secrets.GOOGLE_SERVICES_JSON }}" > ${{ github.workspace }}/app/google-services-base64
+          base64 -d < ${{ github.workspace }}/app/google-services-base64 > ${{ github.workspace }}/app/google-services.json
+        
+      # Build bundle *.aab file with Gradle
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Gradle build
+        run: ./gradlew build
+      - name: Generate bundle *.aab file
+        run: ./gradlew bundle
+
+
+      # Preparing the Keystore file from GitHub secrets
+      - name: Keystore file provision
+        run: |
+          echo "Keystore file provision"
+          printf "%s" "${{ secrets.KEYSTORE_BASE64 }}" > ${{ github.workspace }}/keystore_base64
+          base64 -d < ${{ github.workspace }}/keystore_base64 > ${{ github.workspace }}/keystore.jks
+
+      # Appdome Build-2secure action https://github.com/marketplace/actions/appdome-build-2secure
+      - name: Appdome build-2secure
+        uses: Appdome/github_build-2secure@latest
+        with:
+          APPDOME_API_TOKEN: ${{secrets.APPDOME_API_TOKEN}} # Appdome API key
+          TEAM_ID: ${{secrets.TEAM_ID}} # Your team id in appdome
+          APP_FILE: ${{github.workspace}}/app/build/outputs/bundle/release/app-release.aab # Generated at #48
+          FUSION_SET_ID: ${{secrets.FUSION_SET_ID}} # Appdome Fusion Set_Id Android
+          SIGN_OPTIONS: "SIGN_ON_APPDOME"
+          BUILD_WITH_LOGS: true - Optional
+          KEYSTORE_FILE: ${{github.workspace}}/keystore.jks
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+          KEYSTORE_ALIAS: ${{secrets.KEYSTORE_ALIAS}}
+          KEYSTORE_KEY_PASSWORD: ${{secrets.KEYSTORE_KEY_PASSWORD}}
