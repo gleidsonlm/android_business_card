@@ -8,26 +8,15 @@ permissions:
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
-  # push:
-  #   branches: [ "master" ]
-  # pull_request:
-  #   branches: [ "master" ]
   workflow_dispatch:  # Allows you to run this workflow manually from the Actions tab
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # A demo job that builds an application to use with appdome
-  appdome:
-    # The type of runner that the job will run on
+  appdome: # This is the github.job ID
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
       
-      # Set up Java OpenJDK 21 with gradle cache          
       - name: Azul Zulu OpenJDK
         uses: actions/setup-java@v4
         with:
@@ -35,7 +24,6 @@ jobs:
           distribution: 'zulu'
           cache: gradle
 
-      # Provision the Google Services Json
       - name: Load Google Service file
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
@@ -45,14 +33,12 @@ jobs:
           printf "%s" "${{ secrets.GOOGLE_SERVICES_JSON }}" > ${{ github.workspace }}/app/google-services-base64
           base64 -d < ${{ github.workspace }}/app/google-services-base64 > ${{ github.workspace }}/app/google-services.json
         
-      # Build bundle *.aab file with Gradle
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Generate bundle *.aab file
         run: ./gradlew bundle
 
-      # Provide the Keystore file from GitHub secrets
       - name: Keystore file provision
         run: |
           touch ${{ github.workspace }}/keystore_base64
@@ -60,9 +46,8 @@ jobs:
           printf "%s" "${{ secrets.KEYSTORE_BASE64 }}" > ${{ github.workspace }}/keystore_base64
           base64 -d < ${{ github.workspace }}/keystore_base64 > ${{ github.workspace }}/keystore.jks
 
-      # Appdome Build-2secure action https://github.com/marketplace/actions/appdome-build-2secure
-      # https://www.appdome.com/how-to/devsecops-automation-mobile-cicd/mobile-app-security-anti-fraud-cicd/use-appdomes-github-action/
       - name: Appdome build-2secure
+        id: appdome_build # id for the step
         uses: Appdome/github_build-2secure@latest
         with:
           APP_FILE: "${{ github.workspace }}/app/build/outputs/bundle/release/app-release.aab"
@@ -73,3 +58,52 @@ jobs:
           KEYSTORE_PASSWORD: "${{ secrets.KEYSTORE_PASSWORD }}"
           KEYSTORE_ALIAS: "${{ secrets.KEYSTORE_ALIAS }}"
           KEYSTORE_KEY_PASSWORD: "${{ secrets.KEYSTORE_KEY_PASSWORD }}"
+
+      - name: Download Appdome Output Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ github.job }}_${{ github.run_number }}_Appdome_Outputs
+          # Artifact name pattern confirmed from Appdome action's action.yml
+          path: ./appdome_artifact_download
+          # Destination directory for the downloaded artifact
+
+      - name: Find Protected AAB File
+        id: find_aab
+        run: |
+          echo "Searching for .aab file in ./appdome_artifact_download..."
+          ls -R ./appdome_artifact_download # List contents for debugging
+          AAB_FILE=$(find ./appdome_artifact_download -type f -name '*.aab' -print -quit)
+          if [ -z "$AAB_FILE" ]; then
+            echo "::error::Protected .aab file not found in artifact!"
+            # To ensure the path is empty for the next step's condition
+            echo "aab_path=" >> $GITHUB_OUTPUT
+          else
+            echo "Found .aab file: $AAB_FILE"
+            echo "aab_path=$AAB_FILE" >> $GITHUB_OUTPUT
+          fi
+        shell: bash
+
+      - name: Get Current Date
+        id: current_date
+        run: echo "date=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Get Short SHA
+        id: short_sha
+        run: echo "sha=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Create GitHub Release and Upload AAB
+        if: steps.find_aab.outputs.aab_path != '' # Only run if AAB was found
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ steps.current_date.outputs.date }}-${{ steps.short_sha.outputs.sha }}
+          name: Protected Build ${{ steps.current_date.outputs.date }} (${{ steps.short_sha.outputs.sha }})
+          body: |
+            Automated release of Appdome-protected application.
+            Build Date: ${{ steps.current_date.outputs.date }}
+            Commit: ${{ github.sha }}
+            Short SHA: ${{ steps.short_sha.outputs.sha }}
+            Workflow Run ID: ${{ github.run_id }}
+          files: ${{ steps.find_aab.outputs.aab_path }}
+          # token: ${{ secrets.GITHUB_TOKEN }} # This is used by default
