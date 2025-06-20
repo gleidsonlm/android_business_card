@@ -8,8 +8,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+app/google-services.json
 app/appdome
 app/build
-app/debug
-app/google-services.json
 app/release
+app/keystore.jks
