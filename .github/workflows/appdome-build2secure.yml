@@ -1,6 +1,6 @@
 # This is a basic workflow for integrating appdome-api-python with your github project
 # File location should be under .github/workflows/
-name: Appdome Workflow
+name: Appdome build-2secure
 
 # Potential fix for Workflow does not contain permissions
 permissions:
