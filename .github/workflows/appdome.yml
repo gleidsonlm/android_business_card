@@ -26,9 +26,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
-        with:
-          path: gleidsonlm-actions-android-build-1
-
+      
       # Set up Java OpenJDK 21 with gradle cache          
       - name: Azul Zulu OpenJDK
         uses: actions/setup-java@v4
@@ -41,13 +39,20 @@ jobs:
       - name: Load Google Service file
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
-        run: echo "$GOOGLE_SERVICES_JSON" | base64 -d > ${{ github.workspace }}/app/google-services.json
-
+        run: |
+          touch ${{ github.workspace }}/app/google-services-base64
+          touch ${{ github.workspace }}/app/google-services.json
+          printf "%s" "${{ secrets.GOOGLE_SERVICES_JSON }}" > ${{ github.workspace }}/app/google-services-base64
+          base64 -d < ${{ github.workspace }}/app/google-services-base64 > ${{ github.workspace }}/app/google-services.json
+        
       # Build bundle *.aab file with Gradle
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Build bundle with Gradle
+      - name: Gradle build
+        run: ./gradlew build
+      - name: Generate bundle *.aab file
         run: ./gradlew bundle
+
 
       # Preparing the Keystore file from GitHub secrets
       - name: Keystore file provision
