@@ -188,8 +188,10 @@ private fun BusinessCardApp(businessCardViewModel: BusinessCardViewModel) {
             val context = LocalContext.current
             Button(
                 onClick = {
-                    if (userData != null) {
-                        val vCardString = VCardHelper.generateVCardString(userData)
+                    // Capture userData into a local variable for stable smart casting
+                    val currentData = userData
+                    if (currentData != null) {
+                        val vCardString = VCardHelper.generateVCardString(currentData)
                         val intent = Intent(Intent.ACTION_SEND).apply {
                             type = "text/x-vcard"
                             putExtra(Intent.EXTRA_TEXT, vCardString)
