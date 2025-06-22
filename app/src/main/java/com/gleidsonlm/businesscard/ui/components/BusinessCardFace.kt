@@ -12,10 +12,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import android.content.res.Configuration
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.gleidsonlm.businesscard.R
@@ -27,110 +29,158 @@ fun BusinessCardFace(
     userData: com.gleidsonlm.businesscard.ui.UserData?,
     qrCodeImageBitmap: ImageBitmap?
 ) {
-    Surface(modifier = Modifier.fillMaxSize()) { // Ensure the Surface takes full screen
-        Row(
-            modifier = Modifier
-                .fillMaxSize() // Row takes full screen
-                .padding(8.dp) // Optional: add some padding around the Row
-        ) {
-            // Left Column (25%)
-            BoxWithConstraints(
-                modifier = Modifier
-                    .weight(0.25f)
-                    .fillMaxHeight()
-                    // .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)) // Temporary background removed
-                    .padding(8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                val imageSize = maxWidth * 0.8f // Avatar takes 80% of column width
-                userData?.let {
-                    AsyncImage(
-                        model = it.avatarUri ?: R.drawable.avatar,
-                        contentDescription = stringResource(R.string.cont_desc_user_avatar),
-                        modifier = Modifier
-                            .size(imageSize)
-                            .clip(CircleShape),
-                        placeholder = painterResource(id = R.drawable.avatar),
-                        error = painterResource(id = R.drawable.avatar),
-                        contentScale = ContentScale.Crop
-                    )
-                } ?: Text("Avatar Area", style = MaterialTheme.typography.bodySmall)
-            }
+    val configuration = LocalConfiguration.current
 
-            // Middle Column (50% for QR Code)
+    Surface(modifier = Modifier.fillMaxSize()) {
+        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            // Landscape layout: Row with 3 columns
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp)
+            ) {
+                UserAvatarComposable(
+                    modifier = Modifier
+                        .weight(0.25f)
+                        .fillMaxHeight(),
+                    userData = userData
+                )
+                QRCodeComposable(
+                    modifier = Modifier
+                        .weight(0.5f)
+                        .fillMaxHeight(),
+                    qrCodeImageBitmap = qrCodeImageBitmap,
+                    userData = userData // Pass userData for loading state
+                )
+                UserDetailsComposable(
+                    modifier = Modifier
+                        .weight(0.25f)
+                        .fillMaxHeight(),
+                    userData = userData
+                )
+            }
+        } else {
+            // Portrait layout: Column with 3 sections
             Column(
                 modifier = Modifier
-                    .weight(0.5f)
-                    .fillMaxHeight()
-                    // .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)) // Temporary background removed
-                    .padding(8.dp), // Padding around the QR code image
+                    .fillMaxSize()
+                    .padding(16.dp), // More padding for portrait might be nice
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.SpaceAround // Distribute space
             ) {
-                if (qrCodeImageBitmap != null) {
-                    Image(
-                        bitmap = qrCodeImageBitmap,
-                        contentDescription = stringResource(R.string.qr_code_content_description),
-                        modifier = Modifier
-                            .fillMaxWidth() // Fill the width of the column (which is 50% of screen)
-                            .aspectRatio(1f) // Maintain square aspect ratio for QR code
-                            .padding(4.dp), // Inner padding for the QR code image itself
-                        contentScale = ContentScale.Fit // Scale QR code to fit
-                    )
-                } else if (userData != null) { // Show loader only if userdata exists but QR is not ready
-                    CircularProgressIndicator()
-                } else { // Placeholder if no data at all
-                    Text(stringResource(R.string.qr_code_placeholder_text), style = MaterialTheme.typography.headlineMedium)
-                }
+                UserAvatarComposable(
+                    modifier = Modifier.weight(0.25f), // Assign some weight or fixed size
+                    userData = userData,
+                    isPortrait = true
+                )
+                QRCodeComposable(
+                    modifier = Modifier.weight(0.5f), // QR code can take more space
+                    qrCodeImageBitmap = qrCodeImageBitmap,
+                    userData = userData,
+                    isPortrait = true
+                )
+                UserDetailsComposable(
+                    modifier = Modifier.weight(0.25f), // Assign some weight
+                    userData = userData,
+                    isPortrait = true
+                )
             }
+        }
+    }
+}
 
-            // Right Column (25%)
-            BoxWithConstraints(
+@Composable
+private fun UserAvatarComposable(
+    modifier: Modifier = Modifier,
+    userData: com.gleidsonlm.businesscard.ui.UserData?,
+    isPortrait: Boolean = false
+) {
+    BoxWithConstraints(
+        modifier = modifier.padding(8.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        // In portrait, size might be relative to screen width, not just column.
+        // For now, keep it relative to the Box's constraints.
+        val imageSize = if (isPortrait) (minOf(maxWidth, maxHeight) * 0.5f) else (maxWidth * 0.8f)
+
+        userData?.let {
+            AsyncImage(
+                model = it.avatarUri ?: R.drawable.avatar,
+                contentDescription = stringResource(R.string.cont_desc_user_avatar),
                 modifier = Modifier
-                    .weight(0.25f)
-                    .fillMaxHeight()
-                    // .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)) // Temporary background removed
-                    .padding(8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                val density = LocalDensity.current
-                val availableWidthDp = with(density) { constraints.maxWidth.toDp() }
+                    .size(imageSize)
+                    .clip(CircleShape),
+                placeholder = painterResource(id = R.drawable.avatar),
+                error = painterResource(id = R.drawable.avatar),
+                contentScale = ContentScale.Crop
+            )
+        } ?: Text("Avatar Area", style = MaterialTheme.typography.bodySmall)
+    }
+}
 
-                // Dynamically calculate font sizes based on available width in the column.
-                // Factors (e.g., /10f) and coerceAtMost values are chosen to balance readability and fit.
-                // These may require further tuning based on extensive device testing.
-                val fullNameFontSize = (availableWidthDp.value / 10f).coerceAtMost(20f).sp
-                val titleFontSize = (availableWidthDp.value / 12f).coerceAtMost(16f).sp
-                val companyFontSize = (availableWidthDp.value / 14f).coerceAtMost(14f).sp
+@Composable
+private fun QRCodeComposable(
+    modifier: Modifier = Modifier,
+    qrCodeImageBitmap: ImageBitmap?,
+    userData: com.gleidsonlm.businesscard.ui.UserData?,
+    isPortrait: Boolean = false
+) {
+    Column(
+        modifier = modifier.padding(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        if (qrCodeImageBitmap != null) {
+            Image(
+                bitmap = qrCodeImageBitmap,
+                contentDescription = stringResource(R.string.qr_code_content_description),
+                modifier = Modifier
+                    .fillMaxWidth(if (isPortrait) 0.7f else 1f) // QR takes 70% of width in portrait, full column width in landscape
+                    .aspectRatio(1f)
+                    .padding(4.dp),
+                contentScale = ContentScale.Fit
+            )
+        } else if (userData != null) {
+            CircularProgressIndicator()
+        } else {
+            Text(stringResource(R.string.qr_code_placeholder_text), style = MaterialTheme.typography.headlineMedium)
+        }
+    }
+}
 
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxWidth() // Column takes full width of BoxWithConstraints
-                ) {
-                    userData?.let {
-                        Text(
-                            it.fullName,
-                            style = MaterialTheme.typography.titleMedium.copy(fontSize = fullNameFontSize),
-                            maxLines = 2 // Allow wrapping up to 2 lines
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            it.title,
-                            style = MaterialTheme.typography.bodySmall.copy(fontSize = titleFontSize),
-                            maxLines = 2
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            it.company,
-                            style = MaterialTheme.typography.bodySmall.copy(fontSize = companyFontSize),
-                            maxLines = 2
-                        )
-                    } ?: Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-                        Text(stringResource(R.string.no_data_preview), style = MaterialTheme.typography.bodySmall)
-                        Text(stringResource(R.string.no_data_fill_form), style = MaterialTheme.typography.bodySmall, lineHeight = 16.sp)
-                    }
-                }
+@Composable
+private fun UserDetailsComposable(
+    modifier: Modifier = Modifier,
+    userData: com.gleidsonlm.businesscard.ui.UserData?,
+    isPortrait: Boolean = false
+) {
+    BoxWithConstraints(
+        modifier = modifier.padding(8.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        val density = LocalDensity.current
+        // For portrait, constraints.maxWidth might be screen width.
+        // For landscape, it's column width.
+        val referenceWidthDp = with(density) { constraints.maxWidth.toDp() }
+
+        val fullNameFontSize = (referenceWidthDp.value / (if (isPortrait) 15f else 10f)).coerceAtMost(if (isPortrait) 24f else 20f).sp
+        val titleFontSize = (referenceWidthDp.value / (if (isPortrait) 18f else 12f)).coerceAtMost(if (isPortrait) 20f else 16f).sp
+        val companyFontSize = (referenceWidthDp.value / (if (isPortrait) 20f else 14f)).coerceAtMost(if (isPortrait) 18f else 14f).sp
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            userData?.let {
+                Text(it.fullName, style = MaterialTheme.typography.titleMedium.copy(fontSize = fullNameFontSize), maxLines = 2)
+                Spacer(modifier = Modifier.height(if (isPortrait) 8.dp else 4.dp))
+                Text(it.title, style = MaterialTheme.typography.bodySmall.copy(fontSize = titleFontSize), maxLines = 2)
+                Spacer(modifier = Modifier.height(if (isPortrait) 8.dp else 4.dp))
+                Text(it.company, style = MaterialTheme.typography.bodySmall.copy(fontSize = companyFontSize), maxLines = 2)
+            } ?: Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.no_data_preview), style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.no_data_fill_form), style = MaterialTheme.typography.bodySmall, lineHeight = 16.sp)
             }
         }
     }

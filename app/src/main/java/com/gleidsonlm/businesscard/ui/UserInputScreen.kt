@@ -11,10 +11,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
@@ -95,10 +98,11 @@ fun UserInputScreen(viewModel: UserInputViewModel, onSaveCompleted: () -> Unit) 
         }
     }
 
-    Surface {
+    Surface(modifier = Modifier.fillMaxSize()) { // Ensure Surface takes full size for scroll to work within it
         Column(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize() // Column should also fill size to define scrollable area
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
             Box(
