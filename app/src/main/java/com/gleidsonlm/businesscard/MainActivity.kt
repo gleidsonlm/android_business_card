@@ -7,7 +7,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Call
@@ -25,7 +23,6 @@ import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -91,8 +88,6 @@ class MainActivity : ComponentActivity() {
 
             LaunchedEffect(Unit) {
                 businessCardViewModel.loadInitialData() // Call ViewModel's load
-                // Pass existing data from BusinessCardViewModel to UserInputViewModel if available
-                // This helps prefill UserInputScreen if data was loaded by BusinessCardViewModel
                 currentDataFromViewModel?.let {
                     userInputViewModel.loadExistingData(it)
                 }
@@ -102,17 +97,15 @@ class MainActivity : ComponentActivity() {
                 if (currentDataFromViewModel != null) {
                     showInputScreen = false
                 }
-                // Else, if it's null and app just started, showInputScreen remains true (initial state)
             }
 
             BusinessCardTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     if (showInputScreen) {
                         UserInputScreen(
-                            viewModel = userInputViewModel, // Pass UserInputViewModel
+                            viewModel = userInputViewModel,
                             onSaveCompleted = {
-                                // Tell BusinessCardViewModel to reload data, which should reflect the saved changes.
-                                businessCardViewModel.loadInitialData() // Refresh data via ViewModel
+                                businessCardViewModel.loadInitialData()
                                 showInputScreen = false
                                 Log.d("MainActivity", "Save operation completed by UserInputViewModel")
                             }
@@ -120,7 +113,7 @@ class MainActivity : ComponentActivity() {
                     } else {
                         Box(modifier = Modifier.fillMaxSize()) {
                             BusinessCardApp(
-                                businessCardViewModel = businessCardViewModel // Pass ViewModel
+                                businessCardViewModel = businessCardViewModel
                             )
                             Button(
                                 onClick = {
@@ -143,55 +136,34 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun BusinessCardApp(businessCardViewModel: BusinessCardViewModel) { // Accept ViewModel
+private fun BusinessCardApp(businessCardViewModel: BusinessCardViewModel) {
     val userData by businessCardViewModel.currentData.collectAsState()
     val qrCodeImageBitmap by businessCardViewModel.qrCodeImageBitmap.collectAsState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            // .padding(16.dp) // Padding is now handled by BusinessCardFace's Row
     ) {
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .padding(bottom = 8.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            if (qrCodeImageBitmap != null) {
-                Image(
-                    bitmap = qrCodeImageBitmap!!,
-                    contentDescription = stringResource(R.string.qr_code_content_description),
-                    modifier = Modifier
-                        .size(320.dp)
-                        .padding(
-                            top = 16.dp
-                        )
-                )
-            } else if (userData != null) {
-                CircularProgressIndicator()
-            } else {
-                Text(stringResource(R.string.qr_code_placeholder_text))
-            }
-        }
+        // The BusinessCardFace now takes the full screen and handles its own internal padding and layout.
+        // It also includes the QR code in its middle column.
+        BusinessCardFace(userData = userData, qrCodeImageBitmap = qrCodeImageBitmap)
 
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            BusinessCardFace(userData = userData)
-        }
+        // Links and Share button can be part of a bottom section if needed,
+        // or integrated differently depending on final design.
+        // For now, let's assume they are outside the three-column main face, perhaps below it.
+        // If they need to be in one of the columns, BusinessCardFace would need further modification.
 
+        // This Column is for elements below the BusinessCardFace (like links and share button)
+        // We might need to adjust weights or structure if BusinessCardFace is not meant to take all space by default.
+        // However, the issue implies BusinessCardFace is the main screen content.
+        // Let's put the links and share button in a separate Column that doesn't use weight from the top part.
         Column(
             modifier = Modifier
-                .weight(1f)
                 .fillMaxWidth()
-                .padding(top = 8.dp),
+                .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 16.dp), // Padding for this section
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Bottom // Arrange items at the bottom of this column
         ) {
             BusinessCardLink(
                 icon = Icons.Rounded.Call,
@@ -217,7 +189,7 @@ private fun BusinessCardApp(businessCardViewModel: BusinessCardViewModel) { // A
             Button(
                 onClick = {
                     if (userData != null) {
-                        val vCardString = VCardHelper.generateVCardString(userData!!) // userData is not null here
+                        val vCardString = VCardHelper.generateVCardString(userData)
                         val intent = Intent(Intent.ACTION_SEND).apply {
                             type = "text/x-vcard"
                             putExtra(Intent.EXTRA_TEXT, vCardString)
@@ -238,17 +210,17 @@ private fun BusinessCardApp(businessCardViewModel: BusinessCardViewModel) { // A
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Row( // Row is now inside the Button for layout purposes
+                Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(
                         horizontal = 16.dp,
                         vertical = 8.dp
-                    ) // Padding for content within button
+                    )
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Share,
                         contentDescription = null
-                    ) // Decorative icon
+                    )
                     Spacer(Modifier.width(8.dp))
                     Text(stringResource(R.string.share_vcard_button))
                 }
@@ -261,27 +233,25 @@ private fun BusinessCardApp(businessCardViewModel: BusinessCardViewModel) { // A
 @Composable
 fun BusinessCardPreview() {
     BusinessCardTheme {
-        UserData(
+        // For preview, directly call BusinessCardFace with sample data
+        // This avoids ViewModel complexities in Preview
+        val sampleUserData = UserData(
             fullName = "Sample Name",
             title = "Sample Title",
             phoneNumber = "1234567890",
             emailAddress = "sample@example.com",
             company = "Sample Company",
             website = "https.sample.com",
-            avatarUri = null
+            avatarUri = null // Or some placeholder painterResource
         )
-        // Preview will not work correctly with ViewModel by default.
-        // For preview, you might need to pass a mock ViewModel or use a different composable.
-        // For now, we comment out the direct ViewModel usage in preview or pass null if appropriate.
-        // A better approach for previews with ViewModels will be handled later if needed.
+        // For QR code, you might need a placeholder image or generate a fake ImageBitmap for preview
+        // For simplicity, passing null for qrCodeImageBitmap in preview.
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            // BusinessCardApp(businessCardViewModel = ???) // This preview will need adjustment
-            // For now, let's make a simplified preview that doesn't rely on the ViewModel
-            // Or pass a dummy UserData directly to a modified BusinessCardApp for preview purposes
-             Text("Preview not available with ViewModel integration yet.") // Placeholder
+            BusinessCardFace(userData = sampleUserData, qrCodeImageBitmap = null)
+            // You could also add a preview for the links section if desired
         }
     }
 }
