@@ -13,9 +13,12 @@ This application allows users to create, store, and share their personal busines
 *   **vCard Generation & Sharing:** Automatically generates a vCard from your information and allows easy sharing via Android's share functionality.
 *   **Integrated QR Code Display:** A QR code representing your vCard is displayed directly on the main card screen for quick scanning by others.
 *   **Redesigned Main Card UI:**
-    *   The main business card screen features a responsive three-column layout (25% - 50% - 25%).
-    *   The QR code is prominently centered in the middle column, occupying 50% of the screen width and scaling dynamically while maintaining a 1:1 aspect ratio.
-    *   User avatar and textual details (name, title, company) are placed in responsive side columns, with their content and font sizes adjusting gracefully to different screen dimensions.
+    *   The main business card screen features a responsive layout that adapts to screen orientation:
+        *   **Landscape:** Three-column layout (25% - 50% - 25%) for avatar, QR code, and details.
+        *   **Portrait:** Single-column layout, stacking avatar, QR code, and details vertically.
+    *   The QR code is prominently centered, occupying a significant portion of the screen width (50% in landscape, ~70% in portrait) and scaling dynamically while maintaining a 1:1 aspect ratio.
+    *   User avatar and textual details (name, title, company) are placed in responsive sections, with their content and font sizes adjusting gracefully to different screen dimensions and orientations.
+*   **Scrollable Input Form:** The user input screen for editing business card details is now scrollable, ensuring all fields are accessible even on smaller screens.
 *   **Customizable Avatar:**
     *   Choose an image from your phone's gallery.
     *   Take a new photo using the camera.
