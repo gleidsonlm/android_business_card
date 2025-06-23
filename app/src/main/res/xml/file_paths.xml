@@ -5,4 +5,5 @@
          Alternatively, files-path could be used for more permanent app files.
          The 'path' attribute specifies a subdirectory within the cache directory.
     -->
+    <cache-path name="my_vcards" path="vcards/" />
 </paths>
