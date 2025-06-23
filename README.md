@@ -10,7 +10,10 @@ This application allows users to create, store, and share their personal busines
 
 *   **Dynamic User Input:** Input and edit your name, title, contact details (phone, email, website), and company.
 *   **Persistent Storage:** Your information is saved locally using SharedPreferences, so it's there when you relaunch the app.
-*   **vCard Generation & Sharing:** Automatically generates a vCard from your information and allows easy sharing via Android's share functionality.
+*   **vCard Generation & Sharing:**
+    *   Automatically generates a vCard from your information.
+    *   Share your business card as a standard `.vcf` file using the dedicated share icon on the main card display. This allows others to easily import your contact details into their phone's contact list.
+    *   The app also previously included a button to share vCard data as plain text, which has been streamlined to focus on `.vcf` file sharing.
 *   **Integrated QR Code Display:** A QR code representing your vCard is displayed directly on the main card screen for quick scanning by others.
 *   **Redesigned Main Card UI:**
     *   The main business card screen features a responsive layout that adapts to screen orientation:

@@ -42,9 +42,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.gleidsonlm.businesscard.data.repository.UserRepositoryImpl
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import com.gleidsonlm.businesscard.ui.UserData
 import com.gleidsonlm.businesscard.ui.UserInputScreen
 import com.gleidsonlm.businesscard.ui.components.BusinessCardFace
@@ -117,20 +121,77 @@ class MainActivity : ComponentActivity() {
                             BusinessCardApp(
                                 businessCardViewModel = businessCardViewModel
                             )
-                            IconButton( // Changed Button to IconButton
-                                onClick = {
-                                    val currentCardData = businessCardViewModel.currentData.value
-                                    userInputViewModel.loadExistingData(currentCardData)
-                                    showInputScreen = true
-                                },
+                            // Row to hold Edit and Share buttons
+                            Row(
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)
-                                    .padding(16.dp)
+                                    .padding(16.dp),
+                                horizontalArrangement = Arrangement.End
                             ) {
-                                Icon( // Added Icon composable
-                                    imageVector = Icons.Rounded.Edit, // Set the icon
-                                    contentDescription = stringResource(R.string.edit) // Set content description
-                                )
+                                IconButton(
+                                    onClick = {
+                                        val currentCardData = businessCardViewModel.currentData.value
+                                        userInputViewModel.loadExistingData(currentCardData)
+                                        showInputScreen = true
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Edit,
+                                        contentDescription = stringResource(R.string.edit)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(8.dp)) // Space between Edit and Share
+                                IconButton(
+                                    onClick = {
+                                        val context = this@MainActivity
+                                        val currentData = businessCardViewModel.currentData.value
+                                        if (currentData != null) {
+                                            val vCardString = VCardHelper.generateVCardString(currentData)
+                                            try {
+                                                val vcfDir = File(context.cacheDir, "vcards")
+                                                if (!vcfDir.exists()) {
+                                                    vcfDir.mkdirs()
+                                                }
+                                                val vcfFile = File(vcfDir, "business_card.vcf")
+                                                FileOutputStream(vcfFile).use {
+                                                    it.write(vCardString.toByteArray())
+                                                }
+
+                                                val vcfUri = FileProvider.getUriForFile(
+                                                    context,
+                                                    "${context.packageName}.provider",
+                                                    vcfFile
+                                                )
+
+                                                val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                                    type = "text/x-vcard" // Standard MIME type for vCards
+                                                    putExtra(Intent.EXTRA_STREAM, vcfUri)
+                                                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                                }
+                                                context.startActivity(
+                                                    Intent.createChooser(
+                                                        shareIntent,
+                                                        context.getString(R.string.share_vcard)
+                                                    )
+                                                )
+                                            } catch (e: IOException) {
+                                                Log.e("MainActivityShare", "Error creating or sharing vCard file", e)
+                                                // Optionally show a Toast to the user
+                                            } catch (e: Exception) {
+                                                Log.e("MainActivityShare", "An unexpected error occurred during sharing", e)
+                                                // Optionally show a Toast to the user
+                                            }
+                                        } else {
+                                            Log.w("MainActivityShare", "User data is null, cannot share vCard.")
+                                            // Optionally show a Toast to the user
+                                        }
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Share,
+                                        contentDescription = stringResource(R.string.share_vcard)
+                                    )
+                                }
                             }
                         }
                     }
@@ -150,25 +211,14 @@ private fun BusinessCardApp(businessCardViewModel: BusinessCardViewModel) {
             .fillMaxSize()
             // .padding(16.dp) // Padding is now handled by BusinessCardFace's Row
     ) {
-        // The BusinessCardFace now takes the full screen and handles its own internal padding and layout.
-        // It also includes the QR code in its middle column.
         BusinessCardFace(userData = userData, qrCodeImageBitmap = qrCodeImageBitmap)
 
-        // Links and Share button can be part of a bottom section if needed,
-        // or integrated differently depending on final design.
-        // For now, let's assume they are outside the three-column main face, perhaps below it.
-        // If they need to be in one of the columns, BusinessCardFace would need further modification.
-
-        // This Column is for elements below the BusinessCardFace (like links and share button)
-        // We might need to adjust weights or structure if BusinessCardFace is not meant to take all space by default.
-        // However, the issue implies BusinessCardFace is the main screen content.
-        // Let's put the links and share button in a separate Column that doesn't use weight from the top part.
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 16.dp), // Padding for this section
+                .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Bottom // Arrange items at the bottom of this column
+            verticalArrangement = Arrangement.Bottom
         ) {
             BusinessCardLink(
                 icon = Icons.Rounded.Call,
@@ -190,10 +240,13 @@ private fun BusinessCardApp(businessCardViewModel: BusinessCardViewModel) {
             )
             Spacer(Modifier.height(16.dp))
 
+            // The existing share button functionality (sharing vCard as text) can be removed or kept as an alternative.
+            // For this issue, we are focusing on the new share button in the top bar.
+            // To avoid confusion, I will comment out the old button.
+            /*
             val context = LocalContext.current
             Button(
                 onClick = {
-                    // Capture userData into a local variable for stable smart casting
                     val currentData = userData
                     if (currentData != null) {
                         val vCardString = VCardHelper.generateVCardString(currentData)
@@ -232,6 +285,7 @@ private fun BusinessCardApp(businessCardViewModel: BusinessCardViewModel) {
                     Text(stringResource(R.string.share_vcard_button))
                 }
             }
+            */
         }
     }
 }
