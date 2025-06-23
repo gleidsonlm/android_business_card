@@ -22,8 +22,10 @@ import androidx.compose.material.icons.rounded.Call
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material.icons.rounded.Edit // Added for the edit icon
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton // Added for IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -115,7 +117,7 @@ class MainActivity : ComponentActivity() {
                             BusinessCardApp(
                                 businessCardViewModel = businessCardViewModel
                             )
-                            Button(
+                            IconButton( // Changed Button to IconButton
                                 onClick = {
                                     val currentCardData = businessCardViewModel.currentData.value
                                     userInputViewModel.loadExistingData(currentCardData)
@@ -125,7 +127,10 @@ class MainActivity : ComponentActivity() {
                                     .align(Alignment.TopEnd)
                                     .padding(16.dp)
                             ) {
-                                Text(stringResource(R.string.edit))
+                                Icon( // Added Icon composable
+                                    imageVector = Icons.Rounded.Edit, // Set the icon
+                                    contentDescription = stringResource(R.string.edit) // Set content description
+                                )
                             }
                         }
                     }
