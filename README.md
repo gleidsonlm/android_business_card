@@ -76,6 +76,10 @@ This project demonstrates an ability to integrate various components, manage app
 3.  Let Android Studio sync Gradle dependencies.
 4.  Build and run the app on an Android emulator or a physical device.
 
+## 🧪 Testing
+
+This project includes unit tests to ensure the reliability and correctness of its components. For detailed instructions on how to run these tests and configure your environment, please refer to the [TESTING.md](TESTING.md) file.
+
 ## 🔮 Future Enhancements (Post-Refactoring)
 
 *   **Complete MVVM Refactoring:** Fully implement ViewModels, Repository, and Hilt DI.
