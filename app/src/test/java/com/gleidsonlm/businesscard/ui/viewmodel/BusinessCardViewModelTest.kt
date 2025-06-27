@@ -7,6 +7,8 @@ import com.gleidsonlm.businesscard.data.repository.UserRepository
 import com.gleidsonlm.businesscard.ui.UserData
 import com.gleidsonlm.businesscard.util.VCardHelper
 import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.verify
@@ -74,9 +76,9 @@ class BusinessCardViewModelTest {
         assertNotNull(viewModel.qrCodeImageBitmap.value)
         assertEquals(mockComposeImageBitmap, viewModel.qrCodeImageBitmap.value)
 
-        verify(exactly = 1) { userRepository.loadUserData() }
-        verify(exactly = 1) { VCardHelper.generateVCardString(userData) }
-        verify(exactly = 1) { VCardHelper.generateQRCodeBitmap(dummyVCardString) }
+        coVerify(exactly = 1) { userRepository.loadUserData() }
+        coVerify(exactly = 1) { VCardHelper.generateVCardString(userData) }
+        coVerify(exactly = 1) { VCardHelper.generateQRCodeBitmap(dummyVCardString) }
         verify(exactly = 1) { mockAndroidBitmap.asImageBitmap() }
     }
 
@@ -93,9 +95,9 @@ class BusinessCardViewModelTest {
         assertNull(viewModel.currentData.value)
         assertNull(viewModel.qrCodeImageBitmap.value)
 
-        verify(exactly = 1) { userRepository.loadUserData() }
-        verify(exactly = 0) { VCardHelper.generateVCardString(any()) }
-        verify(exactly = 0) { VCardHelper.generateQRCodeBitmap(any()) }
+        coVerify(exactly = 1) { userRepository.loadUserData() }
+        coVerify(exactly = 0) { VCardHelper.generateVCardString(any()) }
+        coVerify(exactly = 0) { VCardHelper.generateQRCodeBitmap(any()) }
     }
 
     @Test
@@ -118,8 +120,8 @@ class BusinessCardViewModelTest {
 
         // Then
         assertEquals(mockImageBitmap, viewModel.qrCodeImageBitmap.value)
-        verify(exactly = 1) { VCardHelper.generateVCardString(userData) }
-        verify(exactly = 1) { VCardHelper.generateQRCodeBitmap(vCardString) }
+        coVerify(exactly = 1) { VCardHelper.generateVCardString(userData) }
+        coVerify(exactly = 1) { VCardHelper.generateQRCodeBitmap(vCardString) }
         verify(exactly = 1) { mockBitmap.asImageBitmap() } // Verify the conversion call
     }
 
@@ -137,8 +139,8 @@ class BusinessCardViewModelTest {
 
         // Then
         assertNull(viewModel.qrCodeImageBitmap.value)
-        verify(exactly = 1) { VCardHelper.generateVCardString(userData) }
-        verify(exactly = 1) { VCardHelper.generateQRCodeBitmap(vCardString) }
+        coVerify(exactly = 1) { VCardHelper.generateVCardString(userData) }
+        coVerify(exactly = 1) { VCardHelper.generateQRCodeBitmap(vCardString) }
     }
 
     @Test
@@ -154,8 +156,8 @@ class BusinessCardViewModelTest {
 
         // Then
         assertNull(viewModel.qrCodeImageBitmap.value)
-        verify(exactly = 1) { VCardHelper.generateVCardString(userData) }
-        verify(exactly = 0) { VCardHelper.generateQRCodeBitmap(any()) } // Should not be called
+        coVerify(exactly = 1) { VCardHelper.generateVCardString(userData) }
+        coVerify(exactly = 0) { VCardHelper.generateQRCodeBitmap(any()) } // Should not be called
     }
 
     @Test
@@ -174,7 +176,7 @@ class BusinessCardViewModelTest {
 
         // Assert
         assertNull(viewModel.qrCodeImageBitmap.value)
-        verify(exactly = 1) { VCardHelper.generateVCardString(userData) }
-        verify(exactly = 1) { VCardHelper.generateQRCodeBitmap(vCardString) }
+        coVerify(exactly = 1) { VCardHelper.generateVCardString(userData) }
+        coVerify(exactly = 1) { VCardHelper.generateQRCodeBitmap(vCardString) }
     }
 }
