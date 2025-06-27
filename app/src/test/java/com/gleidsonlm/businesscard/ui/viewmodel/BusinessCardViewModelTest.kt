@@ -111,7 +111,6 @@ class BusinessCardViewModelTest {
         // Manually mock the extension function as ImageBitmap
         every { mockBitmap.asImageBitmap() } returns mockImageBitmap
 
-
         // When
         viewModel.generateQrCode(userData)
         testDispatcher.scheduler.advanceUntilIdle()
