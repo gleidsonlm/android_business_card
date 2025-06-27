@@ -17,11 +17,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
+import kotlinx.coroutines.test.resetDefault
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.test.setDefault
-import kotlinx.coroutines.test.resetDefault
+import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -47,11 +47,10 @@ class BusinessCardViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        userRepository = mockk()
-        // Mock VCardHelper object before it's used by the ViewModel during QR code generation
-        mockkObject(VCardHelper)
-        mockkStatic("androidx.compose.ui.graphics.AndroidImageBitmapKt")
         Dispatchers.setDefault(testDispatcher)
+        mockkObject(VCardHelper)
+        mockkStatic("androidx.compose.ui.graphics.AndroidImageBitmapKt") // Corrected static mock target
+        userRepository = mockk()
         viewModel = BusinessCardViewModel(userRepository)
     }
 
