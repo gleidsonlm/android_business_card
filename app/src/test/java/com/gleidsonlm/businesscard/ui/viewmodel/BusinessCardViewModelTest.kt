@@ -63,7 +63,7 @@ class BusinessCardViewModelTest {
         coEvery { userRepository.loadUserData() } returns userData
         coEvery { VCardHelper.generateVCardString(userData) } returns dummyVCardString
         coEvery { VCardHelper.generateQRCodeBitmap(dummyVCardString) } returns mockAndroidBitmap
-        coEvery { mockAndroidBitmap.asImageBitmap() } returns mockComposeImageBitmap
+        every { mockAndroidBitmap.asImageBitmap() } returns mockComposeImageBitmap
 
         // When
         viewModel.loadInitialData()
@@ -109,8 +109,7 @@ class BusinessCardViewModelTest {
         coEvery { VCardHelper.generateVCardString(userData) } returns vCardString
         coEvery { VCardHelper.generateQRCodeBitmap(vCardString) } returns mockBitmap
         // Manually mock the extension function as ImageBitmap
-        coEvery { mockBitmap.asImageBitmap() } returns mockImageBitmap
-
+        every { mockBitmap.asImageBitmap() } returns mockImageBitmap
 
         // When
         viewModel.generateQrCode(userData)
