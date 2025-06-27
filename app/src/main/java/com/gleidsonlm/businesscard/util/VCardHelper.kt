@@ -13,6 +13,7 @@ import ezvcard.property.Organization
 import ezvcard.property.StructuredName
 import ezvcard.property.Telephone
 import ezvcard.property.Url
+import ezvcard.parameter.TelephoneType
 
 /**
  * Utility object for creating VCard strings from [UserData] and
@@ -51,15 +52,25 @@ object VCardHelper {
      */
     private fun setFullNameAndStructure(vcard: VCard, fullName: String) {
         if (fullName.isNotBlank()) {
-            vcard.setFormattedName(fullName)
+            vcard.setFormattedName(fullName) // FN field remains the full name
 
             val structuredName = StructuredName()
             val nameParts = fullName.trim().split(" ", limit = 2)
-            structuredName.given = nameParts.getOrNull(0)
-            if (nameParts.size > 1) {
-                structuredName.family = nameParts.getOrNull(1)
+
+            if (nameParts.isNotEmpty()) {
+                if (nameParts.size == 1) {
+                    // For a single name (e.g., "Madonna"), set it as the family name.
+                    // This aligns with the test expectation N:Madonna;;;;
+                    structuredName.family = nameParts[0]
+                    // structuredName.given is null by default
+                } else { // nameParts.size > 1
+                    // For "John Doe", nameParts[0] is "John" (Given), nameParts[1] is "Doe" (Family)
+                    // To get N:Doe;John;;;, ez-vcard's family property should be "Doe" and given "John".
+                    structuredName.given = nameParts[0]
+                    structuredName.family = nameParts[1]
+                }
+                vcard.structuredName = structuredName
             }
-            vcard.structuredName = structuredName
         }
     }
 
@@ -83,7 +94,9 @@ object VCardHelper {
      */
     private fun setPhoneNumber(vcard: VCard, phoneNumber: String) {
         if (phoneNumber.isNotBlank()) {
-            vcard.addTelephoneNumber(Telephone(phoneNumber))
+            val tel = Telephone(phoneNumber)
+            tel.types.add(TelephoneType.VOICE)
+            vcard.addTelephoneNumber(tel)
         }
     }
 

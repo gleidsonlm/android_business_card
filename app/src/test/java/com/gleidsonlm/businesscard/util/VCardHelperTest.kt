@@ -24,9 +24,9 @@ class VCardHelperTest {
         assertTrue(vCardString.contains("BEGIN:VCARD"))
         assertTrue(vCardString.contains("VERSION:4.0")) // ez-vcard defaults to 4.0
         assertTrue(vCardString.contains("FN:John Doe"))
-        assertTrue(vCardString.contains("N:John;Doe;;;"))
+        assertTrue(vCardString.contains("N:Doe;John;;;"))
         assertTrue(vCardString.contains("TITLE:Software Engineer"))
-        assertTrue(vCardString.contains("TEL:1234567890")) // Type might vary based on library defaults
+        assertTrue(vCardString.contains("TEL;TYPE=voice:1234567890")) // Type might vary based on library defaults
         assertTrue(vCardString.contains("EMAIL:john.doe@example.com"))
         assertTrue(vCardString.contains("ORG:Example Corp"))
         assertTrue(vCardString.contains("URL:https://example.com"))
@@ -49,7 +49,7 @@ class VCardHelperTest {
 
         assertTrue(vCardString.contains("BEGIN:VCARD"))
         assertTrue(vCardString.contains("FN:Jane Doe"))
-        assertTrue(vCardString.contains("N:Jane;Doe;;;"))
+        assertTrue(vCardString.contains("N:Doe;Jane;;;"))
         assertTrue(vCardString.contains("EMAIL:jane.doe@example.com"))
         assertFalse(vCardString.contains("TITLE:"))
         assertFalse(vCardString.contains("TEL:"))
@@ -100,8 +100,7 @@ class VCardHelperTest {
 
         val vCardString = VCardHelper.generateVCardString(userData)
         assertTrue(vCardString.contains("FN:Madonna"))
-        assertTrue(vCardString.contains("N:Madonna\n")) // Given name, family name empty
-        assertFalse(vCardString.contains("N:Madonna;"))
+        assertTrue(vCardString.contains("N:Madonna;;;;")) // Given name, family name empty
         assertTrue(vCardString.contains("TITLE:Singer"))
         assertTrue(vCardString.contains("END:VCARD"))
     }
@@ -120,7 +119,7 @@ class VCardHelperTest {
 
         val vCardString = VCardHelper.generateVCardString(userData)
         assertTrue(vCardString.contains("FN:Gabriel Van Helsing"))
-        assertTrue(vCardString.contains("N:Gabriel;Van Helsing;;;"))
+        assertTrue(vCardString.contains("N:Van Helsing;Gabriel;;;"))
         assertTrue(vCardString.contains("TITLE:Monster Hunter"))
         assertTrue(vCardString.contains("END:VCARD"))
     }

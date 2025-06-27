@@ -11,6 +11,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
+import io.mockk.mockkStatic
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,6 +19,8 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.test.setDefault
+import kotlinx.coroutines.test.resetDefault
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -46,12 +49,15 @@ class BusinessCardViewModelTest {
         userRepository = mockk()
         // Mock VCardHelper object before it's used by the ViewModel during QR code generation
         mockkObject(VCardHelper)
+        mockkStatic("androidx.compose.ui.graphics.AndroidImageBitmapKt")
+        Dispatchers.setDefault(testDispatcher)
         viewModel = BusinessCardViewModel(userRepository)
     }
 
     @After
     fun tearDown() {
         Dispatchers.resetMain()
+        Dispatchers.resetDefault()
     }
 
     @Test
@@ -65,7 +71,7 @@ class BusinessCardViewModelTest {
         coEvery { userRepository.loadUserData() } returns userData
         coEvery { VCardHelper.generateVCardString(userData) } returns dummyVCardString
         coEvery { VCardHelper.generateQRCodeBitmap(dummyVCardString) } returns mockAndroidBitmap
-        every { mockAndroidBitmap.asImageBitmap() } returns mockComposeImageBitmap
+        every { any<android.graphics.Bitmap>().asImageBitmap() } returns mockComposeImageBitmap
 
         // When
         viewModel.loadInitialData()
@@ -111,7 +117,7 @@ class BusinessCardViewModelTest {
         coEvery { VCardHelper.generateVCardString(userData) } returns vCardString
         coEvery { VCardHelper.generateQRCodeBitmap(vCardString) } returns mockBitmap
         // Manually mock the extension function as ImageBitmap
-        every { mockBitmap.asImageBitmap() } returns mockImageBitmap
+        every { any<android.graphics.Bitmap>().asImageBitmap() } returns mockImageBitmap
 
         // When
         viewModel.generateQrCode(userData)
