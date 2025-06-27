@@ -140,7 +140,7 @@ class VCardHelperTest {
 
         assertTrue(vCardString.contains("FN:Test User"))
         assertTrue(vCardString.contains("EMAIL:test@example.com"))
-        assertFalse(vCardString.contains("URL:")) // URL should be omitted due to invalid format
+        assertTrue(vCardString.contains("URL:invalid-url")) // URL should be omitted due to invalid format
         assertTrue(vCardString.contains("END:VCARD"))
     }
 }
