@@ -7,11 +7,14 @@ import androidx.lifecycle.viewModelScope
 import com.gleidsonlm.businesscard.data.repository.UserRepository
 import com.gleidsonlm.businesscard.ui.UserData
 import com.gleidsonlm.businesscard.util.toSha256
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class UserInputViewModel(private val userRepository: UserRepository) : ViewModel() {
+@HiltViewModel
+class UserInputViewModel @Inject constructor(private val userRepository: UserRepository) : ViewModel() {
 
     private val _fullName = MutableStateFlow("")
     val fullName: StateFlow<String> = _fullName

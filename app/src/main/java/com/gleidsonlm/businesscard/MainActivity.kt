@@ -43,12 +43,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import com.gleidsonlm.businesscard.data.repository.UserRepositoryImpl
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
 import com.gleidsonlm.businesscard.ui.UserData
 import com.gleidsonlm.businesscard.ui.UserInputScreen
 import com.gleidsonlm.businesscard.ui.components.BusinessCardFace
@@ -57,31 +52,16 @@ import com.gleidsonlm.businesscard.ui.theme.BusinessCardTheme
 import com.gleidsonlm.businesscard.ui.viewmodel.BusinessCardViewModel
 import com.gleidsonlm.businesscard.ui.viewmodel.UserInputViewModel
 import com.gleidsonlm.businesscard.util.VCardHelper
+import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
-// Simple ViewModel Factory for manual injection until Hilt is set up
-class AppViewModelFactory(private val userRepositoryImpl: UserRepositoryImpl) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(BusinessCardViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return BusinessCardViewModel(userRepositoryImpl) as T
-        }
-        if (modelClass.isAssignableFrom(UserInputViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return UserInputViewModel(userRepositoryImpl) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}
-
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val userRepository by lazy { UserRepositoryImpl(applicationContext) }
-    private val businessCardViewModel: BusinessCardViewModel by viewModels {
-        AppViewModelFactory(userRepository)
-    }
-    private val userInputViewModel: UserInputViewModel by viewModels {
-        AppViewModelFactory(userRepository)
-    }
+    private val businessCardViewModel: BusinessCardViewModel by viewModels()
+    private val userInputViewModel: UserInputViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
