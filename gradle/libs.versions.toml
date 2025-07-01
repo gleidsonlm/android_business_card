@@ -1,25 +1,25 @@
 [versions]
-agp = "8.9.3"
-coilCompose = "2.5.0"
-core = "3.5.0"
+agp = "8.11.0"
+coilCompose = "2.7.0"
+core = "3.5.3"
 ezVcardVersion = "0.12.1"
-gson = "2.10.1"
-kotlin = "2.1.20"
+gson = "2.13.1"
+kotlin = "2.2.0"
 ksp = "2.1.20-2.0.1"
-hilt = "2.51.1"
+hilt = "2.56.2"
 coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.9.1"
 activityCompose = "1.10.1"
-composeBom = "2025.06.00"
+composeBom = "2025.06.01"
 firebaseCrashlytics = "19.4.4"
-googleGmsGoogleServices = "4.4.2"
+googleGmsGoogleServices = "4.4.3"
 googleFirebaseCrashlytics = "3.0.4"
 androidxArchCoreTesting = "2.2.0"
-kotlinxCoroutinesTest = "1.8.0"
-mockk = "1.13.10"
+kotlinxCoroutinesTest = "1.10.2"
+mockk = "1.14.4"
 
 [libraries]
 androidx-arch-core-testing = { group = "androidx.arch.core", name = "core-testing", version.ref = "androidxArchCoreTesting" }
@@ -57,4 +57,3 @@ google-gms-google-services = { id = "com.google.gms.google-services", version.re
 google-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "googleFirebaseCrashlytics" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt-plugin = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
-
