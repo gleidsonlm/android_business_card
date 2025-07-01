@@ -53,7 +53,7 @@ This project was an opportunity to work with and learn several important Android
 *   **Architecture:**
     *   **MVVM (Model-View-ViewModel):** Currently being refactored towards this pattern.
     *   **Repository Pattern:** For abstracting data sources.
-    *   **Dependency Injection (Hilt):** Planned for managing dependencies.
+    *   **Dependency Injection (Hilt):** Integrated for managing dependencies, simplifying the creation and provision of objects throughout the application.
 *   **Android Core Components & APIs:**
     *   **Activity Result APIs:** (`rememberLauncherForActivityResult` with `PickVisualMedia`, `TakePicture` for image picking, camera, permissions).
     *   **Intents:** For sharing data (`ACTION_SEND`) and launching external activities (image picker, camera, web links).
@@ -82,7 +82,7 @@ This project includes unit tests to ensure the reliability and correctness of it
 
 ## 🔮 Future Enhancements (Post-Refactoring)
 
-*   **Complete MVVM Refactoring:** Fully implement ViewModels, Repository, and Hilt DI.
+*   **Complete MVVM Refactoring:** Fully implement ViewModels and Repository. Hilt DI is already integrated.
 *   **Jetpack DataStore:** Migrate from SharedPreferences to Jetpack DataStore for data persistence.
 *   **More Robust Image Persistence:** Copy selected gallery/camera images to app-specific storage.
 *   **Material You Theming:** Implement dynamic theming.
