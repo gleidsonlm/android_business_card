@@ -5,13 +5,9 @@ import com.gleidsonlm.businesscard.ui.UserData
 import com.google.gson.Gson
 import javax.inject.Inject
 
-// @Inject constructor will be added later with Hilt.
-// For now, Hilt is not set up, so Context needs to be passed manually or via a module (later step).
-// For Step 1.6 & 1.7, manual instantiation will use this constructor.
-// For Step 1.9 (Hilt module), this constructor will be used by Hilt.
 class UserRepositoryImpl @Inject constructor(private val context: Context) : UserRepository {
 
-    private val gson = Gson() // Gson can be instantiated here or injected later if needed
+    private val gson = Gson()
 
     companion object {
         private const val PREFS_NAME = "BusinessCardPrefs"

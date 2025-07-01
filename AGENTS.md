@@ -102,9 +102,9 @@ As the (acting) software architect for this application, facilitated by Google J
     *   **Direction:** Strictly adhere to unidirectional data flow. State should primarily be owned and managed by ViewModels. Composables should be as stateless as possible, receiving state and lambdas to communicate events upwards.
     *   **Rationale:** Simplifies debugging, makes UI behavior predictable, and aligns with Jetpack Compose best practices.
 
-4.  **Formalize Dependency Injection:**
-    *   **Direction:** Migrate from the current manual ViewModel factory to Hilt for dependency injection.
-    *   **Rationale:** Reduces boilerplate, improves scalability, and makes testing easier by allowing for easy swapping of dependencies (e.g., mock repositories in tests). This is noted in the README as a future enhancement and should be prioritized.
+4.  **Leverage Dependency Injection (Hilt):**
+    *   **Direction:** Hilt has been integrated, replacing the manual ViewModel factory. Continue to use Hilt for managing all dependencies. Ensure new components are Hilt-compatible (e.g., ViewModels annotated with `@HiltViewModel`, dependencies provided via modules or constructor injection).
+    *   **Rationale:** Reduces boilerplate, improves scalability, and makes testing easier by allowing for easy swapping of dependencies (e.g., mock repositories in tests).
 
 5.  **UI/UX Consistency & Responsiveness:**
     *   **Direction:** Maintain and enhance UI/UX consistency. Ensure the app adapts gracefully to various screen sizes and orientations. The recent UI redesign is a good step in this direction.
