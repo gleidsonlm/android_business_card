@@ -13,4 +13,6 @@
     <string name="no_data_fill_form">Please fill the form to see your card</string>
     <string name="edit">Edit</string>
     <string name="share_vcard">Share vCard</string>
+    <string name="threatevent_screen_title">Threat Event Details</string>
+    <string name="threatevent_default_message">A security event has occurred. No specific message was provided.</string>
 </resources>

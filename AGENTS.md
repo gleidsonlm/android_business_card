@@ -64,6 +64,11 @@ The application generally follows the **MVVM (Model-View-ViewModel)** architectu
 *   **Data Layer:**
     *   **`UserRepository.kt` (interface) & `UserRepositoryImpl.kt` (implementation):** Implements the Repository Pattern. Abstracts the data source (currently SharedPreferences with Gson for serialization) for user data. Responsible for loading and saving `UserData`.
     *   **`UserData.kt`:** A data class representing the user's business card information.
+*   **Threat Handling Components:**
+    *   **`ThreatEventData.kt`:** A Parcelable data class (`app/src/main/java/com/gleidsonlm/businesscard/model/ThreatEventData.kt`) used to encapsulate details of a threat event, primarily a message string.
+    *   **`ThreatEventActivity.kt`:** An Activity (`app/src/main/java/com/gleidsonlm/businesscard/ThreatEventActivity.kt`) dedicated to displaying threat event messages to the user. It receives `ThreatEventData` via an Intent.
+    *   **`ThreatEventScreen.kt`:** A Composable function (`app/src/main/java/com/gleidsonlm/businesscard/ui/ThreatEventScreen.kt`) that defines the UI for displaying the threat event message within `ThreatEventActivity`.
+    *   *Note:* A new `ThreatEventActivity` has been implemented to display detailed messages for Appdome Threat-Events, providing users with immediate feedback on security alerts.
 *   **Utility:**
     *   **`VCardHelper.kt`:** Utility object for generating vCard strings and QR code bitmaps (using `ez-vcard` and `zxing`).
     *   **`FileProvider`:** Configured to allow sharing URIs for camera photos.
