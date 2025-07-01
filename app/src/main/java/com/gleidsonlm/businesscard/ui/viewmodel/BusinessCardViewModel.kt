@@ -5,15 +5,18 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.gleidsonlm.businesscard.ui.UserData
 import com.gleidsonlm.businesscard.data.repository.UserRepository
+import com.gleidsonlm.businesscard.ui.UserData
 import com.gleidsonlm.businesscard.util.VCardHelper
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class BusinessCardViewModel(private val userRepository: UserRepository) : ViewModel() {
+@HiltViewModel
+class BusinessCardViewModel @Inject constructor(private val userRepository: UserRepository) : ViewModel() {
 
     private val _currentData = MutableStateFlow<UserData?>(null)
     val currentData: StateFlow<UserData?> = _currentData
