@@ -41,24 +41,6 @@
                  this might change and an intent filter would be needed.
                  For now, keeping it internal. -->
         </activity>
-
-        <!-- Appdome Threat Event Receiver -->
-        <!-- This receiver listens for specific threat events broadcast by Appdome. -->
-        <!-- It is set to exported="false" as it should only be triggered by broadcasts from within the same app process (Appdome SDK). -->
-        <receiver
-            android:name=".ThreatEventReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="RootedDevice" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="DeveloperOptionsEnabled" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="DebuggerThreatDetected" />
-            </intent-filter>
-        </receiver>
-
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
