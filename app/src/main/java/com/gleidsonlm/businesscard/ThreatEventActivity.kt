@@ -48,7 +48,6 @@ class ThreatEventActivity : ComponentActivity() {
         // No longer need a local request code constant, will use PermissionUtils.REQUEST_CODE_INSTALL_PACKAGES
     }
 
-    private var showPermissionDeniedDialog by mutableStateOf(false)
     // initialPermissionCheckDone helps manage the UI state, especially for Android O+
     // when the user is sent to system settings and then returns.
     /** State variable to control the visibility of the permission denied dialog. */
