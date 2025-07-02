@@ -92,7 +92,7 @@ The application is configured to handle the following Appdome Threat-Events:
 ### Flow of Event Handling
 
 1.  **Detection:** When Appdome's security mechanisms detect one of the configured threat events, it broadcasts an Intent within the application.
-2.  **Reception:** The `ThreatEventReceiver`, a statically registered `BroadcastReceiver`, listens for these specific broadcast actions.
+2.  **Reception:** The `ThreatEventReceiver`, programmatically registered in `BusinessCardApplication.kt`, listens for these specific broadcast actions.
 3.  **Data Extraction:** Upon catching a broadcast, the `ThreatEventReceiver` extracts detailed meta-data associated with the threat event from the Intent. This data is encapsulated in a `ThreatEventData` object.
 4.  **Display:** The receiver then launches the `ThreatEventActivity`, passing the populated `ThreatEventData` object to it.
 5.  **User Notification:** `ThreatEventActivity` uses `ThreatEventScreenContent` (a Jetpack Compose UI) to display all the received meta-data, informing the user about the nature of the detected threat.
@@ -105,8 +105,8 @@ This implementation adheres to Appdome's guidelines for in-app handling and noti
 *   **`ThreatEventActivity.kt`**: An `Activity` responsible for displaying the detailed information of a detected threat event to the user.
 *   **`ThreatEventScreen.kt`**: Contains the Jetpack Compose UI (`ThreatEventScreenContent`) that renders the details from the `ThreatEventData` object.
 *   **`ThreatEventData.kt`**: A Kotlin data class (`Parcelable`) that models all the meta-data fields associated with a threat event.
-*   **`BusinessCardApplication.kt`**: The custom `Application` class where the `ThreatEventReceiver` is programmatically registered (in addition to its static registration in the manifest for specific intents).
-*   **`AndroidManifest.xml`**: Declares the `ThreatEventReceiver` with appropriate intent filters, allowing it to receive broadcasts for `RootedDevice`, `DeveloperOptionsEnabled`, and `DebuggerThreatDetected`.
+*   **`BusinessCardApplication.kt`**: The custom `Application` class where the `ThreatEventReceiver` is instantiated and programmatically registered on application startup. It registers intent filters for `RootedDevice`, `DeveloperOptionsEnabled`, and `DebuggerThreatDetected`.
+*   **`AndroidManifest.xml`**: Contains necessary application permissions (like `REQUEST_INSTALL_PACKAGES`). The `ThreatEventReceiver` itself is no longer declared here as it's registered programmatically.
 
 ## Permissions Required
 
