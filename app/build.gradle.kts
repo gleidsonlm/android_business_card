@@ -6,11 +6,12 @@ plugins {
     alias(libs.plugins.google.firebase.crashlytics)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.hilt.plugin)
+    alias(libs.plugins.kotlin.parcelize)
 }
 
 android {
     namespace = "com.gleidsonlm.businesscard"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.gleidsonlm.businesscard"
