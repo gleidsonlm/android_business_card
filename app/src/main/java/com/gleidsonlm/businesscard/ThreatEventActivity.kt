@@ -26,10 +26,24 @@ import com.gleidsonlm.businesscard.ui.theme.BusinessCardTheme
 import com.gleidsonlm.businesscard.util.PermissionUtils
 import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * An [Activity] that displays details of a detected security threat event.
+ *
+ * This activity is launched by [ThreatEventReceiver] when a threat event is received.
+ * It expects a [ThreatEventData] object to be passed via an Intent extra
+ * with the key [EXTRA_THREAT_EVENT_DATA]. The [ThreatEventData] now contains
+ * a comprehensive set of details about the threat, which are then rendered by
+ * [ThreatEventScreenContent].
+ *
+ * The activity also contains logic to handle "Install unknown apps" permission,
+ * which might be relevant for specific threat response actions not directly
+ * covered by displaying event details.
+ */
 @AndroidEntryPoint
 class ThreatEventActivity : ComponentActivity() {
 
     companion object {
+        /** Key for the Parcelable [ThreatEventData] object passed in the Intent. */
         const val EXTRA_THREAT_EVENT_DATA = "com.gleidsonlm.businesscard.EXTRA_THREAT_EVENT_DATA"
         // No longer need a local request code constant, will use PermissionUtils.REQUEST_CODE_INSTALL_PACKAGES
     }
@@ -37,9 +51,28 @@ class ThreatEventActivity : ComponentActivity() {
     private var showPermissionDeniedDialog by mutableStateOf(false)
     // initialPermissionCheckDone helps manage the UI state, especially for Android O+
     // when the user is sent to system settings and then returns.
+    /** State variable to control the visibility of the permission denied dialog. */
+    private var showPermissionDeniedDialog by mutableStateOf(false)
+    /**
+     * Tracks if the initial check and request for `REQUEST_INSTALL_PACKAGES` permission
+     * (especially for navigation to system settings on Android O+) has been performed.
+     * This helps manage UI state correctly when the user returns from system settings.
+     */
     private var initialPermissionCheckDone by mutableStateOf(false)
 
 
+    /**
+     * Initializes the activity, sets up the edge-to-edge display, retrieves threat event data,
+     * manages the "Install unknown apps" permission flow, and sets the Composable content.
+     *
+     * The permission flow is complex due to `ACTION_MANAGE_UNKNOWN_APP_SOURCES` taking the user
+     * out of the app. The state `initialPermissionCheckDone` and `showPermissionDeniedDialog`
+     * manage the UI during this process.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously being
+     * shut down, this Bundle contains the data it most recently supplied in [onSaveInstanceState].
+     * Otherwise, it is null.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -107,10 +140,22 @@ class ThreatEventActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Checks if the current Android version is Oreo (API 26) or above.
+     * @return True if Android version is O or higher, false otherwise.
+     */
     private fun isAndroidOAndAbove(): Boolean {
         return android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O
     }
 
+    /**
+     * A Composable function that displays an AlertDialog informing the user that the
+     * "Install unknown apps" permission was denied. It provides an option to go to app settings
+     * to grant the permission or dismiss the dialog.
+     *
+     * @param onDismiss Lambda function to be invoked when the dialog is dismissed, either by
+     *                  tapping the dismiss button or by an external event.
+     */
     @Composable
     private fun PermissionDeniedDialog(onDismiss: () -> Unit) {
         val context = LocalContext.current
@@ -147,6 +192,19 @@ class ThreatEventActivity : ComponentActivity() {
         )
     }
 
+    /**
+     * Handles the result from an activity started for a result.
+     *
+     * This method is marked as [Deprecated] for general Activity results, but it is used here
+     * specifically to handle the outcome of the user returning from the system settings screen
+     * for "Install unknown apps" permission (`ACTION_MANAGE_UNKNOWN_APP_SOURCES`), which is
+     * initiated via `startActivityForResult` indirectly by `PermissionUtils.requestInstallPackagesPermission`.
+     *
+     * @param requestCode The integer request code originally supplied to startActivityForResult(),
+     *                    allowing you to identify who this result came from.
+     * @param resultCode The integer result code returned by the child activity through its setResult().
+     * @param data An Intent, which can return result data to the caller (various data can be attached to Intent "extras").
+     */
     @Deprecated("This method is called only for activity results, not permission results from runtime dialogs.")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data) // Call super method

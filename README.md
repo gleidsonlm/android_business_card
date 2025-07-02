@@ -80,26 +80,33 @@ This project demonstrates an ability to integrate various components, manage app
 
 This project includes unit tests to ensure the reliability and correctness of its components. For detailed instructions on how to run these tests and configure your environment, please refer to the [TESTING.md](TESTING.md) file.
 
-## Appdome Threat-Event Display
+## Appdome Threat Event Handling
 
-A new screen (`ThreatEventActivity`) has been added to the application to display messages received from Appdome Threat-Events. This activity is designed to be launched when a security event, which Appdome is configured to react to by sending an Intent, occurs.
+This feature is designed to detect and respond to specific security threats identified by the Appdome security platform integrated into the application. It provides immediate feedback to the user regarding potential security issues on their device.
 
-This provides immediate feedback to the user regarding potential security threats detected by Appdome on their device.
+The application is configured to handle the following Appdome Threat-Events:
+*   `RootedDevice`: Detects if the device is rooted.
+*   `DeveloperOptionsEnabled`: Detects if developer options are enabled on the device.
+*   `DebuggerThreatDetected`: Detects if a debugger is attached to the application.
 
-### Launching ThreatEventActivity
+### Flow of Event Handling
 
-The `ThreatEventActivity` is launched with data passed via an Intent extra. Here's an example of how it can be triggered:
+1.  **Detection:** When Appdome's security mechanisms detect one of the configured threat events, it broadcasts an Intent within the application.
+2.  **Reception:** The `ThreatEventReceiver`, a statically registered `BroadcastReceiver`, listens for these specific broadcast actions.
+3.  **Data Extraction:** Upon catching a broadcast, the `ThreatEventReceiver` extracts detailed meta-data associated with the threat event from the Intent. This data is encapsulated in a `ThreatEventData` object.
+4.  **Display:** The receiver then launches the `ThreatEventActivity`, passing the populated `ThreatEventData` object to it.
+5.  **User Notification:** `ThreatEventActivity` uses `ThreatEventScreenContent` (a Jetpack Compose UI) to display all the received meta-data, informing the user about the nature of the detected threat.
 
-```kotlin
-// Example of how to launch ThreatEventActivity:
-val context: Context = // ... obtain context (e.g., from within an Activity or BroadcastReceiver)
-val intent = Intent(context, ThreatEventActivity::class.java).apply {
-    putExtra(ThreatEventActivity.EXTRA_THREAT_EVENT_DATA, ThreatEventData(message = "Suspicious activity detected."))
-}
-context.startActivity(intent)
-```
+This implementation adheres to Appdome's guidelines for in-app handling and notification of security threat events.
 
-The actual triggering by Appdome's runtime would typically involve an Appdome-configured BroadcastReceiver within the app. This receiver would listen for specific Intents sent by Appdome, extract the relevant threat event details from the Intent, and then use those details to populate `ThreatEventData` and launch `ThreatEventActivity`. For specific details on how Appdome sends these events and what data they contain, please refer to the official Appdome documentation.
+### Key Components
+
+*   **`ThreatEventReceiver.kt`**: A `BroadcastReceiver` that listens for Appdome threat event broadcasts. It processes these events, extracts data, and initiates the display of threat information.
+*   **`ThreatEventActivity.kt`**: An `Activity` responsible for displaying the detailed information of a detected threat event to the user.
+*   **`ThreatEventScreen.kt`**: Contains the Jetpack Compose UI (`ThreatEventScreenContent`) that renders the details from the `ThreatEventData` object.
+*   **`ThreatEventData.kt`**: A Kotlin data class (`Parcelable`) that models all the meta-data fields associated with a threat event.
+*   **`BusinessCardApplication.kt`**: The custom `Application` class where the `ThreatEventReceiver` is programmatically registered (in addition to its static registration in the manifest for specific intents).
+*   **`AndroidManifest.xml`**: Declares the `ThreatEventReceiver` with appropriate intent filters, allowing it to receive broadcasts for `RootedDevice`, `DeveloperOptionsEnabled`, and `DebuggerThreatDetected`.
 
 ## Permissions Required
 
