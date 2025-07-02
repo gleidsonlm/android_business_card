@@ -80,6 +80,27 @@ This project demonstrates an ability to integrate various components, manage app
 
 This project includes unit tests to ensure the reliability and correctness of its components. For detailed instructions on how to run these tests and configure your environment, please refer to the [TESTING.md](TESTING.md) file.
 
+## Appdome Threat-Event Display
+
+A new screen (`ThreatEventActivity`) has been added to the application to display messages received from Appdome Threat-Events. This activity is designed to be launched when a security event, which Appdome is configured to react to by sending an Intent, occurs.
+
+This provides immediate feedback to the user regarding potential security threats detected by Appdome on their device.
+
+### Launching ThreatEventActivity
+
+The `ThreatEventActivity` is launched with data passed via an Intent extra. Here's an example of how it can be triggered:
+
+```kotlin
+// Example of how to launch ThreatEventActivity:
+val context: Context = // ... obtain context (e.g., from within an Activity or BroadcastReceiver)
+val intent = Intent(context, ThreatEventActivity::class.java).apply {
+    putExtra(ThreatEventActivity.EXTRA_THREAT_EVENT_DATA, ThreatEventData(message = "Suspicious activity detected."))
+}
+context.startActivity(intent)
+```
+
+The actual triggering by Appdome's runtime would typically involve an Appdome-configured BroadcastReceiver within the app. This receiver would listen for specific Intents sent by Appdome, extract the relevant threat event details from the Intent, and then use those details to populate `ThreatEventData` and launch `ThreatEventActivity`. For specific details on how Appdome sends these events and what data they contain, please refer to the official Appdome documentation.
+
 ## 🔮 Future Enhancements (Post-Refactoring)
 
 *   **Complete MVVM Refactoring:** Fully implement ViewModels and Repository. Hilt DI is already integrated.

@@ -30,6 +30,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ThreatEventActivity"
+            android:exported="false"
+            android:label="@string/threatevent_screen_title"
+            android:theme="@style/Theme.BusinessCard">
+            <!-- Set exported to false as it's likely launched internally.
+                 If it needs to be launched by Appdome directly via an intent filter,
+                 this might change and an intent filter would be needed.
+                 For now, keeping it internal. -->
+        </activity>
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
