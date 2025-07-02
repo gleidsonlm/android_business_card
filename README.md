@@ -101,6 +101,12 @@ context.startActivity(intent)
 
 The actual triggering by Appdome's runtime would typically involve an Appdome-configured BroadcastReceiver within the app. This receiver would listen for specific Intents sent by Appdome, extract the relevant threat event details from the Intent, and then use those details to populate `ThreatEventData` and launch `ThreatEventActivity`. For specific details on how Appdome sends these events and what data they contain, please refer to the official Appdome documentation.
 
+## Permissions Required
+
+The application requires the `android.permission.REQUEST_INSTALL_PACKAGES` permission for the following reason:
+
+*   **Threat Event Functionality**: This permission is necessary for the proper functioning of the threat-event screen. Certain threat events may require the ability to initiate package installations or updates as a response or mitigation step. Without this permission, the threat-event screen may not load correctly or some of its features related to package management might be disabled. Users will be prompted to grant this permission if it's not already available.
+
 ## 🔮 Future Enhancements (Post-Refactoring)
 
 *   **Complete MVVM Refactoring:** Fully implement ViewModels and Repository. Hilt DI is already integrated.
