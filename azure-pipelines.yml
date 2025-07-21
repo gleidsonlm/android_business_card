@@ -1,0 +1,66 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'macos-15'
+
+variables:
+  buildDir: '$(Build.SourcesDirectory)'
+  appDir: '$(buildDir)/app'
+  outputAab: '$(appDir)/build/outputs/bundle/$(buildVariant)/app-$(buildVariant).aab'
+
+steps:
+
+# Download google-services.json securely
+- task: DownloadSecureFile@1
+  name: DownloadGoogleServices
+  inputs:
+    secureFile: 'google-services.json'
+
+# Copy google-services.json to app directory
+- script: |
+    cp $(DownloadGoogleServices.secureFilePath) $(appDir)/google-services.json
+  displayName: 'Copy google-services.json to app directory'
+
+
+# Build the Android App Bundle (AAB)
+- task: Gradle@4 
+  displayName: 'Assemble Android App Bundle (Debug)'
+  inputs:
+    gradleWrapperFile: 'gradlew'
+    tasks: 'clean :app:bundle'
+    publishJUnitResults: false
+    javaHomeOption: 'JDKVersion'
+    gradleOptions: '-Xmx4096m'
+    workingDirectory: '$(buildDir)'
+
+# Publish the AAB as a pipeline artifact
+- task: PublishPipelineArtifact@1
+  displayName: 'Publish AAB as Artifact'
+  inputs:
+    targetPath: '$(outputAab)'
+    artifact: 'android-business-card-aab'
+    publishLocation: 'pipeline'
+
+# Download keystore file from Secure Files
+- task: DownloadSecureFile@1
+  name: DownloadKeystore
+  inputs:
+    secureFile: '$(APPDOME_SIGN_KEYSTORE)'
+
+# Protect and sign the AAB with Appdome Build-2Secure
+
+- task: Build-2Secure@0
+  displayName: 'Protect and Sign AAB with Appdome'
+  inputs:
+    Platform: 'android'
+    Sign: 'signOnAppdome'
+    App: '$(outputAab)'
+    Token: '$(APPDOME_API_TOKEN)'
+    FusionSetId: '$(APPDOME_FUSION_SET_ID)'
+    OutputFileName: 'android-business-card-protected'
+    KeystoreFile: '$(DownloadKeystore.secureFilePath)'
+    KeystorePass: '$(APPDOME_SIGN_KEYSTORE_PASSWORD)'
+    KeystoreAlias: '$(APPDOME_SIGN_KEY_ALIAS)'
+    KeyPass: '$(APPDOME_SIGN_KEY_PASSWORD)'
+    BuildWithLogs: true
