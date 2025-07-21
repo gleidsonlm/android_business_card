@@ -1,32 +1,33 @@
-# Android
-# Build your Android project with Gradle.
-# Add steps that test, sign, and distribute the APK, save build artifacts, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/android
-
 trigger:
 - main
-
-
 
 pool:
   vmImage: 'macos-latest'
 
+variables:
+  buildDir: '$(Build.SourcesDirectory)'
+  appDir: '$(buildDir)/app'
+
 steps:
 
+# Download google-services.json securely
 - task: DownloadSecureFile@1
   name: DownloadGoogleServices
   inputs:
     secureFile: 'google-services.json'
 
+# Copy the file to the correct location
 - script: |
-    cp $(DownloadGoogleServices.secureFilePath) $(Build.SourcesDirectory)/app/google-services.json
+    cp $(DownloadGoogleServices.secureFilePath) $(appDir)/google-services.json
   displayName: 'Copy google-services.json to app directory'
 
+# Build the Android App Bundle (AAB)
 - task: Gradle@2
+  displayName: 'Assemble Android App Bundle (Debug)'
   inputs:
-    workingDirectory: ''
+    workingDirectory: '$(buildDir)'
     gradleWrapperFile: 'gradlew'
-    gradleOptions: '-Xmx3072m'
-    publishJUnitResults: false
+    gradleOptions: '-Xmx4096m'
+    publishJUnitResults: true
     testResultsFiles: '**/TEST-*.xml'
-    tasks: 'assembleDebug'
+    tasks: 'clean :app:bundleDebug'
