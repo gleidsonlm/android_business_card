@@ -7,19 +7,30 @@ import android.content.IntentFilter
 import android.os.Build
 import android.util.Log
 import com.gleidsonlm.businesscard.model.ThreatEventData
+import com.gleidsonlm.businesscard.security.BotDefenseHandler
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * A [BroadcastReceiver] that listens for Appdome threat events.
  *
  * This receiver is responsible for registering to specific threat event broadcasts,
  * extracting threat data from the received intents, and launching the
- * [ThreatEventActivity] to display the information.
+ * [ThreatEventActivity] to display the information. It also handles MobileBotDefenseCheck
+ * events through the [BotDefenseHandler].
  *
  * @property applicationContext The context of the application.
  */
 class ThreatEventReceiver(private val applicationContext: Context) {
 
     private val TAG = "Appdome ThreatEvent"
+
+    // Bot defense handler will be injected when available
+    private var botDefenseHandler: BotDefenseHandler? = null
+
+    fun setBotDefenseHandler(handler: BotDefenseHandler) {
+        this.botDefenseHandler = handler
+    }
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -31,13 +42,15 @@ class ThreatEventReceiver(private val applicationContext: Context) {
      * Registers the broadcast receiver for a predefined set of Appdome threat events.
      *
      * This method should be called, for example, in the `onCreate` method of the Application class.
-     * It registers for events like "RootedDevice", "DeveloperOptionsEnabled", and "DebuggerThreatDetected".
+     * It registers for events like "RootedDevice", "DeveloperOptionsEnabled", "DebuggerThreatDetected",
+     * and "MobileBotDefenseCheck".
      */
     fun register() {
         // Register for specific threat events
         registerReceiverWithFlags(IntentFilter("RootedDevice"))
         registerReceiverWithFlags(IntentFilter("DeveloperOptionsEnabled"))
         registerReceiverWithFlags(IntentFilter("DebuggerThreatDetected"))
+        registerReceiverWithFlags(IntentFilter("MobileBotDefenseCheck"))
         // Add other threat events if needed, ensuring they match the documentation and requirements
     }
 
@@ -82,7 +95,8 @@ class ThreatEventReceiver(private val applicationContext: Context) {
      *
      * This method is called when a registered threat event is broadcast. It extracts
      * all relevant threat metadata from the intent, populates a [ThreatEventData] object,
-     * and then starts the [ThreatEventActivity] to display the details of the threat.
+     * and then either handles it with the [BotDefenseHandler] for MobileBotDefenseCheck events
+     * or starts the [ThreatEventActivity] to display the details of other threats.
      *
      * @param intent The intent containing the threat event data.
      */
@@ -130,7 +144,76 @@ class ThreatEventReceiver(private val applicationContext: Context) {
 
         Log.d(TAG, "Populated ThreatEventData: $threatEventData")
 
-        // Route to ThreatEventActivity
+        // Handle MobileBotDefenseCheck events with bot defense handler
+        if (action == "MobileBotDefenseCheck") {
+            handleBotDefenseCheck(threatEventData)
+        } else {
+            // Route other threat events to ThreatEventActivity
+            routeToThreatEventActivity(threatEventData, action)
+        }
+    }
+
+    /**
+     * Handles MobileBotDefenseCheck events using the BotDefenseHandler.
+     */
+    private fun handleBotDefenseCheck(threatEventData: ThreatEventData) {
+        Log.i(TAG, "Handling MobileBotDefenseCheck event")
+        
+        botDefenseHandler?.handleBotDetectionEvent(
+            threatEventData = threatEventData,
+            callback = object : com.gleidsonlm.businesscard.security.BotDetectionCallback {
+                override fun onDetectionComplete(action: com.gleidsonlm.businesscard.security.BotResponseAction) {
+                    Log.i(TAG, "Bot detection completed with action: $action")
+                    // Optionally route to ThreatEventActivity for user display
+                    if (action != com.gleidsonlm.businesscard.security.BotResponseAction.LOG_ONLY) {
+                        routeToThreatEventActivity(threatEventData, "MobileBotDefenseCheck")
+                    }
+                }
+
+                override fun onUserNotificationRequired(message: String) {
+                    Log.i(TAG, "User notification required: $message")
+                    // Create enhanced threat event data with user message
+                    val enhancedData = threatEventData.copy(
+                        message = message,
+                        defaultMessage = message
+                    )
+                    routeToThreatEventActivity(enhancedData, "MobileBotDefenseCheck")
+                }
+
+                override fun onSecurityCountermeasuresTriggered() {
+                    Log.w(TAG, "Security countermeasures triggered for bot defense")
+                    routeToThreatEventActivity(threatEventData, "MobileBotDefenseCheck")
+                }
+
+                override fun onCriticalThreatDetected(threatEventData: ThreatEventData) {
+                    Log.e(TAG, "Critical bot threat detected")
+                    val criticalData = threatEventData.copy(
+                        message = "CRITICAL: Automated threat detected. App security measures activated.",
+                        defaultMessage = "Critical security event - potential bot activity detected."
+                    )
+                    routeToThreatEventActivity(criticalData, "MobileBotDefenseCheck")
+                }
+
+                override fun onError(exception: Exception) {
+                    Log.e(TAG, "Error in bot detection", exception)
+                    val errorData = threatEventData.copy(
+                        message = "Bot detection error: ${exception.message}",
+                        internalError = exception.message
+                    )
+                    routeToThreatEventActivity(errorData, "MobileBotDefenseCheck")
+                }
+            }
+        ) ?: run {
+            // Fallback if bot defense handler is not available
+            Log.w(TAG, "BotDefenseHandler not available, routing to ThreatEventActivity")
+            routeToThreatEventActivity(threatEventData, "MobileBotDefenseCheck")
+        }
+    }
+
+    /**
+     * Routes threat events to the ThreatEventActivity for display.
+     */
+    private fun routeToThreatEventActivity(threatEventData: ThreatEventData, action: String) {
         val activityIntent = Intent(applicationContext, ThreatEventActivity::class.java).apply {
             putExtra(ThreatEventActivity.EXTRA_THREAT_EVENT_DATA, threatEventData)
             // FLAG_ACTIVITY_NEW_TASK is required when starting an activity from a context outside of an activity (like a BroadcastReceiver).
