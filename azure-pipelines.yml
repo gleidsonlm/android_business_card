@@ -59,7 +59,7 @@ steps:
     Token: '$(APPDOME_API_TOKEN)'
     FusionSetId: '$(APPDOME_FUSION_SET_ID)'
     OutputFileName: 'android-business-card-protected'
-    KeystoreFile: 'AppdomeLabs-Android-Signing.jks'
+    KeystoreFile: '$(DownloadKeystore.secureFilePath)'
     KeystorePass: '$(APPDOME_SIGN_KEYSTORE_PASSWORD)'
     KeystoreAlias: '$(APPDOME_SIGN_KEY_ALIAS)'
     KeyPass: '$(APPDOME_SIGN_KEY_PASSWORD)'
