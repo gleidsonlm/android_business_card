@@ -34,14 +34,6 @@ steps:
     gradleOptions: '-Xmx4096m'
     workingDirectory: '$(buildDir)'
 
-# Publish the AAB as a pipeline artifact
-- task: PublishPipelineArtifact@1
-  displayName: 'Publish AAB as Artifact'
-  inputs:
-    targetPath: '$(outputAab)'
-    artifact: 'android-business-card-aab'
-    publishLocation: 'pipeline'
-
 # Download keystore file from Secure Files
 - task: DownloadSecureFile@1
   name: DownloadKeystore
@@ -64,3 +56,11 @@ steps:
     KeystoreAlias: '$(APPDOME_SIGN_KEY_ALIAS)'
     KeyPass: '$(APPDOME_SIGN_KEY_PASSWORD)'
     BuildWithLogs: true
+
+# Publish the AAB as a pipeline artifact
+- task: PublishPipelineArtifact@1
+  displayName: 'Publish AAB as Artifact'
+  inputs:
+    targetPath: '$(Build.ArtifactStagingDirectory)'
+    artifact: 'android_business_card_protected'
+    publishLocation: 'pipeline'
