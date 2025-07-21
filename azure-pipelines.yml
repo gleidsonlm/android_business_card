@@ -2,7 +2,7 @@ trigger:
 - main
 
 pool:
-  vmImage: 'macos-latest'
+  vmImage: 'macos-15'
 
 variables:
   buildDir: '$(Build.SourcesDirectory)'
@@ -21,8 +21,9 @@ steps:
     cp $(DownloadGoogleServices.secureFilePath) $(appDir)/google-services.json
   displayName: 'Copy google-services.json to app directory'
 
+
 # Build the Android App Bundle (AAB)
-- task: Gradle@2
+- task: Gradle@3
   displayName: 'Assemble Android App Bundle (Debug)'
   inputs:
     workingDirectory: '$(buildDir)'
@@ -31,3 +32,11 @@ steps:
     publishJUnitResults: true
     testResultsFiles: '**/TEST-*.xml'
     tasks: 'clean :app:bundleDebug'
+
+# Publish the AAB as a pipeline artifact
+- task: PublishPipelineArtifact@1
+  displayName: 'Publish AAB as Artifact'
+  inputs:
+    targetPath: '$(outputAab)'
+    artifact: 'android-business-card-aab'
+    publishLocation: 'pipeline'
