@@ -7,7 +7,7 @@ pool:
 variables:
   buildDir: '$(Build.SourcesDirectory)'
   appDir: '$(buildDir)/app'
-  outputAab: '$(appDir)/build/outputs/bundle/debug/app-debug.aab'
+  outputAab: '$(appDir)/build/outputs/bundle/$(buildVariant)/app-$(buildVariant).aab'
 
 steps:
 
@@ -24,15 +24,15 @@ steps:
 
 
 # Build the Android App Bundle (AAB)
-- task: Gradle@3
+- task: Gradle@4 
   displayName: 'Assemble Android App Bundle (Debug)'
   inputs:
-    workingDirectory: '$(buildDir)'
     gradleWrapperFile: 'gradlew'
+    tasks: 'clean :app:bundle'
+    publishJUnitResults: false
+    javaHomeOption: 'JDKVersion'
     gradleOptions: '-Xmx4096m'
-    publishJUnitResults: true
-    testResultsFiles: '**/TEST-*.xml'
-    tasks: 'clean :app:bundleDebug'
+    workingDirectory: '$(buildDir)'
 
 # Publish the AAB as a pipeline artifact
 - task: PublishPipelineArtifact@1
@@ -46,7 +46,7 @@ steps:
 - task: DownloadSecureFile@1
   name: DownloadKeystore
   inputs:
-    secureFile: 'AppdomeLabs-Android-Signing.jks'
+    secureFile: '$(APPDOME_SIGN_KEYSTORE)'
 
 # Protect and sign the AAB with Appdome Build-2Secure
 
