@@ -2,7 +2,7 @@ trigger:
 - main
 
 pool:
-  vmImage: 'macos-15'
+  vmImage: 'ubuntu-latest'
 
 variables:
   buildDir: '$(Build.SourcesDirectory)'
