@@ -8,6 +8,7 @@ import android.os.Build
 import android.util.Log
 import com.gleidsonlm.businesscard.model.ThreatEventData
 import com.gleidsonlm.businesscard.security.BotDefenseHandler
+import com.gleidsonlm.businesscard.security.GoogleEmulatorHandler
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -27,9 +28,14 @@ class ThreatEventReceiver(private val applicationContext: Context) {
 
     // Bot defense handler will be injected when available
     private var botDefenseHandler: BotDefenseHandler? = null
+    private var googleEmulatorHandler: GoogleEmulatorHandler? = null
 
     fun setBotDefenseHandler(handler: BotDefenseHandler) {
         this.botDefenseHandler = handler
+    }
+
+    fun setGoogleEmulatorHandler(handler: GoogleEmulatorHandler) {
+        this.googleEmulatorHandler = handler
     }
 
     private val receiver = object : BroadcastReceiver() {
@@ -48,6 +54,7 @@ class ThreatEventReceiver(private val applicationContext: Context) {
     fun register() {
         // Register for specific threat events
         registerReceiverWithFlags(IntentFilter("RootedDevice"))
+        registerReceiverWithFlags(IntentFilter("GoogleEmulatorDetected"))
         registerReceiverWithFlags(IntentFilter("DeveloperOptionsEnabled"))
         registerReceiverWithFlags(IntentFilter("DebuggerThreatDetected"))
         registerReceiverWithFlags(IntentFilter("MobileBotDefenseCheck"))
@@ -144,12 +151,16 @@ class ThreatEventReceiver(private val applicationContext: Context) {
 
         Log.d(TAG, "Populated ThreatEventData: $threatEventData")
 
-        // Handle MobileBotDefenseCheck events with bot defense handler
-        if (action == "MobileBotDefenseCheck") {
-            handleBotDefenseCheck(threatEventData)
-        } else {
-            // Route other threat events to ThreatEventActivity
-            routeToThreatEventActivity(threatEventData, action)
+        when (action) {
+            "MobileBotDefenseCheck" -> handleBotDefenseCheck(threatEventData)
+            "GoogleEmulatorDetected" -> {
+                googleEmulatorHandler?.handleGoogleEmulatorEvent(threatEventData)
+                routeToThreatEventActivity(threatEventData, action)
+            }
+            else -> {
+                // Route other threat events to ThreatEventActivity
+                routeToThreatEventActivity(threatEventData, action)
+            }
         }
     }
 
