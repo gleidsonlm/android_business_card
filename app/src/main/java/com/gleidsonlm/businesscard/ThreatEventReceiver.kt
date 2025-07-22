@@ -7,8 +7,12 @@ import android.content.IntentFilter
 import android.os.Build
 import android.util.Log
 import com.gleidsonlm.businesscard.model.ThreatEventData
+import com.gleidsonlm.businesscard.security.AppIntegrityErrorHandler
+import com.gleidsonlm.businesscard.security.AppIsDebuggableHandler
 import com.gleidsonlm.businesscard.security.BotDefenseHandler
+import com.gleidsonlm.businesscard.security.EmulatorFoundHandler
 import com.gleidsonlm.businesscard.security.GoogleEmulatorHandler
+import com.gleidsonlm.businesscard.security.UnknownSourcesEnabledHandler
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -29,6 +33,10 @@ class ThreatEventReceiver(private val applicationContext: Context) {
     // Bot defense handler will be injected when available
     private var botDefenseHandler: BotDefenseHandler? = null
     private var googleEmulatorHandler: GoogleEmulatorHandler? = null
+    private var unknownSourcesEnabledHandler: UnknownSourcesEnabledHandler? = null
+    private var appIsDebuggableHandler: AppIsDebuggableHandler? = null
+    private var appIntegrityErrorHandler: AppIntegrityErrorHandler? = null
+    private var emulatorFoundHandler: EmulatorFoundHandler? = null
 
     fun setBotDefenseHandler(handler: BotDefenseHandler) {
         this.botDefenseHandler = handler
@@ -36,6 +44,22 @@ class ThreatEventReceiver(private val applicationContext: Context) {
 
     fun setGoogleEmulatorHandler(handler: GoogleEmulatorHandler) {
         this.googleEmulatorHandler = handler
+    }
+
+    fun setUnknownSourcesEnabledHandler(handler: UnknownSourcesEnabledHandler) {
+        this.unknownSourcesEnabledHandler = handler
+    }
+
+    fun setAppIsDebuggableHandler(handler: AppIsDebuggableHandler) {
+        this.appIsDebuggableHandler = handler
+    }
+
+    fun setAppIntegrityErrorHandler(handler: AppIntegrityErrorHandler) {
+        this.appIntegrityErrorHandler = handler
+    }
+
+    fun setEmulatorFoundHandler(handler: EmulatorFoundHandler) {
+        this.emulatorFoundHandler = handler
     }
 
     private val receiver = object : BroadcastReceiver() {
@@ -58,6 +82,10 @@ class ThreatEventReceiver(private val applicationContext: Context) {
         registerReceiverWithFlags(IntentFilter("DeveloperOptionsEnabled"))
         registerReceiverWithFlags(IntentFilter("DebuggerThreatDetected"))
         registerReceiverWithFlags(IntentFilter("MobileBotDefenseCheck"))
+        registerReceiverWithFlags(IntentFilter("UnknownSourcesEnabled"))
+        registerReceiverWithFlags(IntentFilter("AppIsDebuggable"))
+        registerReceiverWithFlags(IntentFilter("AppIntegrityError"))
+        registerReceiverWithFlags(IntentFilter("EmulatorFound"))
         // Add other threat events if needed, ensuring they match the documentation and requirements
     }
 
@@ -155,6 +183,22 @@ class ThreatEventReceiver(private val applicationContext: Context) {
             "MobileBotDefenseCheck" -> handleBotDefenseCheck(threatEventData)
             "GoogleEmulatorDetected" -> {
                 googleEmulatorHandler?.handleGoogleEmulatorEvent(threatEventData)
+                routeToThreatEventActivity(threatEventData, action)
+            }
+            "UnknownSourcesEnabled" -> {
+                unknownSourcesEnabledHandler?.handleUnknownSourcesEnabledEvent(threatEventData)
+                routeToThreatEventActivity(threatEventData, action)
+            }
+            "AppIsDebuggable" -> {
+                appIsDebuggableHandler?.handleAppIsDebuggableEvent(threatEventData)
+                routeToThreatEventActivity(threatEventData, action)
+            }
+            "AppIntegrityError" -> {
+                appIntegrityErrorHandler?.handleAppIntegrityErrorEvent(threatEventData)
+                routeToThreatEventActivity(threatEventData, action)
+            }
+            "EmulatorFound" -> {
+                emulatorFoundHandler?.handleEmulatorFoundEvent(threatEventData)
                 routeToThreatEventActivity(threatEventData, action)
             }
             else -> {
