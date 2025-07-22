@@ -86,6 +86,7 @@ This feature is designed to detect and respond to specific security threats iden
 
 The application is configured to handle the following Appdome Threat-Events:
 *   `RootedDevice`: Detects if the device is rooted.
+*   `GoogleEmulatorDetected`: Detects if the application is running on a Google emulator.
 *   `DeveloperOptionsEnabled`: Detects if developer options are enabled on the device.
 *   `DebuggerThreatDetected`: Detects if a debugger is attached to the application.
 
@@ -105,7 +106,7 @@ This implementation adheres to Appdome's guidelines for in-app handling and noti
 *   **`ThreatEventActivity.kt`**: An `Activity` responsible for displaying the detailed information of a detected threat event to the user.
 *   **`ThreatEventScreen.kt`**: Contains the Jetpack Compose UI (`ThreatEventScreenContent`) that renders the details from the `ThreatEventData` object.
 *   **`ThreatEventData.kt`**: A Kotlin data class (`Parcelable`) that models all the meta-data fields associated with a threat event.
-*   **`BusinessCardApplication.kt`**: The custom `Application` class where the `ThreatEventReceiver` is instantiated and programmatically registered on application startup. It registers intent filters for `RootedDevice`, `DeveloperOptionsEnabled`, and `DebuggerThreatDetected`.
+*   **`BusinessCardApplication.kt`**: The custom `Application` class where the `ThreatEventReceiver` is instantiated and programmatically registered on application startup. It registers intent filters for `RootedDevice`, `GoogleEmulatorDetected`, `DeveloperOptionsEnabled`, and `DebuggerThreatDetected`.
 *   **`AndroidManifest.xml`**: Contains necessary application permissions (like `REQUEST_INSTALL_PACKAGES`). The `ThreatEventReceiver` itself is no longer declared here as it's registered programmatically.
 
 ## Permissions Required

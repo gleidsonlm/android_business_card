@@ -2,6 +2,7 @@ package com.gleidsonlm.businesscard
 
 import android.app.Application
 import com.gleidsonlm.businesscard.security.BotDefenseHandler
+import com.gleidsonlm.businesscard.security.GoogleEmulatorHandler
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -20,6 +21,9 @@ class BusinessCardApplication : Application() {
     @Inject
     lateinit var botDefenseHandler: BotDefenseHandler
 
+    @Inject
+    lateinit var googleEmulatorHandler: GoogleEmulatorHandler
+
     /**
      * Called when the application is starting, before any other application objects have been created.
      *
@@ -33,6 +37,7 @@ class BusinessCardApplication : Application() {
         // This allows the application to listen for security events detected by Appdome.
         threatEventsReceiver = ThreatEventReceiver(applicationContext)
         threatEventsReceiver.setBotDefenseHandler(botDefenseHandler)
+        threatEventsReceiver.setGoogleEmulatorHandler(googleEmulatorHandler)
         threatEventsReceiver.register()
         
         // Note: Unregistration of an Application-level receiver is typically handled by Android
