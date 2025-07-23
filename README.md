@@ -130,3 +130,14 @@ The application requires the `android.permission.REQUEST_INSTALL_PACKAGES` permi
 ---
 
 *This project, including this README, is being developed with the significant assistance of Jules, an AI software engineering agent from Google.*
+
+## Appdome Threat-Events Integration
+
+This application is integrated with Appdome Threat-Events to provide runtime threat detection and response. The following threat events are currently handled:
+
+- **UnknownSourcesEnabled**: Detects if "Unknown Sources" are enabled on the device.
+- **AppIsDebuggable**: Detects if the app is running in debuggable mode.
+- **AppIntegrityError**: Detects app integrity errors (tampering, repackaging, etc).
+- **EmulatorFound**: Detects if the app is running in an emulator environment.
+
+When a threat is detected, the application will display a screen with the details of the threat.

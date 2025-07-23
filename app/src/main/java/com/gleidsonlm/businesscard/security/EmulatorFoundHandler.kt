@@ -6,14 +6,14 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GoogleEmulatorHandler @Inject constructor() {
+class EmulatorFoundHandler @Inject constructor() {
 
     companion object {
-        private const val TAG = "GoogleEmulatorHandler"
+        private const val TAG = "EmulatorFound"
     }
 
-    fun handleGoogleEmulatorEvent(threatEventData: ThreatEventData) {
+    fun handleEmulatorFoundEvent(threatEventData: ThreatEventData) {
         val sanitizedData = "id=${threatEventData.deviceID}, type=${threatEventData.threatCode}"
-        Log.w(TAG, "Google Emulator Detected: $sanitizedData")
+        Log.w(TAG, "Emulator Found Detected: $sanitizedData")
     }
 }

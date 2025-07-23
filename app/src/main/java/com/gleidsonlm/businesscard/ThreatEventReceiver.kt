@@ -8,9 +8,6 @@ import android.os.Build
 import android.util.Log
 import com.gleidsonlm.businesscard.model.ThreatEventData
 import com.gleidsonlm.businesscard.security.BotDefenseHandler
-import com.gleidsonlm.businesscard.security.GoogleEmulatorHandler
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 /**
  * A [BroadcastReceiver] that listens for Appdome threat events.
@@ -26,16 +23,15 @@ class ThreatEventReceiver(private val applicationContext: Context) {
 
     private val TAG = "Appdome ThreatEvent"
 
-    // Bot defense handler will be injected when available
     private var botDefenseHandler: BotDefenseHandler? = null
-    private var googleEmulatorHandler: GoogleEmulatorHandler? = null
+    private val threatHandlers = mutableMapOf<String, (ThreatEventData) -> Unit>()
 
     fun setBotDefenseHandler(handler: BotDefenseHandler) {
         this.botDefenseHandler = handler
     }
 
-    fun setGoogleEmulatorHandler(handler: GoogleEmulatorHandler) {
-        this.googleEmulatorHandler = handler
+    fun addHandler(action: String, handler: (ThreatEventData) -> Unit) {
+        threatHandlers[action] = handler
     }
 
     private val receiver = object : BroadcastReceiver() {
@@ -58,6 +54,10 @@ class ThreatEventReceiver(private val applicationContext: Context) {
         registerReceiverWithFlags(IntentFilter("DeveloperOptionsEnabled"))
         registerReceiverWithFlags(IntentFilter("DebuggerThreatDetected"))
         registerReceiverWithFlags(IntentFilter("MobileBotDefenseCheck"))
+        registerReceiverWithFlags(IntentFilter("UnknownSourcesEnabled"))
+        registerReceiverWithFlags(IntentFilter("AppIsDebuggable"))
+        registerReceiverWithFlags(IntentFilter("AppIntegrityError"))
+        registerReceiverWithFlags(IntentFilter("EmulatorFound"))
         // Add other threat events if needed, ensuring they match the documentation and requirements
     }
 
@@ -111,14 +111,10 @@ class ThreatEventReceiver(private val applicationContext: Context) {
         val action = intent.action ?: return
         Log.i(TAG, "Threat event received: $action")
 
-        // Extract all data based on the Appdome documentation's "Meta-Data for Mobile Application Threat-Events"
-        // and the updated ThreatEventData model.
-        // The string keys used in intent.getStringExtra(key) MUST exactly match the keys
-        // sent by Appdome in the threat event Intent. Consult Appdome documentation for the definitive list of keys.
         val threatEventData = ThreatEventData(
             defaultMessage = intent.getStringExtra("defaultMessage"),
             internalError = intent.getStringExtra("internalError"),
-            timeStamp = intent.getStringExtra("timestamp"), // Example: "timestamp" might be "timeStamp" or "eventTimestamp" in Appdome docs.
+            timeStamp = intent.getStringExtra("timestamp"),
             deviceID = intent.getStringExtra("deviceID"),
             deviceModel = intent.getStringExtra("deviceModel"),
             osVersion = intent.getStringExtra("osVersion"),
@@ -131,7 +127,7 @@ class ThreatEventReceiver(private val applicationContext: Context) {
             buildHost = intent.getStringExtra("buildHost"),
             buildUser = intent.getStringExtra("buildUser"),
             sdkVersion = intent.getStringExtra("sdkVersion"),
-            message = intent.getStringExtra("message"), // Specific message for this event, if any
+            message = intent.getStringExtra("message"),
             failSafeEnforce = intent.getStringExtra("failSafeEnforce"),
             externalID = intent.getStringExtra("externalID"),
             reasonCode = intent.getStringExtra("reasonCode"),
@@ -153,12 +149,8 @@ class ThreatEventReceiver(private val applicationContext: Context) {
 
         when (action) {
             "MobileBotDefenseCheck" -> handleBotDefenseCheck(threatEventData)
-            "GoogleEmulatorDetected" -> {
-                googleEmulatorHandler?.handleGoogleEmulatorEvent(threatEventData)
-                routeToThreatEventActivity(threatEventData, action)
-            }
             else -> {
-                // Route other threat events to ThreatEventActivity
+                threatHandlers[action]?.invoke(threatEventData)
                 routeToThreatEventActivity(threatEventData, action)
             }
         }
