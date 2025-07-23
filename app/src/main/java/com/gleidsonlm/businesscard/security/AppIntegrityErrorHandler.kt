@@ -13,7 +13,7 @@ class AppIntegrityErrorHandler @Inject constructor() {
     }
 
     fun handleAppIntegrityErrorEvent(threatEventData: ThreatEventData) {
-       val sanitizedData = "id=${threatEventData.deviceID}, type=${threatEventData.threatCode}"
-       Log.w(TAG, "App Integrity Error Detected: $sanitizedData")
+        val sanitizedData = "id=${threatEventData.deviceID}, type=${threatEventData.threatCode}"
+        Log.w(TAG, "App Integrity Error Detected: $sanitizedData")
     }
 }

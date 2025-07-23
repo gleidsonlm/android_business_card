@@ -13,7 +13,7 @@ class EmulatorFoundHandler @Inject constructor() {
     }
 
     fun handleEmulatorFoundEvent(threatEventData: ThreatEventData) {
-       val sanitizedData = "id=${threatEventData.deviceID}, type=${threatEventData.threatCode}"
-       Log.w(TAG, "Emulator Found Detected: $sanitizedData")
+        val sanitizedData = "id=${threatEventData.deviceID}, type=${threatEventData.threatCode}"
+        Log.w(TAG, "Emulator Found Detected: $sanitizedData")
     }
 }

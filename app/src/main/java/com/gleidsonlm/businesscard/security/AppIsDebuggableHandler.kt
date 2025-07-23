@@ -13,7 +13,7 @@ class AppIsDebuggableHandler @Inject constructor() {
     }
 
     fun handleAppIsDebuggableEvent(threatEventData: ThreatEventData) {
-       val sanitizedData = "id=${threatEventData.deviceID}, type=${threatEventData.threatCode}"
+        val sanitizedData = "id=${threatEventData.deviceID}, type=${threatEventData.threatCode}"
         Log.w(TAG, "App Is Debuggable Detected: $sanitizedData")
     }
 }

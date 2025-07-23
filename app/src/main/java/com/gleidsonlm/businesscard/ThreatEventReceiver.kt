@@ -147,11 +147,12 @@ class ThreatEventReceiver(private val applicationContext: Context) {
 
         Log.d(TAG, "Populated ThreatEventData: $threatEventData")
 
-        if (action == "MobileBotDefenseCheck") {
-            handleBotDefenseCheck(threatEventData)
-        } else {
-            threatHandlers[action]?.invoke(threatEventData)
-            routeToThreatEventActivity(threatEventData, action)
+        when (action) {
+            "MobileBotDefenseCheck" -> handleBotDefenseCheck(threatEventData)
+            else -> {
+                threatHandlers[action]?.invoke(threatEventData)
+                routeToThreatEventActivity(threatEventData, action)
+            }
         }
     }
 
