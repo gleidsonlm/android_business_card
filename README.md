@@ -80,64 +80,20 @@ This project demonstrates an ability to integrate various components, manage app
 
 This project includes unit tests to ensure the reliability and correctness of its components. For detailed instructions on how to run these tests and configure your environment, please refer to the [TESTING.md](TESTING.md) file.
 
-## Appdome Threat Event Handling
-
-This feature is designed to detect and respond to specific security threats identified by the Appdome security platform integrated into the application. It provides immediate feedback to the user regarding potential security issues on their device.
-
-The application is configured to handle the following Appdome Threat-Events:
-*   `RootedDevice`: Detects if the device is rooted.
-*   `GoogleEmulatorDetected`: Detects if the application is running on a Google emulator.
-*   `DeveloperOptionsEnabled`: Detects if developer options are enabled on the device.
-*   `DebuggerThreatDetected`: Detects if a debugger is attached to the application.
-
-### Flow of Event Handling
-
-1.  **Detection:** When Appdome's security mechanisms detect one of the configured threat events, it broadcasts an Intent within the application.
-2.  **Reception:** The `ThreatEventReceiver`, programmatically registered in `BusinessCardApplication.kt`, listens for these specific broadcast actions.
-3.  **Data Extraction:** Upon catching a broadcast, the `ThreatEventReceiver` extracts detailed meta-data associated with the threat event from the Intent. This data is encapsulated in a `ThreatEventData` object.
-4.  **Display:** The receiver then launches the `ThreatEventActivity`, passing the populated `ThreatEventData` object to it.
-5.  **User Notification:** `ThreatEventActivity` uses `ThreatEventScreenContent` (a Jetpack Compose UI) to display all the received meta-data, informing the user about the nature of the detected threat.
-
-This implementation adheres to Appdome's guidelines for in-app handling and notification of security threat events.
-
-### Key Components
-
-*   **`ThreatEventReceiver.kt`**: A `BroadcastReceiver` that listens for Appdome threat event broadcasts. It processes these events, extracts data, and initiates the display of threat information.
-*   **`ThreatEventActivity.kt`**: An `Activity` responsible for displaying the detailed information of a detected threat event to the user.
-*   **`ThreatEventScreen.kt`**: Contains the Jetpack Compose UI (`ThreatEventScreenContent`) that renders the details from the `ThreatEventData` object.
-*   **`ThreatEventData.kt`**: A Kotlin data class (`Parcelable`) that models all the meta-data fields associated with a threat event.
-*   **`BusinessCardApplication.kt`**: The custom `Application` class where the `ThreatEventReceiver` is instantiated and programmatically registered on application startup. It registers intent filters for `RootedDevice`, `GoogleEmulatorDetected`, `DeveloperOptionsEnabled`, and `DebuggerThreatDetected`.
-*   **`AndroidManifest.xml`**: Contains necessary application permissions (like `REQUEST_INSTALL_PACKAGES`). The `ThreatEventReceiver` itself is no longer declared here as it's registered programmatically.
-
-## Permissions Required
-
-The application requires the `android.permission.REQUEST_INSTALL_PACKAGES` permission for the following reason:
-
-*   **Threat Event Functionality**: This permission is necessary for the proper functioning of the threat-event screen. Certain threat events may require the ability to initiate package installations or updates as a response or mitigation step. Without this permission, the threat-event screen may not load correctly or some of its features related to package management might be disabled. Users will be prompted to grant this permission if it's not already available.
-
-## 🔮 Future Enhancements (Post-Refactoring)
-
-*   **Complete MVVM Refactoring:** Fully implement ViewModels and Repository. Hilt DI is already integrated.
-*   **Jetpack DataStore:** Migrate from SharedPreferences to Jetpack DataStore for data persistence.
-*   **More Robust Image Persistence:** Copy selected gallery/camera images to app-specific storage.
-*   **Material You Theming:** Implement dynamic theming.
-*   **Improved Error Handling & User Feedback:** Comprehensive error states and messages.
-*   **Tablet Layout:** Optimized layout for tablets.
-*   **Direct File Saving for vCard:** Option to save .vcf file.
-*   **Widget:** Home screen widget.
-*   **Unit & UI Tests:** Comprehensive test suite.
-
----
-
-*This project, including this README, is being developed with the significant assistance of Jules, an AI software engineering agent from Google.*
-
 ## Appdome Threat-Events Integration
 
 This application is integrated with Appdome Threat-Events to provide runtime threat detection and response. The following threat events are currently handled:
 
-- **UnknownSourcesEnabled**: Detects if "Unknown Sources" are enabled on the device.
-- **AppIsDebuggable**: Detects if the app is running in debuggable mode.
-- **AppIntegrityError**: Detects app integrity errors (tampering, repackaging, etc).
-- **EmulatorFound**: Detects if the app is running in an emulator environment.
+*   **DetectUnlockedBootloader**: Detects if the device's bootloader is unlocked.
+*   **KernelSUDetected**: Detects if KernelSU is installed on the device.
+*   **OsRemountDetected**: Detects if the OS has been remounted with write permissions.
+*   **InjectedShellCodeDetected**: Detects if shellcode has been injected into the app.
+*   **UnauthorizedAIAssistantDetected**: Detects if an unauthorized AI assistant is running.
+*   **HookFrameworkDetected**: Detects if a hooking framework (like Xposed or Frida) is present.
+*   **MagiskManagerDetected**: Detects if Magisk Manager is installed.
+*   **FridaDetected**: Detects if the Frida instrumentation toolkit is running.
+*   **FridaCustomDetected**: Detects custom Frida installations.
+*   **SslIntegrityCheckFail**: Detects SSL integrity check failures.
+*   **MalwareInjectionDetected**: Detects malware injection attempts.
 
 When a threat is detected, the application will display a screen with the details of the threat.

@@ -49,16 +49,17 @@ class ThreatEventReceiver(private val applicationContext: Context) {
      */
     fun register() {
         // Register for specific threat events
-        registerReceiverWithFlags(IntentFilter("RootedDevice"))
-        registerReceiverWithFlags(IntentFilter("GoogleEmulatorDetected"))
-        registerReceiverWithFlags(IntentFilter("DeveloperOptionsEnabled"))
-        registerReceiverWithFlags(IntentFilter("DebuggerThreatDetected"))
-        registerReceiverWithFlags(IntentFilter("MobileBotDefenseCheck"))
-        registerReceiverWithFlags(IntentFilter("UnknownSourcesEnabled"))
-        registerReceiverWithFlags(IntentFilter("AppIsDebuggable"))
-        registerReceiverWithFlags(IntentFilter("AppIntegrityError"))
-        registerReceiverWithFlags(IntentFilter("EmulatorFound"))
-        // Add other threat events if needed, ensuring they match the documentation and requirements
+        registerReceiverWithFlags(IntentFilter("DetectUnlockedBootloader"))
+        registerReceiverWithFlags(IntentFilter("KernelSUDetected"))
+        registerReceiverWithFlags(IntentFilter("OsRemountDetected"))
+        registerReceiverWithFlags(IntentFilter("InjectedShellCodeDetected"))
+        registerReceiverWithFlags(IntentFilter("UnauthorizedAIAssistantDetected"))
+        registerReceiverWithFlags(IntentFilter("HookFrameworkDetected"))
+        registerReceiverWithFlags(IntentFilter("MagiskManagerDetected"))
+        registerReceiverWithFlags(IntentFilter("FridaDetected"))
+        registerReceiverWithFlags(IntentFilter("FridaCustomDetected"))
+        registerReceiverWithFlags(IntentFilter("SslIntegrityCheckFail"))
+        registerReceiverWithFlags(IntentFilter("MalwareInjectionDetected"))
     }
 
     /**

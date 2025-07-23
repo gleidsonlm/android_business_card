@@ -50,6 +50,21 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+        <receiver android:name=".ThreatEventReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="DetectUnlockedBootloader" />
+                <action android:name="KernelSUDetected" />
+                <action android:name="OsRemountDetected" />
+                <action android:name="InjectedShellCodeDetected" />
+                <action android:name="UnauthorizedAIAssistantDetected" />
+                <action android:name="HookFrameworkDetected" />
+                <action android:name="MagiskManagerDetected" />
+                <action android:name="FridaDetected" />
+                <action android:name="FridaCustomDetected" />
+                <action android:name="SslIntegrityCheckFail" />
+                <action android:name="MalwareInjectionDetected" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
