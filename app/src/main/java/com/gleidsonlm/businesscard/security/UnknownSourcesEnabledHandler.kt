@@ -8,7 +8,9 @@ import javax.inject.Singleton
 @Singleton
 class UnknownSourcesEnabledHandler @Inject constructor() {
 
-    private val TAG = "UnknownSourcesEnabled"
+    companion object {
+        private const val TAG = "UnknownSourcesEnabled"
+    }
 
     fun handleUnknownSourcesEnabledEvent(threatEventData: ThreatEventData) {
         Log.w(TAG, "Unknown Sources Enabled Detected: $threatEventData")

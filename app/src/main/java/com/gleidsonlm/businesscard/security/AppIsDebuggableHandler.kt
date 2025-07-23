@@ -8,7 +8,9 @@ import javax.inject.Singleton
 @Singleton
 class AppIsDebuggableHandler @Inject constructor() {
 
-    private val TAG = "AppIsDebuggable"
+    companion object {
+        private const val TAG = "AppIsDebuggable"
+    }
 
     fun handleAppIsDebuggableEvent(threatEventData: ThreatEventData) {
         Log.w(TAG, "App Is Debuggable Detected: $threatEventData")

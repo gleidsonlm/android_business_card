@@ -13,8 +13,6 @@ import com.gleidsonlm.businesscard.security.BotDefenseHandler
 import com.gleidsonlm.businesscard.security.EmulatorFoundHandler
 import com.gleidsonlm.businesscard.security.GoogleEmulatorHandler
 import com.gleidsonlm.businesscard.security.UnknownSourcesEnabledHandler
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 /**
  * A [BroadcastReceiver] that listens for Appdome threat events.

@@ -8,7 +8,9 @@ import javax.inject.Singleton
 @Singleton
 class AppIntegrityErrorHandler @Inject constructor() {
 
-    private val TAG = "AppIntegrityError"
+    companion object {
+        private const val TAG = "AppIntegrityError"
+    }
 
     fun handleAppIntegrityErrorEvent(threatEventData: ThreatEventData) {
         Log.w(TAG, "App Integrity Error Detected: $threatEventData")

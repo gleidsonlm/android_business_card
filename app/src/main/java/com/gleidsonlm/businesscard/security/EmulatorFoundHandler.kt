@@ -8,7 +8,9 @@ import javax.inject.Singleton
 @Singleton
 class EmulatorFoundHandler @Inject constructor() {
 
-    private val TAG = "EmulatorFound"
+    companion object {
+        private const val TAG = "EmulatorFound"
+    }
 
     fun handleEmulatorFoundEvent(threatEventData: ThreatEventData) {
         Log.w(TAG, "Emulator Found Detected: $threatEventData")
