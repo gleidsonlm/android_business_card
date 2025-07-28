@@ -85,10 +85,29 @@ This project includes unit tests to ensure the reliability and correctness of it
 This feature is designed to detect and respond to specific security threats identified by the Appdome security platform integrated into the application. It provides immediate feedback to the user regarding potential security issues on their device.
 
 The application is configured to handle the following Appdome Threat-Events:
+
+### Existing Threat Events
 *   `RootedDevice`: Detects if the device is rooted.
 *   `GoogleEmulatorDetected`: Detects if the application is running on a Google emulator.
 *   `DeveloperOptionsEnabled`: Detects if developer options are enabled on the device.
 *   `DebuggerThreatDetected`: Detects if a debugger is attached to the application.
+*   `UnknownSourcesEnabled`: Detects if "Unknown Sources" are enabled on the device.
+*   `AppIsDebuggable`: Detects if the app is running in debuggable mode.
+*   `AppIntegrityError`: Detects app integrity errors (tampering, repackaging, etc).
+*   `EmulatorFound`: Detects if the app is running in an emulator environment.
+
+### New Anti-Malware Threat Events
+*   `DetectUnlockedBootloader`: Detects devices with unlocked bootloaders which may indicate compromised device security.
+*   `KernelSUDetected`: Detects KernelSU installations which provide root access through kernel modifications.
+*   `OsRemountDetected`: Detects when OS remounts are present which may indicate system partition tampering.
+*   `InjectedShellCodeDetected`: Detects injected shell code which may indicate malicious code injection attacks.
+*   `UnauthorizedAIAssistantDetected`: Detects unauthorized AI assistants which may indicate malware using AI for malicious purposes.
+*   `HookFrameworkDetected`: Detects hook frameworks (e.g., Xposed) which can be used to modify app behavior.
+*   `MagiskManagerDetected`: Detects Magisk Manager installations which provide systemless root access.
+*   `FridaDetected`: Detects Frida instrumentation framework which can be used for dynamic analysis and code injection.
+*   `FridaCustomDetected`: Detects strong/custom Frida detection for advanced instrumentation frameworks.
+*   `SslIntegrityCheckFail`: Detects SSL integrity check failures which may indicate SSL pinning bypass attempts.
+*   `MalwareInjectionDetected`: Detects malware injection using AI-powered detection capabilities.
 
 ### Flow of Event Handling
 
@@ -106,8 +125,17 @@ This implementation adheres to Appdome's guidelines for in-app handling and noti
 *   **`ThreatEventActivity.kt`**: An `Activity` responsible for displaying the detailed information of a detected threat event to the user.
 *   **`ThreatEventScreen.kt`**: Contains the Jetpack Compose UI (`ThreatEventScreenContent`) that renders the details from the `ThreatEventData` object.
 *   **`ThreatEventData.kt`**: A Kotlin data class (`Parcelable`) that models all the meta-data fields associated with a threat event.
-*   **`BusinessCardApplication.kt`**: The custom `Application` class where the `ThreatEventReceiver` is instantiated and programmatically registered on application startup. It registers intent filters for `RootedDevice`, `GoogleEmulatorDetected`, `DeveloperOptionsEnabled`, and `DebuggerThreatDetected`.
+*   **`BusinessCardApplication.kt`**: The custom `Application` class where the `ThreatEventReceiver` is instantiated and programmatically registered on application startup. It registers intent filters for all supported threat events.
+*   **Security Handlers**: Individual handler classes for each threat event type, providing specialized logging and processing for different security threats.
 *   **`AndroidManifest.xml`**: Contains necessary application permissions (like `REQUEST_INSTALL_PACKAGES`). The `ThreatEventReceiver` itself is no longer declared here as it's registered programmatically.
+
+### Threat Event Handler Architecture
+
+Each threat event is handled by a dedicated handler class that follows these principles:
+- **Single Responsibility**: Each handler focuses on one specific threat type
+- **Dependency Injection**: All handlers are injected via Hilt for testability and modularity
+- **Consistent Logging**: All handlers use sanitized logging to avoid exposing sensitive data
+- **Extensibility**: New threat handlers can be easily added following the established pattern
 
 ## Permissions Required
 
