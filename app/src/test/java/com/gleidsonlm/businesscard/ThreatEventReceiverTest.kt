@@ -280,4 +280,61 @@ class ThreatEventReceiverTest {
         // Then - no exception should be thrown
         // In a real test environment, we would verify the IntentFilter registration
     }
+
+    @Test
+    fun `onEvent handles DetectUnlockedBootloader threat event`() {
+        // Given
+        val intent = Intent("DetectUnlockedBootloader").apply {
+            putExtra("defaultMessage", "Unlocked bootloader detected")
+            putExtra("deviceID", "test-device-123")
+            putExtra("threatCode", "UNLOCKED_BOOTLOADER")
+        }
+        val handlerFunction = mockk<(ThreatEventData) -> Unit>(relaxed = true)
+        threatEventReceiver.addHandler("DetectUnlockedBootloader", handlerFunction)
+
+        // When
+        threatEventReceiver.onEvent(intent)
+
+        // Then
+        verify { handlerFunction.invoke(any()) }
+        verify { context.startActivity(any()) }
+    }
+
+    @Test
+    fun `onEvent handles FridaDetected threat event`() {
+        // Given
+        val intent = Intent("FridaDetected").apply {
+            putExtra("defaultMessage", "Frida instrumentation detected")
+            putExtra("deviceID", "test-device-456")
+            putExtra("threatCode", "FRIDA_DETECTED")
+        }
+        val handlerFunction = mockk<(ThreatEventData) -> Unit>(relaxed = true)
+        threatEventReceiver.addHandler("FridaDetected", handlerFunction)
+
+        // When
+        threatEventReceiver.onEvent(intent)
+
+        // Then
+        verify { handlerFunction.invoke(any()) }
+        verify { context.startActivity(any()) }
+    }
+
+    @Test
+    fun `onEvent handles MalwareInjectionDetected threat event`() {
+        // Given
+        val intent = Intent("MalwareInjectionDetected").apply {
+            putExtra("defaultMessage", "Malware injection detected")
+            putExtra("deviceID", "test-device-789")
+            putExtra("threatCode", "MALWARE_INJECTION")
+        }
+        val handlerFunction = mockk<(ThreatEventData) -> Unit>(relaxed = true)
+        threatEventReceiver.addHandler("MalwareInjectionDetected", handlerFunction)
+
+        // When
+        threatEventReceiver.onEvent(intent)
+
+        // Then
+        verify { handlerFunction.invoke(any()) }
+        verify { context.startActivity(any()) }
+    }
 }
