@@ -45,10 +45,10 @@ class ThreatEventReceiver(private val applicationContext: Context) {
      *
      * This method should be called, for example, in the `onCreate` method of the Application class.
      * It registers for events like "RootedDevice", "DeveloperOptionsEnabled", "DebuggerThreatDetected",
-     * and "MobileBotDefenseCheck".
+     * "MobileBotDefenseCheck", and the new Anti-Malware threat events.
      */
     fun register() {
-        // Register for specific threat events
+        // Register for existing threat events
         registerReceiverWithFlags(IntentFilter("RootedDevice"))
         registerReceiverWithFlags(IntentFilter("GoogleEmulatorDetected"))
         registerReceiverWithFlags(IntentFilter("DeveloperOptionsEnabled"))
@@ -58,7 +58,19 @@ class ThreatEventReceiver(private val applicationContext: Context) {
         registerReceiverWithFlags(IntentFilter("AppIsDebuggable"))
         registerReceiverWithFlags(IntentFilter("AppIntegrityError"))
         registerReceiverWithFlags(IntentFilter("EmulatorFound"))
-        // Add other threat events if needed, ensuring they match the documentation and requirements
+        
+        // Register for new Anti-Malware threat events
+        registerReceiverWithFlags(IntentFilter("DetectUnlockedBootloader"))
+        registerReceiverWithFlags(IntentFilter("KernelSUDetected"))
+        registerReceiverWithFlags(IntentFilter("OsRemountDetected"))
+        registerReceiverWithFlags(IntentFilter("InjectedShellCodeDetected"))
+        registerReceiverWithFlags(IntentFilter("UnauthorizedAIAssistantDetected"))
+        registerReceiverWithFlags(IntentFilter("HookFrameworkDetected"))
+        registerReceiverWithFlags(IntentFilter("MagiskManagerDetected"))
+        registerReceiverWithFlags(IntentFilter("FridaDetected"))
+        registerReceiverWithFlags(IntentFilter("FridaCustomDetected"))
+        registerReceiverWithFlags(IntentFilter("SslIntegrityCheckFail"))
+        registerReceiverWithFlags(IntentFilter("MalwareInjectionDetected"))
     }
 
     /**
