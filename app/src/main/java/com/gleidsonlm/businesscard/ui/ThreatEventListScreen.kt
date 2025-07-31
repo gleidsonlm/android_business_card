@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
@@ -26,12 +27,14 @@ import com.gleidsonlm.businesscard.ui.viewmodel.ThreatEventListViewModel
  * Includes options to refresh the list and clear all events.
  * 
  * @param onEventClick Callback when a threat event card is clicked
+ * @param onBackClick Callback when the back button is clicked
  * @param viewModel The ViewModel managing the threat events list state
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ThreatEventListScreen(
     onEventClick: (ThreatEventData) -> Unit,
+    onBackClick: (() -> Unit)? = null,
     viewModel: ThreatEventListViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -48,13 +51,23 @@ fun ThreatEventListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Threat Events") },
+                title = { Text(stringResource(R.string.threat_events_title)) },
+                navigationIcon = {
+                    onBackClick?.let {
+                        IconButton(onClick = it) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.back)
+                            )
+                        }
+                    }
+                },
                 actions = {
                     // Refresh button
                     IconButton(onClick = { viewModel.refresh() }) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
-                            contentDescription = "Refresh events"
+                            contentDescription = stringResource(R.string.refresh_events)
                         )
                     }
                     
@@ -62,7 +75,7 @@ fun ThreatEventListScreen(
                     IconButton(onClick = { showClearDialog = true }) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "Clear all events"
+                            contentDescription = stringResource(R.string.clear_all_events)
                         )
                     }
                 }
@@ -95,13 +108,13 @@ fun ThreatEventListScreen(
                         verticalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "No threat events detected",
+                            text = stringResource(R.string.no_threat_events_title),
                             style = MaterialTheme.typography.headlineSmall,
                             textAlign = TextAlign.Center
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "When security threats are detected, they will appear here.",
+                            text = stringResource(R.string.no_threat_events_message),
                             style = MaterialTheme.typography.bodyMedium,
                             textAlign = TextAlign.Center,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -132,7 +145,7 @@ fun ThreatEventListScreen(
                     modifier = Modifier.align(Alignment.BottomCenter),
                     action = {
                         TextButton(onClick = { viewModel.clearError() }) {
-                            Text("Dismiss")
+                            Text(stringResource(R.string.dismiss))
                         }
                     }
                 ) {
@@ -146,8 +159,8 @@ fun ThreatEventListScreen(
     if (showClearDialog) {
         AlertDialog(
             onDismissRequest = { showClearDialog = false },
-            title = { Text("Clear All Events") },
-            text = { Text("Are you sure you want to delete all threat events? This action cannot be undone.") },
+            title = { Text(stringResource(R.string.clear_events_dialog_title)) },
+            text = { Text(stringResource(R.string.clear_events_dialog_message)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -155,12 +168,12 @@ fun ThreatEventListScreen(
                         showClearDialog = false
                     }
                 ) {
-                    Text("Clear")
+                    Text(stringResource(R.string.clear_events_confirm))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showClearDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.clear_events_cancel))
                 }
             }
         )

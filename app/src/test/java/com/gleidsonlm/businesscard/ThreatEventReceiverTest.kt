@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
+import com.gleidsonlm.businesscard.data.repository.ThreatEventRepository
 import com.gleidsonlm.businesscard.model.ThreatEventData
 import com.gleidsonlm.businesscard.security.BotDefenseHandler
 import com.gleidsonlm.businesscard.security.BotDetectionCallback
@@ -39,6 +40,9 @@ class ThreatEventReceiverTest {
 
     @RelaxedMockK
     private lateinit var botDefenseHandler: BotDefenseHandler
+    
+    @RelaxedMockK
+    private lateinit var threatEventRepository: ThreatEventRepository
 
     private lateinit var threatEventReceiver: ThreatEventReceiver
 
@@ -53,7 +57,7 @@ class ThreatEventReceiverTest {
         every { mockContext.startActivity(any()) } returns Unit
         every { mockContext.packageName } returns "com.gleidsonlm.businesscard"
         
-        threatEventReceiver = ThreatEventReceiver(mockContext)
+        threatEventReceiver = ThreatEventReceiver(mockContext, threatEventRepository)
         threatEventReceiver.setBotDefenseHandler(botDefenseHandler)
     }
 
@@ -281,7 +285,7 @@ class ThreatEventReceiverTest {
     @Test
     fun `onEvent without bot defense handler falls back to threat event activity`() {
         // Given
-        val receiverWithoutHandler = ThreatEventReceiver(mockContext)
+        val receiverWithoutHandler = ThreatEventReceiver(mockContext, threatEventRepository)
         val intent = createMobileBotDefenseCheckIntent()
 
         // When

@@ -4,10 +4,12 @@ import android.content.Context
 import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
 import com.gleidsonlm.businesscard.ThreatEventReceiver
+import com.gleidsonlm.businesscard.data.repository.ThreatEventRepository
 import com.gleidsonlm.businesscard.model.ThreatEventData
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -36,6 +38,9 @@ class BotDefenseIntegrationTest {
 
     @MockK
     private lateinit var mockContext: Context
+    
+    @RelaxedMockK
+    private lateinit var threatEventRepository: ThreatEventRepository
 
     private lateinit var context: Context
     private lateinit var botDefenseHandler: BotDefenseHandler
@@ -64,7 +69,7 @@ class BotDefenseIntegrationTest {
         )
         
         botDefenseHandler = BotDefenseHandler(context, config, testDispatcher)
-        threatEventReceiver = ThreatEventReceiver(mockContext)
+        threatEventReceiver = ThreatEventReceiver(mockContext, threatEventRepository)
         threatEventReceiver.setBotDefenseHandler(botDefenseHandler)
     }
 
@@ -179,7 +184,7 @@ class BotDefenseIntegrationTest {
     @Test
     fun `fallback behavior when bot defense handler is not set`() = runTest {
         // Given - Receiver without bot defense handler
-        val receiverWithoutHandler = ThreatEventReceiver(mockContext)
+        val receiverWithoutHandler = ThreatEventReceiver(mockContext, threatEventRepository)
         val intent = Intent("MobileBotDefenseCheck").apply {
             putExtra("defaultMessage", "Bot detected")
         }
