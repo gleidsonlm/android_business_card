@@ -16,9 +16,9 @@ android {
     defaultConfig {
         applicationId = "com.gleidsonlm.businesscard"
         minSdk = 31
-        targetSdk = 35
-        versionCode = 1753112636
-        versionName = "January 21, 2025 - Complete Appdome Threat Events Implementation"
+        targetSdk = 36
+        versionCode = 1753976531
+        versionName = "July 31, 2025"
     }
 
     buildTypes {
@@ -76,12 +76,12 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk)
     testImplementation(libs.mockk.android)
-    testImplementation("org.robolectric:robolectric:4.14.1")
-    testImplementation("androidx.test:core:1.6.1")
-    testImplementation("androidx.test:rules:1.6.1")
-    testImplementation("androidx.test:runner:1.6.2")
-    testImplementation("androidx.compose.ui:ui-test-junit4")
-    testImplementation("androidx.compose.ui:ui-test-manifest")
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.core)
+    testImplementation(libs.androidx.rules)
+    testImplementation(libs.androidx.runner)
+    testImplementation(libs.ui.test.junit4)
+    testImplementation(libs.ui.test.manifest)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
