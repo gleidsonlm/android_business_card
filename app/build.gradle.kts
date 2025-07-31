@@ -17,8 +17,8 @@ android {
         applicationId = "com.gleidsonlm.businesscard"
         minSdk = 31
         targetSdk = 36
-        versionCode = 1753976533
-        versionName = "August 13, 2025 - Event List Screen Implementation"
+        versionCode = 1753976534
+        versionName = "August 13, 2025 - READ_PHONE_STATE Permission for SIM Swap Detection"
     }
 
     buildTypes {
