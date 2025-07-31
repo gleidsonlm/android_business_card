@@ -100,6 +100,14 @@ The application is configured to handle the following Appdome Threat-Events:
 
 The application now implements comprehensive Appdome threat event handling with support for all major threat categories:
 
+#### Event List Screen
+
+*   **Threat Events List:** A dedicated screen that displays all received threat events as individual cards, showing event type, detection time, and summary message.
+*   **Navigation:** Access the threat events list via the warning icon in the top-right corner of the main business card screen.
+*   **Event Details:** Tap any event card to view the complete threat event details with all available metadata.
+*   **Event Management:** Refresh the list or clear all events using the action buttons in the toolbar.
+*   **Dynamic Updates:** New threat events automatically appear in the list as they are detected.
+
 #### SSL/TLS Security Threats
 *   `SslCertificateValidationFailed`: Detects SSL certificate validation failures indicating potential MITM attacks.
 *   `SslNonSslConnection`: Detects non-SSL connections which may indicate security vulnerabilities.
@@ -134,18 +142,25 @@ The application now implements comprehensive Appdome threat event handling with 
 
 1.  **Detection:** When Appdome's security mechanisms detect one of the configured threat events, it broadcasts an Intent within the application.
 2.  **Reception:** The `ThreatEventReceiver`, programmatically registered in `BusinessCardApplication.kt`, listens for these specific broadcast actions.
-3.  **Data Extraction:** Upon catching a broadcast, the `ThreatEventReceiver` extracts detailed meta-data associated with the threat event from the Intent. This data is encapsulated in a `ThreatEventData` object.
-4.  **Display:** The receiver then launches the `ThreatEventActivity`, passing the populated `ThreatEventData` object to it.
-5.  **User Notification:** `ThreatEventActivity` uses `ThreatEventScreenContent` (a Jetpack Compose UI) to display all the received meta-data, informing the user about the nature of the detected threat.
+3.  **Data Extraction:** Upon catching a broadcast, the `ThreatEventReceiver` extracts detailed meta-data associated with the threat event from the Intent. This data is encapsulated in a `ThreatEventData` object with a unique ID and timestamp.
+4.  **Storage:** The threat event is automatically saved to the local repository for display in the events list.
+5.  **Display Options:** 
+    - **Immediate Display:** For individual events, the receiver launches the `ThreatEventActivity` with detailed information.
+    - **Events List:** Users can access all threat events via the warning icon on the main screen to view the comprehensive events list.
+6.  **User Interaction:** Users can tap on event cards in the list to view full details, refresh the list, or clear all events.
 
-This implementation adheres to Appdome's guidelines for in-app handling and notification of security threat events.
+This implementation provides both immediate threat notification and comprehensive event history management.
 
 ### Key Components
 
-*   **`ThreatEventReceiver.kt`**: A `BroadcastReceiver` that listens for Appdome threat event broadcasts. It processes these events, extracts data, and initiates the display of threat information.
+*   **`ThreatEventReceiver.kt`**: A `BroadcastReceiver` that listens for Appdome threat event broadcasts. It processes these events, extracts data, saves them to the repository, and initiates the display of threat information.
+*   **`ThreatEventRepository.kt`** & **`ThreatEventRepositoryImpl.kt`**: Repository pattern implementation for storing and managing threat events using SharedPreferences with Gson serialization.
+*   **`ThreatEventListViewModel.kt`**: ViewModel that manages the state and business logic for the threat events list screen, following MVVM architecture patterns.
+*   **`ThreatEventListScreen.kt`**: Jetpack Compose screen that displays all threat events as a list of interactive cards with refresh and clear functionality.
+*   **`ThreatEventCard.kt`**: Reusable Composable component for displaying individual threat event summaries in the list.
 *   **`ThreatEventActivity.kt`**: An `Activity` responsible for displaying the detailed information of a detected threat event to the user.
 *   **`ThreatEventScreen.kt`**: Contains the Jetpack Compose UI (`ThreatEventScreenContent`) that renders the details from the `ThreatEventData` object.
-*   **`ThreatEventData.kt`**: A Kotlin data class (`Parcelable`) that models all the meta-data fields associated with a threat event.
+*   **`ThreatEventData.kt`**: A Kotlin data class (`Parcelable`) that models all the meta-data fields associated with a threat event, enhanced with unique IDs and timestamps.
 *   **`BusinessCardApplication.kt`**: The custom `Application` class where the `ThreatEventReceiver` is instantiated and programmatically registered on application startup. It registers intent filters for all supported threat events.
 *   **Security Handlers**: Individual handler classes for each threat event type, providing specialized logging and processing for different security threats.
 *   **`AndroidManifest.xml`**: Contains necessary application permissions (like `REQUEST_INSTALL_PACKAGES`). The `ThreatEventReceiver` itself is no longer declared here as it's registered programmatically.

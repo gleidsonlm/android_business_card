@@ -6,22 +6,32 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.util.Log
+import com.gleidsonlm.businesscard.data.repository.ThreatEventRepository
 import com.gleidsonlm.businesscard.model.ThreatEventData
 import com.gleidsonlm.businesscard.security.BotDefenseHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.util.UUID
 
 /**
  * A [BroadcastReceiver] that listens for Appdome threat events.
  *
  * This receiver is responsible for registering to specific threat event broadcasts,
- * extracting threat data from the received intents, and launching the
- * [ThreatEventActivity] to display the information. It also handles MobileBotDefenseCheck
- * events through the [BotDefenseHandler].
+ * extracting threat data from the received intents, saving them to the repository,
+ * and launching the [ThreatEventActivity] to display the information. It also handles 
+ * MobileBotDefenseCheck events through the [BotDefenseHandler].
  *
  * @property applicationContext The context of the application.
+ * @property threatEventRepository The repository for storing threat events.
  */
-class ThreatEventReceiver(private val applicationContext: Context) {
+class ThreatEventReceiver(
+    private val applicationContext: Context,
+    private val threatEventRepository: ThreatEventRepository
+) {
 
     private val TAG = "Appdome ThreatEvent"
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     private var botDefenseHandler: BotDefenseHandler? = null
     private val threatHandlers = mutableMapOf<String, (ThreatEventData) -> Unit>()
@@ -134,8 +144,9 @@ class ThreatEventReceiver(private val applicationContext: Context) {
      *
      * This method is called when a registered threat event is broadcast. It extracts
      * all relevant threat metadata from the intent, populates a [ThreatEventData] object,
-     * and then either handles it with the [BotDefenseHandler] for MobileBotDefenseCheck events
-     * or starts the [ThreatEventActivity] to display the details of other threats.
+     * saves it to the repository, and then either handles it with the [BotDefenseHandler] 
+     * for MobileBotDefenseCheck events or starts the [ThreatEventActivity] to display 
+     * the details of other threats.
      *
      * @param intent The intent containing the threat event data.
      */
@@ -144,6 +155,9 @@ class ThreatEventReceiver(private val applicationContext: Context) {
         Log.i(TAG, "Threat event received: $action")
 
         val threatEventData = ThreatEventData(
+            id = UUID.randomUUID().toString(),
+            eventType = action,
+            receivedTimestamp = System.currentTimeMillis(),
             defaultMessage = intent.getStringExtra("defaultMessage"),
             internalError = intent.getStringExtra("internalError"),
             timeStamp = intent.getStringExtra("timestamp"),
@@ -178,6 +192,16 @@ class ThreatEventReceiver(private val applicationContext: Context) {
         )
 
         Log.d(TAG, "Populated ThreatEventData: $threatEventData")
+
+        // Save the event to repository for the event list screen
+        coroutineScope.launch {
+            try {
+                threatEventRepository.saveEvent(threatEventData)
+                Log.d(TAG, "Threat event saved to repository: ${threatEventData.id}")
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to save threat event to repository", e)
+            }
+        }
 
         when (action) {
             "MobileBotDefenseCheck" -> handleBotDefenseCheck(threatEventData)

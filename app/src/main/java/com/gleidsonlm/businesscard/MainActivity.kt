@@ -23,6 +23,7 @@ import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material.icons.rounded.Edit // Added for the edit icon
+import androidx.compose.material.icons.rounded.Warning // Added for the threat events icon
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton // Added for IconButton
@@ -46,6 +47,7 @@ import androidx.core.content.FileProvider
 import com.gleidsonlm.businesscard.data.repository.UserRepositoryImpl
 import com.gleidsonlm.businesscard.ui.UserData
 import com.gleidsonlm.businesscard.ui.UserInputScreen
+import com.gleidsonlm.businesscard.ui.ThreatEventListScreen
 import com.gleidsonlm.businesscard.ui.components.BusinessCardFace
 import com.gleidsonlm.businesscard.ui.components.BusinessCardLink
 import com.gleidsonlm.businesscard.ui.theme.BusinessCardTheme
@@ -68,6 +70,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             var showInputScreen by remember { mutableStateOf(true) }
+            var showThreatEventsScreen by remember { mutableStateOf(false) }
 
             // Observe ViewModel's currentData for initial load check
             val currentDataFromViewModel by businessCardViewModel.currentData.collectAsState()
@@ -87,27 +90,54 @@ class MainActivity : ComponentActivity() {
 
             BusinessCardTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    if (showInputScreen) {
-                        UserInputScreen(
-                            viewModel = userInputViewModel,
-                            onSaveCompleted = {
-                                businessCardViewModel.loadInitialData()
-                                showInputScreen = false
-                                Log.d("MainActivity", "Save operation completed by UserInputViewModel")
-                            }
-                        )
-                    } else {
+                    when {
+                        showThreatEventsScreen -> {
+                            ThreatEventListScreen(
+                                onEventClick = { threatEvent ->
+                                    // Navigate to threat event detail screen
+                                    val intent = Intent(this@MainActivity, ThreatEventActivity::class.java).apply {
+                                        putExtra(ThreatEventActivity.EXTRA_THREAT_EVENT_DATA, threatEvent)
+                                    }
+                                    startActivity(intent)
+                                },
+                                onBackClick = {
+                                    showThreatEventsScreen = false
+                                }
+                            )
+                        }
+                        showInputScreen -> {
+                            UserInputScreen(
+                                viewModel = userInputViewModel,
+                                onSaveCompleted = {
+                                    businessCardViewModel.loadInitialData()
+                                    showInputScreen = false
+                                    Log.d("MainActivity", "Save operation completed by UserInputViewModel")
+                                }
+                            )
+                        }
+                        else -> {
                         Box(modifier = Modifier.fillMaxSize()) {
                             BusinessCardApp(
                                 businessCardViewModel = businessCardViewModel
                             )
-                            // Row to hold Edit and Share buttons
+                            // Row to hold Threat Events, Edit and Share buttons
                             Row(
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)
                                     .padding(16.dp),
                                 horizontalArrangement = Arrangement.End
                             ) {
+                                IconButton(
+                                    onClick = {
+                                        showThreatEventsScreen = true
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Warning,
+                                        contentDescription = stringResource(R.string.threat_events_button_description)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(8.dp))
                                 IconButton(
                                     onClick = {
                                         val currentCardData = businessCardViewModel.currentData.value
@@ -177,6 +207,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
+        }
         }
     }
 }

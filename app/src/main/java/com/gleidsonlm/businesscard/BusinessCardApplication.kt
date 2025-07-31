@@ -1,6 +1,7 @@
 package com.gleidsonlm.businesscard
 
 import android.app.Application
+import com.gleidsonlm.businesscard.data.repository.ThreatEventRepository
 import com.gleidsonlm.businesscard.security.ActiveADBDetectedHandler
 import com.gleidsonlm.businesscard.security.AppIntegrityErrorHandler
 import com.gleidsonlm.businesscard.security.AppIsDebuggableHandler
@@ -51,6 +52,9 @@ import javax.inject.Inject
 class BusinessCardApplication : Application() {
 
     private lateinit var threatEventReceiver: ThreatEventReceiver
+
+    @Inject
+    lateinit var threatEventRepository: ThreatEventRepository
 
     @Inject
     lateinit var botDefenseHandler: BotDefenseHandler
@@ -168,7 +172,7 @@ class BusinessCardApplication : Application() {
      */
     override fun onCreate() {
         super.onCreate()
-        threatEventReceiver = ThreatEventReceiver(this)
+        threatEventReceiver = ThreatEventReceiver(this, threatEventRepository)
 
         threatEventReceiver.setBotDefenseHandler(botDefenseHandler)
 

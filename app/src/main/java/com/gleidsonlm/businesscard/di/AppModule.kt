@@ -1,6 +1,8 @@
 package com.gleidsonlm.businesscard.di
 
 import android.content.Context
+import com.gleidsonlm.businesscard.data.repository.ThreatEventRepository
+import com.gleidsonlm.businesscard.data.repository.ThreatEventRepositoryImpl
 import com.gleidsonlm.businesscard.data.repository.UserRepository
 import com.gleidsonlm.businesscard.data.repository.UserRepositoryImpl
 import dagger.Module
@@ -24,5 +26,11 @@ object AppModule {
     @Singleton
     fun provideUserRepository(context: Context): UserRepository {
         return UserRepositoryImpl(context)
+    }
+    
+    @Provides
+    @Singleton
+    fun provideThreatEventRepository(context: Context): ThreatEventRepository {
+        return ThreatEventRepositoryImpl(context)
     }
 }

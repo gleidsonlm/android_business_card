@@ -28,4 +28,17 @@
     <string name="bot_defense_critical_severity">CRITICAL: Automated threat detected. App security measures activated.</string>
     <string name="bot_defense_error">Bot detection error occurred. Please contact support if issues persist.</string>
     <string name="threatevent_no_data">No threat event data available.</string>
+    <!-- Threat Events List Screen strings -->
+    <string name="threat_events_title">Threat Events</string>
+    <string name="threat_events_button_description">View threat events</string>
+    <string name="refresh_events">Refresh events</string>
+    <string name="clear_all_events">Clear all events</string>
+    <string name="no_threat_events_title">No threat events detected</string>
+    <string name="no_threat_events_message">When security threats are detected, they will appear here.</string>
+    <string name="clear_events_dialog_title">Clear All Events</string>
+    <string name="clear_events_dialog_message">Are you sure you want to delete all threat events? This action cannot be undone.</string>
+    <string name="clear_events_confirm">Clear</string>
+    <string name="clear_events_cancel">Cancel</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="back">Back</string>
 </resources>

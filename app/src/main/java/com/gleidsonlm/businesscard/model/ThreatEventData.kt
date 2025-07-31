@@ -13,6 +13,12 @@ import kotlinx.parcelize.Parcelize
  */
 @Parcelize
 data class ThreatEventData(
+    /** Unique identifier for this threat event, generated when the event is received. */
+    val id: String = "",
+    /** The threat event action/type (e.g., "RootedDevice", "DebuggerThreatDetected"). */
+    val eventType: String = "",
+    /** Timestamp when this event was received by the app (in milliseconds since epoch). */
+    val receivedTimestamp: Long = System.currentTimeMillis(),
     /** Internal error code or message from Appdome. */
     val internalError: String?,
     /** Default message provided by Appdome for the threat event, suitable for user display. */
