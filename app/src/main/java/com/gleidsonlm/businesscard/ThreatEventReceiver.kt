@@ -71,6 +71,26 @@ class ThreatEventReceiver(private val applicationContext: Context) {
         registerReceiverWithFlags(IntentFilter("FridaCustomDetected"))
         registerReceiverWithFlags(IntentFilter("SslIntegrityCheckFail"))
         registerReceiverWithFlags(IntentFilter("MalwareInjectionDetected"))
+        
+        // Register for additional required threat events
+        registerReceiverWithFlags(IntentFilter("SslCertificateValidationFailed"))
+        registerReceiverWithFlags(IntentFilter("SslNonSslConnection"))
+        registerReceiverWithFlags(IntentFilter("SslIncompatibleVersion"))
+        registerReceiverWithFlags(IntentFilter("NetworkProxyConfigured"))
+        registerReceiverWithFlags(IntentFilter("ClickBotDetected"))
+        registerReceiverWithFlags(IntentFilter("ClickBotDetectedByPermissions"))
+        registerReceiverWithFlags(IntentFilter("KeyInjectionDetected"))
+        registerReceiverWithFlags(IntentFilter("ActiveADBDetected"))
+        registerReceiverWithFlags(IntentFilter("BlockSecondSpace"))
+        registerReceiverWithFlags(IntentFilter("RunningInVirtualSpace"))
+        registerReceiverWithFlags(IntentFilter("SeccompDetected"))
+        registerReceiverWithFlags(IntentFilter("CorelliumFileFound"))
+        registerReceiverWithFlags(IntentFilter("NotInstalledFromOfficialStore"))
+        registerReceiverWithFlags(IntentFilter("GameGuardianDetected"))
+        registerReceiverWithFlags(IntentFilter("SpeedHackDetected"))
+        registerReceiverWithFlags(IntentFilter("CodeInjectionDetected"))
+        registerReceiverWithFlags(IntentFilter("OatIntegrityBadCommandLine"))
+        registerReceiverWithFlags(IntentFilter("RuntimeBundleValidationViolation"))
     }
 
     /**

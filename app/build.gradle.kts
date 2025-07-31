@@ -17,8 +17,8 @@ android {
         applicationId = "com.gleidsonlm.businesscard"
         minSdk = 31
         targetSdk = 35
-        versionCode = 1753112635
-        versionName = "July 24, 2025 - Anti-Malware Security Update"
+        versionCode = 1753112636
+        versionName = "January 21, 2025 - Complete Appdome Threat Events Implementation"
     }
 
     buildTypes {
