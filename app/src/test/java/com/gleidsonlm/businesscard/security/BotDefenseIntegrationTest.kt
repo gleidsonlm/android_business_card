@@ -91,6 +91,9 @@ class BotDefenseIntegrationTest {
         // When - Process the threat event
         threatEventReceiver.onEvent(intent)
 
+        // Allow coroutines to complete
+        testScheduler.advanceUntilIdle()
+
         // Then - Should trigger activity launch for high severity threat
         verify { mockContext.startActivity(any()) }
     }

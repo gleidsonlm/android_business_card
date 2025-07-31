@@ -5,11 +5,13 @@ import android.content.Intent
 // PackageManager is not directly used for REQUEST_INSTALL_PACKAGES checks after PermissionUtils update
 // import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -59,6 +61,26 @@ class ThreatEventActivity : ComponentActivity() {
      */
     private var initialPermissionCheckDone by mutableStateOf(false)
 
+    /**
+     * Activity result launcher for handling the install packages permission request.
+     * This replaces the deprecated onActivityResult method.
+     */
+    private val installPackagesPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        // Handle the result from the install packages permission settings
+        initialPermissionCheckDone = true // Mark that we have returned from the settings activity
+        
+        // No matter the resultCode, we re-check the actual permission status
+        if (PermissionUtils.hasInstallPackagesPermission(this)) {
+            showPermissionDeniedDialog = false // Ensure dialog is hidden if permission was granted
+            recreate() // Recreate to refresh UI and apply permission
+        } else {
+            // User returned from settings without granting the permission
+            showPermissionDeniedDialog = true
+        }
+    }
+
 
     /**
      * Initializes the activity, sets up the edge-to-edge display, retrieves threat event data,
@@ -76,18 +98,23 @@ class ThreatEventActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val threatEventData: ThreatEventData? = intent.getParcelableExtra(EXTRA_THREAT_EVENT_DATA)
+        val threatEventData: ThreatEventData? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra(EXTRA_THREAT_EVENT_DATA, ThreatEventData::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getParcelableExtra(EXTRA_THREAT_EVENT_DATA)
+        }
 
         // Check for permission. If not granted, and it's the first time (or a retry), request it.
         // For Android O+, this will navigate to system settings.
-        // The result of this navigation will be handled in onActivityResult.
+        // The result of this navigation will be handled by the activity result launcher.
         if (!PermissionUtils.hasInstallPackagesPermission(this)) {
-            // Only request if we haven't initiated the check yet (e.g. returning from settings is handled in onActivityResult)
-            // This check helps prevent re-triggering the permission request if onCreate is called again before onActivityResult.
+            // Only request if we haven't initiated the check yet (e.g. returning from settings is handled by the launcher)
+            // This check helps prevent re-triggering the permission request if onCreate is called again before the launcher callback.
             if (!initialPermissionCheckDone && isAndroidOAndAbove()) {
-                 PermissionUtils.requestInstallPackagesPermission(this)
+                 requestInstallPackagesPermissionWithLauncher()
                  // At this point, for O+, the user is being sent to Settings.
-                 // initialPermissionCheckDone will be set to true in onActivityResult.
+                 // initialPermissionCheckDone will be set to true in the launcher callback.
             } else if (!isAndroidOAndAbove()) {
                 // For pre-O, if hasInstallPackagesPermission is false (which it shouldn't be with our updated PermissionUtils)
                 // something is wrong, or the permission isn't in the manifest.
@@ -148,6 +175,26 @@ class ThreatEventActivity : ComponentActivity() {
     }
 
     /**
+     * Requests the install packages permission using the modern Activity Result API.
+     * This replaces the deprecated PermissionUtils.requestInstallPackagesPermission method
+     * that used the deprecated startActivityForResult.
+     */
+    private fun requestInstallPackagesPermissionWithLauncher() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (!packageManager.canRequestPackageInstalls()) {
+                // Intent to navigate to the settings page for the app to allow package installs.
+                // This is the standard way to request this permission on Android O+.
+                val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
+                    data = Uri.parse("package:$packageName")
+                }
+                installPackagesPermissionLauncher.launch(intent)
+            }
+        }
+        // For pre-O versions, no runtime request is typically made for REQUEST_INSTALL_PACKAGES.
+        // If the permission is in the manifest, it's considered granted.
+    }
+
+    /**
      * A Composable function that displays an AlertDialog informing the user that the
      * "Install unknown apps" permission was denied. It provides an option to go to app settings
      * to grant the permission or dismiss the dialog.
@@ -189,37 +236,6 @@ class ThreatEventActivity : ComponentActivity() {
                 }
             }
         )
-    }
-
-    /**
-     * Handles the result from an activity started for a result.
-     *
-     * This method is marked as [Deprecated] for general Activity results, but it is used here
-     * specifically to handle the outcome of the user returning from the system settings screen
-     * for "Install unknown apps" permission (`ACTION_MANAGE_UNKNOWN_APP_SOURCES`), which is
-     * initiated via `startActivityForResult` indirectly by `PermissionUtils.requestInstallPackagesPermission`.
-     *
-     * @param requestCode The integer request code originally supplied to startActivityForResult(),
-     *                    allowing you to identify who this result came from.
-     * @param resultCode The integer result code returned by the child activity through its setResult().
-     * @param data An Intent, which can return result data to the caller (various data can be attached to Intent "extras").
-     */
-    @Deprecated("This method is called only for activity results, not permission results from runtime dialogs.")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data) // Call super method
-
-        if (requestCode == PermissionUtils.REQUEST_CODE_INSTALL_PACKAGES) {
-            initialPermissionCheckDone = true // Mark that we have returned from the settings activity
-
-            // No matter the resultCode, we re-check the actual permission status
-            if (PermissionUtils.hasInstallPackagesPermission(this)) {
-                showPermissionDeniedDialog = false // Ensure dialog is hidden if permission was granted
-                recreate() // Recreate to refresh UI and apply permission
-            } else {
-                // User returned from settings without granting the permission
-                showPermissionDeniedDialog = true
-            }
-        }
     }
 }
 // Placeholder string resource comments (to be replaced with actual R.string references later):
