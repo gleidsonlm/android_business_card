@@ -10,7 +10,8 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -32,12 +33,11 @@ class BotDefenseIntegrationTest {
 
     private lateinit var botDefenseHandler: BotDefenseHandler
     private lateinit var threatEventReceiver: ThreatEventReceiver
-    private lateinit var testDispatcher: UnconfinedTestDispatcher
+    private val testDispatcher = StandardTestDispatcher()
 
     @Before
     fun setup() {
         MockKAnnotations.init(this)
-        testDispatcher = UnconfinedTestDispatcher()
         Dispatchers.setMain(testDispatcher)
 
         // Mock context behavior
