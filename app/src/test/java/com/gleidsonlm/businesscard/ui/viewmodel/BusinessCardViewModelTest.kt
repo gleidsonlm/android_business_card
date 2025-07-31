@@ -28,10 +28,12 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 @ExperimentalCoroutinesApi
-@RunWith(JUnit4::class)
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [34])
 class BusinessCardViewModelTest {
 
     @get:Rule
@@ -46,7 +48,11 @@ class BusinessCardViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         mockkObject(VCardHelper)
-        mockkStatic("androidx.compose.ui.graphics.AndroidImageBitmapKt") // Corrected static mock target
+        
+        // Mock the extension function properly for Android Bitmap to ImageBitmap conversion
+        mockkStatic("androidx.compose.ui.graphics.AndroidImageBitmapKt")
+        mockkStatic("android.graphics.Bitmap")
+        
         userRepository = mockk()
         viewModel = BusinessCardViewModel(userRepository)
     }

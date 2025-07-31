@@ -4,7 +4,8 @@ import com.gleidsonlm.businesscard.model.ThreatEventData
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 /**
  * Unit tests for additional Appdome threat event handlers.
@@ -12,7 +13,8 @@ import org.mockito.junit.MockitoJUnitRunner
  * Tests the basic functionality of newly implemented threat handlers
  * to ensure they properly handle threat events and log appropriate messages.
  */
-@RunWith(MockitoJUnitRunner::class)
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [34])
 class AdditionalThreatHandlersTest {
 
     private lateinit var sslCertificateValidationFailedHandler: SslCertificateValidationFailedHandler

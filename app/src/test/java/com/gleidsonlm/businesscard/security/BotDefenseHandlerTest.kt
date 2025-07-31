@@ -1,10 +1,10 @@
 package com.gleidsonlm.businesscard.security
 
 import android.content.Context
+import androidx.test.core.app.ApplicationProvider
 import com.gleidsonlm.businesscard.model.ThreatEventData
 import io.mockk.MockKAnnotations
 import io.mockk.every
-import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
 import io.mockk.slot
@@ -12,7 +12,7 @@ import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestDispatcher
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -20,6 +20,9 @@ import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 /**
  * Unit tests for [BotDefenseHandler].
@@ -28,9 +31,10 @@ import org.junit.Test
  * and configuration handling functionality.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [34])
 class BotDefenseHandlerTest {
 
-    @MockK
     private lateinit var context: Context
 
     @RelaxedMockK
@@ -42,8 +46,9 @@ class BotDefenseHandlerTest {
     @Before
     fun setup() {
         MockKAnnotations.init(this)
-        testDispatcher = UnconfinedTestDispatcher()
+        testDispatcher = StandardTestDispatcher()
         Dispatchers.setMain(testDispatcher)
+        context = ApplicationProvider.getApplicationContext()
     }
 
     @After
@@ -108,6 +113,8 @@ class BotDefenseHandlerTest {
 
         // When
         botDefenseHandler.handleBotDetectionEvent(threatData, callback)
+        testDispatcher.scheduler.advanceUntilIdle() // Allow coroutines to complete
+        testDispatcher.scheduler.advanceUntilIdle() // Allow coroutines to complete
 
         // Then
         verify { callback.onCriticalThreatDetected(threatData) }
@@ -126,6 +133,8 @@ class BotDefenseHandlerTest {
 
         // When
         botDefenseHandler.handleBotDetectionEvent(threatData, callback)
+        testDispatcher.scheduler.advanceUntilIdle() // Allow coroutines to complete
+        testDispatcher.scheduler.advanceUntilIdle() // Allow coroutines to complete
 
         // Then
         verify { callback.onSecurityCountermeasuresTriggered() }
@@ -144,6 +153,8 @@ class BotDefenseHandlerTest {
 
         // When
         botDefenseHandler.handleBotDetectionEvent(threatData, callback)
+        testDispatcher.scheduler.advanceUntilIdle() // Allow coroutines to complete
+        testDispatcher.scheduler.advanceUntilIdle() // Allow coroutines to complete
 
         // Then
         verify { callback.onUserNotificationRequired(capture(messageSlot)) }
@@ -162,6 +173,7 @@ class BotDefenseHandlerTest {
 
         // When
         botDefenseHandler.handleBotDetectionEvent(threatData, callback)
+        testDispatcher.scheduler.advanceUntilIdle() // Allow coroutines to complete
 
         // Then
         verify { callback.onDetectionComplete(BotResponseAction.LOG_ONLY) }
@@ -177,6 +189,7 @@ class BotDefenseHandlerTest {
 
         // When
         botDefenseHandler.handleBotDetectionEvent(threatData, callback)
+        testDispatcher.scheduler.advanceUntilIdle() // Allow coroutines to complete
 
         // Then
         verify { callback.onDetectionComplete(any()) }
@@ -194,6 +207,7 @@ class BotDefenseHandlerTest {
 
         // When
         botDefenseHandler.handleBotDetectionEvent(threatData, callback)
+        testDispatcher.scheduler.advanceUntilIdle() // Allow coroutines to complete
 
         // Then
         verify { callback.onDetectionComplete(any()) }
@@ -211,6 +225,7 @@ class BotDefenseHandlerTest {
 
         // When
         botDefenseHandler.handleBotDetectionEvent(threatData, mockCallback)
+        testDispatcher.scheduler.advanceUntilIdle() // Allow coroutines to complete
 
         // Then
         verify { mockCallback.onError(any()) }
@@ -228,6 +243,7 @@ class BotDefenseHandlerTest {
 
         // When
         botDefenseHandler.handleBotDetectionEvent(threatData, callback)
+        testDispatcher.scheduler.advanceUntilIdle() // Allow coroutines to complete
 
         // Then
         verify { callback.onSecurityCountermeasuresTriggered() }
@@ -247,6 +263,7 @@ class BotDefenseHandlerTest {
 
         // When
         botDefenseHandler.handleBotDetectionEvent(threatData, callback)
+        testDispatcher.scheduler.advanceUntilIdle() // Allow coroutines to complete
 
         // Then
         verify { callback.onUserNotificationRequired(any()) }
@@ -262,6 +279,7 @@ class BotDefenseHandlerTest {
 
         // When & Then (should not throw exception)
         botDefenseHandler.handleBotDetectionEvent(threatData, null)
+        testDispatcher.scheduler.advanceUntilIdle() // Allow coroutines to complete
     }
 
     @Test

@@ -2,6 +2,7 @@ package com.gleidsonlm.businesscard.security
 
 import android.content.Context
 import android.content.Intent
+import androidx.test.core.app.ApplicationProvider
 import com.gleidsonlm.businesscard.ThreatEventReceiver
 import com.gleidsonlm.businesscard.model.ThreatEventData
 import io.mockk.MockKAnnotations
@@ -18,6 +19,9 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 /**
  * Integration tests for the complete MobileBotDefenseCheck threat event flow.
@@ -26,11 +30,14 @@ import org.junit.Test
  * through bot detection and response mechanisms.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [34])
 class BotDefenseIntegrationTest {
 
     @MockK
-    private lateinit var context: Context
+    private lateinit var mockContext: Context
 
+    private lateinit var context: Context
     private lateinit var botDefenseHandler: BotDefenseHandler
     private lateinit var threatEventReceiver: ThreatEventReceiver
     private val testDispatcher = StandardTestDispatcher()
@@ -39,10 +46,13 @@ class BotDefenseIntegrationTest {
     fun setup() {
         MockKAnnotations.init(this)
         Dispatchers.setMain(testDispatcher)
+        
+        // Use real context for actual functionality, mock for verification
+        context = ApplicationProvider.getApplicationContext()
 
-        // Mock context behavior
-        every { context.startActivity(any()) } returns Unit
-        every { context.packageName } returns "com.gleidsonlm.businesscard"
+        // Mock context behavior for verification
+        every { mockContext.startActivity(any()) } returns Unit
+        every { mockContext.packageName } returns "com.gleidsonlm.businesscard"
 
         // Create real instances for integration testing
         val config = BotDefenseConfig(
@@ -54,7 +64,7 @@ class BotDefenseIntegrationTest {
         )
         
         botDefenseHandler = BotDefenseHandler(context, config, testDispatcher)
-        threatEventReceiver = ThreatEventReceiver(context)
+        threatEventReceiver = ThreatEventReceiver(mockContext)
         threatEventReceiver.setBotDefenseHandler(botDefenseHandler)
     }
 
@@ -82,7 +92,7 @@ class BotDefenseIntegrationTest {
         threatEventReceiver.onEvent(intent)
 
         // Then - Should trigger activity launch for high severity threat
-        verify { context.startActivity(any()) }
+        verify { mockContext.startActivity(any()) }
     }
 
     @Test
@@ -106,7 +116,7 @@ class BotDefenseIntegrationTest {
         threatEventReceiver.onEvent(intent)
 
         // Then - Should not trigger activity launch for log only mode
-        verify(exactly = 0) { context.startActivity(any()) }
+        verify(exactly = 0) { mockContext.startActivity(any()) }
     }
 
     @Test
@@ -121,7 +131,7 @@ class BotDefenseIntegrationTest {
         threatEventReceiver.onEvent(intent)
 
         // Then - Should route to ThreatEventActivity normally
-        verify { context.startActivity(any()) }
+        verify { mockContext.startActivity(any()) }
     }
 
     @Test
@@ -166,7 +176,7 @@ class BotDefenseIntegrationTest {
     @Test
     fun `fallback behavior when bot defense handler is not set`() = runTest {
         // Given - Receiver without bot defense handler
-        val receiverWithoutHandler = ThreatEventReceiver(context)
+        val receiverWithoutHandler = ThreatEventReceiver(mockContext)
         val intent = Intent("MobileBotDefenseCheck").apply {
             putExtra("defaultMessage", "Bot detected")
         }
@@ -175,6 +185,6 @@ class BotDefenseIntegrationTest {
         receiverWithoutHandler.onEvent(intent)
 
         // Then - Should fallback to normal threat event activity
-        verify { context.startActivity(any()) }
+        verify { mockContext.startActivity(any()) }
     }
 }
