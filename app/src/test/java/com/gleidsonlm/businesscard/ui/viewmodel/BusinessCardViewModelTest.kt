@@ -12,6 +12,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.mockkStatic
+import io.mockk.unmockkObject
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -56,12 +57,13 @@ class BusinessCardViewModelTest {
     @After
     fun tearDown() {
         Dispatchers.resetMain()
+        unmockkObject(VCardHelper)
     }
 
     @Test
     fun `loadInitialData_whenRepositoryReturnsData_updatesStateAndCallsQrCodeGeneration`() = runTest {
         // Given
-        val userData = UserData("Test User", "Test Title", "123456789", "test@example.com", "Test Company", "www.example.com", "Test Address")
+        val userData = UserData("Test User", "Test Title", "123456789", "test@example.com", "Test Company", "www.example.com")
         val dummyVCardString = "BEGIN:VCARD..."
         val mockAndroidBitmap = mockk<android.graphics.Bitmap>(relaxed = true)
 
@@ -101,8 +103,8 @@ class BusinessCardViewModelTest {
     @Test
     fun `generateQrCode_whenSuccessful_callsHelperMethods`() = runTest {
         // Given
-        val userData = UserData("Test User", "Test Title", "123456789", "test@example.com", "Test Company", "www.example.com", "Test Address")
-        val vCardString = "BEGIN:VCARD\nVERSION:3.0\nN:User;Test\nFN:Test User\nORG:Test Company\nTITLE:Test Title\nTEL;TYPE=WORK,VOICE:123456789\nEMAIL:test@example.com\nURL:www.example.com\nADR;TYPE=WORK:;;Test Address\nEND:VCARD" // More realistic VCard
+        val userData = UserData("Test User", "Test Title", "123456789", "test@example.com", "Test Company", "www.example.com")
+        val vCardString = "BEGIN:VCARD\nVERSION:3.0\nN:User;Test\nFN:Test User\nORG:Test Company\nTITLE:Test Title\nTEL;TYPE=WORK,VOICE:123456789\nEMAIL:test@example.com\nURL:www.example.com\nEND:VCARD" // More realistic VCard
         val mockBitmap = mockk<android.graphics.Bitmap>(relaxed = true)
 
         coEvery { VCardHelper.generateVCardString(userData) } returns vCardString
@@ -120,7 +122,7 @@ class BusinessCardViewModelTest {
     @Test
     fun `generateQrCode_whenBitmapGenerationReturnsNull_handlesGracefully`() = runTest {
         // Given
-        val userData = UserData("Test User", "Test Title", "123456789", "test@example.com", "Test Company", "www.example.com", "Test Address")
+        val userData = UserData("Test User", "Test Title", "123456789", "test@example.com", "Test Company", "www.example.com")
         val vCardString = "BEGIN:VCARD..." // Dummy vCard string
         coEvery { VCardHelper.generateVCardString(userData) } returns vCardString
         coEvery { VCardHelper.generateQRCodeBitmap(vCardString) } returns null
@@ -137,7 +139,7 @@ class BusinessCardViewModelTest {
     @Test
     fun `generateQrCode_whenVCardStringGenerationThrowsException_handlesGracefully`() = runTest {
         // Given
-        val userData = UserData("Test User", "Test Title", "123456789", "test@example.com", "Test Company", "www.example.com", "Test Address")
+        val userData = UserData("Test User", "Test Title", "123456789", "test@example.com", "Test Company", "www.example.com")
         val exception = RuntimeException("VCard String generation failed")
         coEvery { VCardHelper.generateVCardString(userData) } throws exception
 
@@ -153,7 +155,7 @@ class BusinessCardViewModelTest {
     @Test
     fun `generateQrCode_whenBitmapGenerationThrowsException_handlesGracefully`() = runTest {
         // Arrange
-        val userData = UserData("Test User", "Test Title", "123456789", "test@example.com", "Test Company", "www.example.com", "Test Address")
+        val userData = UserData("Test User", "Test Title", "123456789", "test@example.com", "Test Company", "www.example.com")
         val vCardString = "BEGIN:VCARD..." // Dummy vCard string
         val exception = RuntimeException("Bitmap generation failed")
 

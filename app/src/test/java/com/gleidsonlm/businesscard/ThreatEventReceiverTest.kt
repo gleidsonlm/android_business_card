@@ -2,6 +2,7 @@ package com.gleidsonlm.businesscard
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.gleidsonlm.businesscard.model.ThreatEventData
 import com.gleidsonlm.businesscard.security.BotDefenseHandler
@@ -170,7 +171,7 @@ class ThreatEventReceiverTest {
             callbackSlot.captured.onUserNotificationRequired(testMessage)
         }
         
-        every { context.startActivity(capture(activityIntentSlot)) } returns Unit
+        every { mockContext.startActivity(capture(activityIntentSlot)) } returns Unit
 
         // When
         threatEventReceiver.onEvent(intent)
@@ -179,9 +180,17 @@ class ThreatEventReceiverTest {
         verify { mockContext.startActivity(any()) }
         
         val capturedIntent = activityIntentSlot.captured
-        val threatData = capturedIntent.getParcelableExtra<ThreatEventData>(
-            ThreatEventActivity.EXTRA_THREAT_EVENT_DATA
-        )
+        val threatData = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            capturedIntent.getParcelableExtra(
+                ThreatEventActivity.EXTRA_THREAT_EVENT_DATA,
+                ThreatEventData::class.java
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            capturedIntent.getParcelableExtra<ThreatEventData>(
+                ThreatEventActivity.EXTRA_THREAT_EVENT_DATA
+            )
+        }
         
         assertNotNull(threatData)
         assertEquals(testMessage, threatData?.message)
@@ -202,7 +211,7 @@ class ThreatEventReceiverTest {
             callbackSlot.captured.onCriticalThreatDetected(threatData)
         }
         
-        every { context.startActivity(capture(activityIntentSlot)) } returns Unit
+        every { mockContext.startActivity(capture(activityIntentSlot)) } returns Unit
 
         // When
         threatEventReceiver.onEvent(intent)
@@ -211,9 +220,17 @@ class ThreatEventReceiverTest {
         verify { mockContext.startActivity(any()) }
         
         val capturedIntent = activityIntentSlot.captured
-        val threatData = capturedIntent.getParcelableExtra<ThreatEventData>(
-            ThreatEventActivity.EXTRA_THREAT_EVENT_DATA
-        )
+        val threatData = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            capturedIntent.getParcelableExtra(
+                ThreatEventActivity.EXTRA_THREAT_EVENT_DATA,
+                ThreatEventData::class.java
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            capturedIntent.getParcelableExtra<ThreatEventData>(
+                ThreatEventActivity.EXTRA_THREAT_EVENT_DATA
+            )
+        }
         
         assertNotNull(threatData)
         assertTrue("Should contain critical message", 
@@ -234,7 +251,7 @@ class ThreatEventReceiverTest {
             callbackSlot.captured.onError(testException)
         }
         
-        every { context.startActivity(capture(activityIntentSlot)) } returns Unit
+        every { mockContext.startActivity(capture(activityIntentSlot)) } returns Unit
 
         // When
         threatEventReceiver.onEvent(intent)
@@ -243,9 +260,17 @@ class ThreatEventReceiverTest {
         verify { mockContext.startActivity(any()) }
         
         val capturedIntent = activityIntentSlot.captured
-        val threatData = capturedIntent.getParcelableExtra<ThreatEventData>(
-            ThreatEventActivity.EXTRA_THREAT_EVENT_DATA
-        )
+        val threatData = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            capturedIntent.getParcelableExtra(
+                ThreatEventActivity.EXTRA_THREAT_EVENT_DATA,
+                ThreatEventData::class.java
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            capturedIntent.getParcelableExtra<ThreatEventData>(
+                ThreatEventActivity.EXTRA_THREAT_EVENT_DATA
+            )
+        }
         
         assertNotNull(threatData)
         assertTrue("Should contain error message", 
@@ -256,7 +281,7 @@ class ThreatEventReceiverTest {
     @Test
     fun `onEvent without bot defense handler falls back to threat event activity`() {
         // Given
-        val receiverWithoutHandler = ThreatEventReceiver(context)
+        val receiverWithoutHandler = ThreatEventReceiver(mockContext)
         val intent = createMobileBotDefenseCheckIntent()
 
         // When
