@@ -16,9 +16,9 @@ android {
     defaultConfig {
         applicationId = "com.gleidsonlm.businesscard"
         minSdk = 31
-        targetSdk = 35
-        versionCode = 1753112635
-        versionName = "July 24, 2025 - Anti-Malware Security Update"
+        targetSdk = 36
+        versionCode = 1753976531
+        versionName = "July 31, 2025"
     }
 
     buildTypes {
@@ -41,6 +41,12 @@ android {
 
     buildFeatures {
         compose = true
+    }
+    
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
     }
 }
 
@@ -70,6 +76,12 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk)
     testImplementation(libs.mockk.android)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.core)
+    testImplementation(libs.androidx.rules)
+    testImplementation(libs.androidx.runner)
+    testImplementation(libs.ui.test.junit4)
+    testImplementation(libs.ui.test.manifest)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

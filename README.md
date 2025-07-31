@@ -96,18 +96,39 @@ The application is configured to handle the following Appdome Threat-Events:
 *   `AppIntegrityError`: Detects app integrity errors (tampering, repackaging, etc).
 *   `EmulatorFound`: Detects if the app is running in an emulator environment.
 
-### New Anti-Malware Threat Events
-*   `DetectUnlockedBootloader`: Detects devices with unlocked bootloaders which may indicate compromised device security.
-*   `KernelSUDetected`: Detects KernelSU installations which provide root access through kernel modifications.
-*   `OsRemountDetected`: Detects when OS remounts are present which may indicate system partition tampering.
-*   `InjectedShellCodeDetected`: Detects injected shell code which may indicate malicious code injection attacks.
-*   `UnauthorizedAIAssistantDetected`: Detects unauthorized AI assistants which may indicate malware using AI for malicious purposes.
-*   `HookFrameworkDetected`: Detects hook frameworks (e.g., Xposed) which can be used to modify app behavior.
-*   `MagiskManagerDetected`: Detects Magisk Manager installations which provide systemless root access.
-*   `FridaDetected`: Detects Frida instrumentation framework which can be used for dynamic analysis and code injection.
-*   `FridaCustomDetected`: Detects strong/custom Frida detection for advanced instrumentation frameworks.
+### Comprehensive Appdome Threat Event Coverage
+
+The application now implements comprehensive Appdome threat event handling with support for all major threat categories:
+
+#### SSL/TLS Security Threats
+*   `SslCertificateValidationFailed`: Detects SSL certificate validation failures indicating potential MITM attacks.
+*   `SslNonSslConnection`: Detects non-SSL connections which may indicate security vulnerabilities.
+*   `SslIncompatibleVersion`: Detects incompatible SSL/TLS versions which may indicate security vulnerabilities.
 *   `SslIntegrityCheckFail`: Detects SSL integrity check failures which may indicate SSL pinning bypass attempts.
-*   `MalwareInjectionDetected`: Detects malware injection using AI-powered detection capabilities.
+
+#### Network Security Threats
+*   `NetworkProxyConfigured`: Detects network proxy configurations which may indicate man-in-the-middle attacks.
+
+#### Bot and Automation Detection
+*   `MobileBotDefenseCheck`: Advanced bot detection with configurable response actions.
+*   `ClickBotDetected`: Detects mobile auto-clicker applications which may indicate fraudulent activity.
+*   `ClickBotDetectedByPermissions`: Detects mobile auto-clicker applications through permission analysis.
+
+#### Fraud Prevention
+*   `KeyInjectionDetected`: Detects keystroke injection attacks which may indicate fraudulent input.
+*   `ActiveADBDetected`: Detects active Android Debug Bridge connections which may indicate debugging attacks.
+*   `BlockSecondSpace`: Detects secondary space applications which may indicate privacy bypass attempts.
+*   `RunningInVirtualSpace`: Detects virtual devices and environments which may indicate fraud or testing.
+*   `SeccompDetected`: Detects seccomp abuse which may indicate AI-assisted attacks.
+*   `CorelliumFileFound`: Detects Corellium ARM-in-ARM virtual devices which may indicate testing or fraud.
+*   `NotInstalledFromOfficialStore`: Detects applications not installed from official stores which may indicate sideloading.
+
+#### Anti-Cheat and Modding Detection
+*   `GameGuardianDetected`: Detects GameGuardian cheating applications which may indicate fraud or gaming exploits.
+*   `SpeedHackDetected`: Detects speed hacking applications which may indicate cheating or fraud.
+*   `CodeInjectionDetected`: Detects code and process injection attacks which may indicate malicious modifications.
+*   `OatIntegrityBadCommandLine`: Detects APK modding tools through OAT integrity checks which may indicate tampering.
+*   `RuntimeBundleValidationViolation`: Detects runtime bundle validation violations which may indicate dynamic modding.
 
 ### Flow of Event Handling
 
@@ -161,11 +182,10 @@ The application requires the `android.permission.REQUEST_INSTALL_PACKAGES` permi
 
 ## Appdome Threat-Events Integration
 
-This application is integrated with Appdome Threat-Events to provide runtime threat detection and response. The following threat events are currently handled:
+This application is integrated with Appdome Threat-Events to provide comprehensive runtime threat detection and response. The implementation covers all major threat categories including SSL/TLS security, network security, bot detection, fraud prevention, and anti-cheat mechanisms.
 
-- **UnknownSourcesEnabled**: Detects if "Unknown Sources" are enabled on the device.
-- **AppIsDebuggable**: Detects if the app is running in debuggable mode.
-- **AppIntegrityError**: Detects app integrity errors (tampering, repackaging, etc).
-- **EmulatorFound**: Detects if the app is running in an emulator environment.
+**Total Coverage**: 29+ threat event types across all major security categories.
 
-When a threat is detected, the application will display a screen with the details of the threat.
+Key threat events include SSL certificate validation failures, network proxy detection, mobile bot defense, keystroke injection detection, virtual environment detection, and gaming/modding prevention.
+
+When any threat is detected, the application displays a detailed screen with comprehensive threat information to inform the user about the specific security concern.

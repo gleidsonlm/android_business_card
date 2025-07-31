@@ -2,6 +2,7 @@ package com.gleidsonlm.businesscard
 
 import android.content.Context
 import android.content.Intent
+import androidx.test.core.app.ApplicationProvider
 import com.gleidsonlm.businesscard.model.ThreatEventData
 import com.gleidsonlm.businesscard.security.BotDefenseHandler
 import com.gleidsonlm.businesscard.security.BotDetectionCallback
@@ -16,6 +17,9 @@ import io.mockk.verify
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 /**
  * Unit tests for [ThreatEventReceiver] integration with [BotDefenseHandler].
@@ -23,9 +27,13 @@ import org.junit.Test
  * These tests validate the proper handling of MobileBotDefenseCheck events
  * and integration between the receiver and bot defense handler.
  */
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [34])
 class ThreatEventReceiverTest {
 
     @MockK
+    private lateinit var mockContext: Context
+    
     private lateinit var context: Context
 
     @RelaxedMockK
@@ -37,11 +45,14 @@ class ThreatEventReceiverTest {
     fun setup() {
         MockKAnnotations.init(this)
         
-        // Mock context.startActivity to avoid ActivityNotFoundException in tests
-        every { context.startActivity(any()) } returns Unit
-        every { context.packageName } returns "com.gleidsonlm.businesscard"
+        // Get real context and mock context for verification
+        context = ApplicationProvider.getApplicationContext()
         
-        threatEventReceiver = ThreatEventReceiver(context)
+        // Mock context.startActivity to avoid ActivityNotFoundException in tests
+        every { mockContext.startActivity(any()) } returns Unit
+        every { mockContext.packageName } returns "com.gleidsonlm.businesscard"
+        
+        threatEventReceiver = ThreatEventReceiver(mockContext)
         threatEventReceiver.setBotDefenseHandler(botDefenseHandler)
     }
 
@@ -100,7 +111,7 @@ class ThreatEventReceiverTest {
         // Then
         verify(exactly = 0) { botDefenseHandler.handleBotDetectionEvent(any(), any()) }
         // Should call startActivity for ThreatEventActivity
-        verify { context.startActivity(any()) }
+        verify { mockContext.startActivity(any()) }
     }
 
     @Test
@@ -121,7 +132,7 @@ class ThreatEventReceiverTest {
 
         // Then
         // Should not start ThreatEventActivity for LOG_ONLY action
-        verify(exactly = 0) { context.startActivity(any()) }
+        verify(exactly = 0) { mockContext.startActivity(any()) }
     }
 
     @Test
@@ -141,7 +152,7 @@ class ThreatEventReceiverTest {
         threatEventReceiver.onEvent(intent)
 
         // Then
-        verify { context.startActivity(any()) }
+        verify { mockContext.startActivity(any()) }
     }
 
     @Test
@@ -165,7 +176,7 @@ class ThreatEventReceiverTest {
         threatEventReceiver.onEvent(intent)
 
         // Then
-        verify { context.startActivity(any()) }
+        verify { mockContext.startActivity(any()) }
         
         val capturedIntent = activityIntentSlot.captured
         val threatData = capturedIntent.getParcelableExtra<ThreatEventData>(
@@ -197,7 +208,7 @@ class ThreatEventReceiverTest {
         threatEventReceiver.onEvent(intent)
 
         // Then
-        verify { context.startActivity(any()) }
+        verify { mockContext.startActivity(any()) }
         
         val capturedIntent = activityIntentSlot.captured
         val threatData = capturedIntent.getParcelableExtra<ThreatEventData>(
@@ -229,7 +240,7 @@ class ThreatEventReceiverTest {
         threatEventReceiver.onEvent(intent)
 
         // Then
-        verify { context.startActivity(any()) }
+        verify { mockContext.startActivity(any()) }
         
         val capturedIntent = activityIntentSlot.captured
         val threatData = capturedIntent.getParcelableExtra<ThreatEventData>(
@@ -253,7 +264,7 @@ class ThreatEventReceiverTest {
 
         // Then
         // Should start ThreatEventActivity as fallback
-        verify { context.startActivity(any()) }
+        verify { mockContext.startActivity(any()) }
     }
 
     @Test
@@ -266,7 +277,7 @@ class ThreatEventReceiverTest {
 
         // Then
         verify(exactly = 0) { botDefenseHandler.handleBotDetectionEvent(any(), any()) }
-        verify(exactly = 0) { context.startActivity(any()) }
+        verify(exactly = 0) { mockContext.startActivity(any()) }
     }
 
     @Test
@@ -297,7 +308,7 @@ class ThreatEventReceiverTest {
 
         // Then
         verify { handlerFunction.invoke(any()) }
-        verify { context.startActivity(any()) }
+        verify { mockContext.startActivity(any()) }
     }
 
     @Test
@@ -316,7 +327,7 @@ class ThreatEventReceiverTest {
 
         // Then
         verify { handlerFunction.invoke(any()) }
-        verify { context.startActivity(any()) }
+        verify { mockContext.startActivity(any()) }
     }
 
     @Test
@@ -335,6 +346,6 @@ class ThreatEventReceiverTest {
 
         // Then
         verify { handlerFunction.invoke(any()) }
-        verify { context.startActivity(any()) }
+        verify { mockContext.startActivity(any()) }
     }
 }
