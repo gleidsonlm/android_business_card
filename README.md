@@ -144,16 +144,15 @@ The application now implements comprehensive Appdome threat event handling with 
 2.  **Reception:** The `ThreatEventReceiver`, programmatically registered in `BusinessCardApplication.kt`, listens for these specific broadcast actions.
 3.  **Data Extraction:** Upon catching a broadcast, the `ThreatEventReceiver` extracts detailed meta-data associated with the threat event from the Intent. This data is encapsulated in a `ThreatEventData` object with a unique ID and timestamp.
 4.  **Storage:** The threat event is automatically saved to the local repository for display in the events list.
-5.  **Display Options:** 
-    - **Immediate Display:** For individual events, the receiver launches the `ThreatEventActivity` with detailed information.
-    - **Events List:** Users can access all threat events via the warning icon on the main screen to view the comprehensive events list.
-6.  **User Interaction:** Users can tap on event cards in the list to view full details, refresh the list, or clear all events.
+5.  **List Display:** Events appear in the threat events list screen (accessed via the warning icon on the main screen) as individual cards.
+6.  **User Navigation:** Users must tap on specific threat event cards in the list to view the detailed payload and metadata.
+7.  **Immediate Display Exception:** Only critical security actions (such as `SECURITY_MEASURES` or `APP_PROTECTION` from bot defense checks) may show immediate notifications that require urgent user attention.
 
-This implementation provides both immediate threat notification and comprehensive event history management.
+This new navigation flow ensures users have control over when they view threat details while maintaining immediate alerts for the most critical security events.
 
 ### Key Components
 
-*   **`ThreatEventReceiver.kt`**: A `BroadcastReceiver` that listens for Appdome threat event broadcasts. It processes these events, extracts data, saves them to the repository, and initiates the display of threat information.
+*   **`ThreatEventReceiver.kt`**: A `BroadcastReceiver` that listens for Appdome threat event broadcasts. It processes these events, extracts data, saves them to the repository for list display. Critical security events may trigger immediate notifications, but most events are displayed only when users tap them in the list.
 *   **`ThreatEventRepository.kt`** & **`ThreatEventRepositoryImpl.kt`**: Repository pattern implementation for storing and managing threat events using SharedPreferences with Gson serialization.
 *   **`ThreatEventListViewModel.kt`**: ViewModel that manages the state and business logic for the threat events list screen, following MVVM architecture patterns.
 *   **`ThreatEventListScreen.kt`**: Jetpack Compose screen that displays all threat events as a list of interactive cards with refresh and clear functionality.
@@ -203,4 +202,4 @@ This application is integrated with Appdome Threat-Events to provide comprehensi
 
 Key threat events include SSL certificate validation failures, network proxy detection, mobile bot defense, keystroke injection detection, virtual environment detection, and gaming/modding prevention.
 
-When any threat is detected, the application displays a detailed screen with comprehensive threat information to inform the user about the specific security concern.
+When any threat is detected, the application saves it to the events list. Users can view all threat events by tapping the warning icon on the main screen, and then tap individual event cards to view detailed threat information and comprehensive metadata about the specific security concern.

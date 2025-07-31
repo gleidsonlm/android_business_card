@@ -17,8 +17,8 @@ android {
         applicationId = "com.gleidsonlm.businesscard"
         minSdk = 31
         targetSdk = 36
-        versionCode = 1753976533
-        versionName = "August 13, 2025 - Event List Screen Implementation"
+        versionCode = 1753976534
+        versionName = "January 21, 2025 - Threat Event Navigation Refactoring"
     }
 
     buildTypes {
