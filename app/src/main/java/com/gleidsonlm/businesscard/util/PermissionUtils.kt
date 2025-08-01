@@ -100,5 +100,6 @@ object PermissionUtils {
             activity,
             Manifest.permission.READ_PHONE_STATE
         ) && !hasReadPhoneStatePermission(activity)
+            && hasRequestedReadPhoneStatePermission(activity)
     }
 }
