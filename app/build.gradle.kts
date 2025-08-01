@@ -18,7 +18,7 @@ android {
         minSdk = 31
         targetSdk = 36
         versionCode = 1753976534
-        versionName = "January 21, 2025 - Threat Event Navigation Refactoring"
+        versionName = "August 1, 2025"
     }
 
     buildTypes {

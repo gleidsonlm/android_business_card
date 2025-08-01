@@ -54,6 +54,7 @@ import com.gleidsonlm.businesscard.ui.theme.BusinessCardTheme
 import com.gleidsonlm.businesscard.ui.viewmodel.BusinessCardViewModel
 import com.gleidsonlm.businesscard.ui.viewmodel.UserInputViewModel
 import com.gleidsonlm.businesscard.util.VCardHelper
+import com.gleidsonlm.businesscard.util.PermissionUtils
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import java.io.FileOutputStream
@@ -68,6 +69,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        
+        // Request READ_PHONE_STATE permission for Appdome SIM swap detection
+        if (!PermissionUtils.hasReadPhoneStatePermission(this)) {
+            PermissionUtils.requestReadPhoneStatePermission(this)
+        }
+        
         setContent {
             var showInputScreen by remember { mutableStateOf(true) }
             var showThreatEventsScreen by remember { mutableStateOf(false) }
