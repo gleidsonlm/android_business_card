@@ -18,7 +18,7 @@ android {
         minSdk = 31
         targetSdk = 36
         versionCode = 1753976534
-        versionName = "August 13, 2025 - READ_PHONE_STATE Permission for SIM Swap Detection"
+        versionName = "August 1, 2025"
     }
 
     buildTypes {

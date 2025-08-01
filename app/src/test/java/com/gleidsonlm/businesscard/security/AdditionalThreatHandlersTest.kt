@@ -21,6 +21,19 @@ class AdditionalThreatHandlersTest {
     private lateinit var clickBotDetectedHandler: ClickBotDetectedHandler
     private lateinit var gameGuardianDetectedHandler: GameGuardianDetectedHandler
     private lateinit var codeInjectionDetectedHandler: CodeInjectionDetectedHandler
+    
+    // New threat event handlers from issue #60
+    private lateinit var sslServerCertificatePinningFailedHandler: SslServerCertificatePinningFailedHandler
+    private lateinit var vulnerableUriDetectedHandler: VulnerableUriDetectedHandler
+    private lateinit var faceIDBypassDetectedHandler: FaceIDBypassDetectedHandler
+    private lateinit var deepFakeAppsDetectedHandler: DeepFakeAppsDetectedHandler
+    private lateinit var activePhoneCallDetectedHandler: ActivePhoneCallDetectedHandler
+    private lateinit var blockedScreenCaptureEventHandler: BlockedScreenCaptureEventHandler
+    private lateinit var clickBotDetectedVirtualFingerHandler: ClickBotDetectedVirtualFingerHandler
+    private lateinit var illegalDisplayEventHandler: IllegalDisplayEventHandler
+    private lateinit var overlayDetectedHandler: OverlayDetectedHandler
+    private lateinit var blockedKeyboardEventHandler: BlockedKeyboardEventHandler
+    private lateinit var rogueMDMChangeDetectedHandler: RogueMDMChangeDetectedHandler
 
     @Before
     fun setup() {
@@ -28,6 +41,19 @@ class AdditionalThreatHandlersTest {
         clickBotDetectedHandler = ClickBotDetectedHandler()
         gameGuardianDetectedHandler = GameGuardianDetectedHandler()
         codeInjectionDetectedHandler = CodeInjectionDetectedHandler()
+        
+        // Initialize new threat event handlers from issue #60
+        sslServerCertificatePinningFailedHandler = SslServerCertificatePinningFailedHandler()
+        vulnerableUriDetectedHandler = VulnerableUriDetectedHandler()
+        faceIDBypassDetectedHandler = FaceIDBypassDetectedHandler()
+        deepFakeAppsDetectedHandler = DeepFakeAppsDetectedHandler()
+        activePhoneCallDetectedHandler = ActivePhoneCallDetectedHandler()
+        blockedScreenCaptureEventHandler = BlockedScreenCaptureEventHandler()
+        clickBotDetectedVirtualFingerHandler = ClickBotDetectedVirtualFingerHandler()
+        illegalDisplayEventHandler = IllegalDisplayEventHandler()
+        overlayDetectedHandler = OverlayDetectedHandler()
+        blockedKeyboardEventHandler = BlockedKeyboardEventHandler()
+        rogueMDMChangeDetectedHandler = RogueMDMChangeDetectedHandler()
     }
 
     private fun createThreatEventData(threatCode: String = "TEST_THREAT"): ThreatEventData {
@@ -110,6 +136,128 @@ class AdditionalThreatHandlersTest {
         // Then - Test passes if no exception thrown
     }
 
+    // New threat event handler tests from issue #60
+    @Test
+    fun `SslServerCertificatePinningFailedHandler handles threat event`() {
+        // Given
+        val threatEventData = createThreatEventData("SSL_PINNING_FAIL")
+
+        // When - Should not throw exception
+        sslServerCertificatePinningFailedHandler.handleSslServerCertificatePinningFailedEvent(threatEventData)
+
+        // Then - Test passes if no exception thrown
+    }
+
+    @Test
+    fun `VulnerableUriDetectedHandler handles threat event`() {
+        // Given
+        val threatEventData = createThreatEventData("VULNERABLE_URI_001")
+
+        // When - Should not throw exception
+        vulnerableUriDetectedHandler.handleVulnerableUriDetectedEvent(threatEventData)
+
+        // Then - Test passes if no exception thrown
+    }
+
+    @Test
+    fun `FaceIDBypassDetectedHandler handles threat event`() {
+        // Given
+        val threatEventData = createThreatEventData("FACEID_BYPASS_001")
+
+        // When - Should not throw exception
+        faceIDBypassDetectedHandler.handleFaceIDBypassDetectedEvent(threatEventData)
+
+        // Then - Test passes if no exception thrown
+    }
+
+    @Test
+    fun `DeepFakeAppsDetectedHandler handles threat event`() {
+        // Given
+        val threatEventData = createThreatEventData("DEEPFAKE_APP_001")
+
+        // When - Should not throw exception
+        deepFakeAppsDetectedHandler.handleDeepFakeAppsDetectedEvent(threatEventData)
+
+        // Then - Test passes if no exception thrown
+    }
+
+    @Test
+    fun `ActivePhoneCallDetectedHandler handles threat event`() {
+        // Given
+        val threatEventData = createThreatEventData("ACTIVE_CALL_001")
+
+        // When - Should not throw exception
+        activePhoneCallDetectedHandler.handleActivePhoneCallDetectedEvent(threatEventData)
+
+        // Then - Test passes if no exception thrown
+    }
+
+    @Test
+    fun `BlockedScreenCaptureEventHandler handles threat event`() {
+        // Given
+        val threatEventData = createThreatEventData("SCREEN_CAPTURE_001")
+
+        // When - Should not throw exception
+        blockedScreenCaptureEventHandler.handleBlockedScreenCaptureEventEvent(threatEventData)
+
+        // Then - Test passes if no exception thrown
+    }
+
+    @Test
+    fun `ClickBotDetectedVirtualFingerHandler handles threat event`() {
+        // Given
+        val threatEventData = createThreatEventData("VIRTUAL_FINGER_001")
+
+        // When - Should not throw exception
+        clickBotDetectedVirtualFingerHandler.handleClickBotDetectedVirtualFingerEvent(threatEventData)
+
+        // Then - Test passes if no exception thrown
+    }
+
+    @Test
+    fun `IllegalDisplayEventHandler handles threat event`() {
+        // Given
+        val threatEventData = createThreatEventData("ILLEGAL_DISPLAY_001")
+
+        // When - Should not throw exception
+        illegalDisplayEventHandler.handleIllegalDisplayEventEvent(threatEventData)
+
+        // Then - Test passes if no exception thrown
+    }
+
+    @Test
+    fun `OverlayDetectedHandler handles threat event`() {
+        // Given
+        val threatEventData = createThreatEventData("OVERLAY_ATTACK_001")
+
+        // When - Should not throw exception
+        overlayDetectedHandler.handleOverlayDetectedEvent(threatEventData)
+
+        // Then - Test passes if no exception thrown
+    }
+
+    @Test
+    fun `BlockedKeyboardEventHandler handles threat event`() {
+        // Given
+        val threatEventData = createThreatEventData("KEYBOARD_BLOCK_001")
+
+        // When - Should not throw exception
+        blockedKeyboardEventHandler.handleBlockedKeyboardEventEvent(threatEventData)
+
+        // Then - Test passes if no exception thrown
+    }
+
+    @Test
+    fun `RogueMDMChangeDetectedHandler handles threat event`() {
+        // Given
+        val threatEventData = createThreatEventData("ROGUE_MDM_001")
+
+        // When - Should not throw exception
+        rogueMDMChangeDetectedHandler.handleRogueMDMChangeDetectedEvent(threatEventData)
+
+        // Then - Test passes if no exception thrown
+    }
+
     @Test
     fun `handlers work with null device ID and threat code`() {
         // Given
@@ -123,6 +271,19 @@ class AdditionalThreatHandlersTest {
         clickBotDetectedHandler.handleClickBotDetectedEvent(threatEventData)
         gameGuardianDetectedHandler.handleGameGuardianDetectedEvent(threatEventData)
         codeInjectionDetectedHandler.handleCodeInjectionDetectedEvent(threatEventData)
+        
+        // Test new handlers from issue #60 with null values
+        sslServerCertificatePinningFailedHandler.handleSslServerCertificatePinningFailedEvent(threatEventData)
+        vulnerableUriDetectedHandler.handleVulnerableUriDetectedEvent(threatEventData)
+        faceIDBypassDetectedHandler.handleFaceIDBypassDetectedEvent(threatEventData)
+        deepFakeAppsDetectedHandler.handleDeepFakeAppsDetectedEvent(threatEventData)
+        activePhoneCallDetectedHandler.handleActivePhoneCallDetectedEvent(threatEventData)
+        blockedScreenCaptureEventHandler.handleBlockedScreenCaptureEventEvent(threatEventData)
+        clickBotDetectedVirtualFingerHandler.handleClickBotDetectedVirtualFingerEvent(threatEventData)
+        illegalDisplayEventHandler.handleIllegalDisplayEventEvent(threatEventData)
+        overlayDetectedHandler.handleOverlayDetectedEvent(threatEventData)
+        blockedKeyboardEventHandler.handleBlockedKeyboardEventEvent(threatEventData)
+        rogueMDMChangeDetectedHandler.handleRogueMDMChangeDetectedEvent(threatEventData)
 
         // Then - Test passes if no exception thrown
     }

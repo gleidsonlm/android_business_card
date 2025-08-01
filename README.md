@@ -138,6 +138,19 @@ The application now implements comprehensive Appdome threat event handling with 
 *   `OatIntegrityBadCommandLine`: Detects APK modding tools through OAT integrity checks which may indicate tampering.
 *   `RuntimeBundleValidationViolation`: Detects runtime bundle validation violations which may indicate dynamic modding.
 
+#### Enhanced Security Threat Detection (Additional Coverage)
+*   `SslServerCertificatePinningFailed`: Detects SSL/TLS certificate pinning failures indicating potential MITM attacks.
+*   `VulnerableUriDetected`: Detects usage of malicious or vulnerable URIs.
+*   `FaceIDBypassDetected`: Detects attempts to bypass FaceID authentication using deepfake or spoofing techniques.
+*   `DeepFakeAppsDetected`: Detects presence of deepfake applications that may be used for fraud or impersonation.
+*   `ActivePhoneCallDetected`: Detects active phone calls during sensitive actions to prevent social engineering attacks.
+*   `BlockedScreenCaptureEvent`: Detects and blocks screen capture attempts to prevent data exfiltration.
+*   `ClickBotDetectedVirtualFinger`: Detects virtual finger or click bot activity indicating automated malicious interactions.
+*   `IllegalDisplayEvent`: Detects illegal or remote displays that may indicate remote desktop scams or unauthorized access.
+*   `OverlayDetected`: Detects overlay attacks or malware that may steal sensitive information or manipulate user interface.
+*   `BlockedKeyboardEvent`: Detects and blocks unauthorized keyboard events to prevent keylogging malware.
+*   `RogueMDMChangeDetected`: Detects rogue Mobile Device Management (MDM) changes indicating potential device admin malware.
+
 ### Flow of Event Handling
 
 1.  **Detection:** When Appdome's security mechanisms detect one of the configured threat events, it broadcasts an Intent within the application.
@@ -204,7 +217,7 @@ The application requires the following permissions:
 
 This application is integrated with Appdome Threat-Events to provide comprehensive runtime threat detection and response. The implementation covers all major threat categories including SSL/TLS security, network security, bot detection, fraud prevention, and anti-cheat mechanisms.
 
-**Total Coverage**: 29+ threat event types across all major security categories.
+**Total Coverage**: 40+ threat event types across all major security categories.
 
 Key threat events include SSL certificate validation failures, network proxy detection, mobile bot defense, keystroke injection detection, virtual environment detection, and gaming/modding prevention.
 
