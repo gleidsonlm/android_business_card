@@ -101,6 +101,19 @@ class ThreatEventReceiver(
         registerReceiverWithFlags(IntentFilter("CodeInjectionDetected"))
         registerReceiverWithFlags(IntentFilter("OatIntegrityBadCommandLine"))
         registerReceiverWithFlags(IntentFilter("RuntimeBundleValidationViolation"))
+        
+        // Register for new additional threat events from issue #60
+        registerReceiverWithFlags(IntentFilter("SslServerCertificatePinningFailed"))
+        registerReceiverWithFlags(IntentFilter("VulnerableUriDetected"))
+        registerReceiverWithFlags(IntentFilter("FaceIDBypassDetected"))
+        registerReceiverWithFlags(IntentFilter("DeepFakeAppsDetected"))
+        registerReceiverWithFlags(IntentFilter("ActivePhoneCallDetected"))
+        registerReceiverWithFlags(IntentFilter("BlockedScreenCaptureEvent"))
+        registerReceiverWithFlags(IntentFilter("ClickBotDetectedVirtualFinger"))
+        registerReceiverWithFlags(IntentFilter("IllegalDisplayEvent"))
+        registerReceiverWithFlags(IntentFilter("OverlayDetected"))
+        registerReceiverWithFlags(IntentFilter("BlockedKeyboardEvent"))
+        registerReceiverWithFlags(IntentFilter("RogueMDMChangeDetected"))
     }
 
     /**

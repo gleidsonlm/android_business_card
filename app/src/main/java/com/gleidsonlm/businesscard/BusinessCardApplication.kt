@@ -3,21 +3,28 @@ package com.gleidsonlm.businesscard
 import android.app.Application
 import com.gleidsonlm.businesscard.data.repository.ThreatEventRepository
 import com.gleidsonlm.businesscard.security.ActiveADBDetectedHandler
+import com.gleidsonlm.businesscard.security.ActivePhoneCallDetectedHandler
 import com.gleidsonlm.businesscard.security.AppIntegrityErrorHandler
 import com.gleidsonlm.businesscard.security.AppIsDebuggableHandler
 import com.gleidsonlm.businesscard.security.BlockSecondSpaceHandler
+import com.gleidsonlm.businesscard.security.BlockedKeyboardEventHandler
+import com.gleidsonlm.businesscard.security.BlockedScreenCaptureEventHandler
 import com.gleidsonlm.businesscard.security.BotDefenseHandler
 import com.gleidsonlm.businesscard.security.ClickBotDetectedByPermissionsHandler
 import com.gleidsonlm.businesscard.security.ClickBotDetectedHandler
+import com.gleidsonlm.businesscard.security.ClickBotDetectedVirtualFingerHandler
 import com.gleidsonlm.businesscard.security.CodeInjectionDetectedHandler
 import com.gleidsonlm.businesscard.security.CorelliumFileFoundHandler
+import com.gleidsonlm.businesscard.security.DeepFakeAppsDetectedHandler
 import com.gleidsonlm.businesscard.security.DetectUnlockedBootloaderHandler
 import com.gleidsonlm.businesscard.security.EmulatorFoundHandler
+import com.gleidsonlm.businesscard.security.FaceIDBypassDetectedHandler
 import com.gleidsonlm.businesscard.security.FridaCustomDetectedHandler
 import com.gleidsonlm.businesscard.security.FridaDetectedHandler
 import com.gleidsonlm.businesscard.security.GameGuardianDetectedHandler
 import com.gleidsonlm.businesscard.security.GoogleEmulatorHandler
 import com.gleidsonlm.businesscard.security.HookFrameworkDetectedHandler
+import com.gleidsonlm.businesscard.security.IllegalDisplayEventHandler
 import com.gleidsonlm.businesscard.security.InjectedShellCodeDetectedHandler
 import com.gleidsonlm.businesscard.security.KernelSUDetectedHandler
 import com.gleidsonlm.businesscard.security.KeyInjectionDetectedHandler
@@ -27,6 +34,8 @@ import com.gleidsonlm.businesscard.security.NetworkProxyConfiguredHandler
 import com.gleidsonlm.businesscard.security.NotInstalledFromOfficialStoreHandler
 import com.gleidsonlm.businesscard.security.OatIntegrityBadCommandLineHandler
 import com.gleidsonlm.businesscard.security.OsRemountDetectedHandler
+import com.gleidsonlm.businesscard.security.OverlayDetectedHandler
+import com.gleidsonlm.businesscard.security.RogueMDMChangeDetectedHandler
 import com.gleidsonlm.businesscard.security.RunningInVirtualSpaceHandler
 import com.gleidsonlm.businesscard.security.RuntimeBundleValidationViolationHandler
 import com.gleidsonlm.businesscard.security.SeccompDetectedHandler
@@ -35,8 +44,10 @@ import com.gleidsonlm.businesscard.security.SslCertificateValidationFailedHandle
 import com.gleidsonlm.businesscard.security.SslIncompatibleVersionHandler
 import com.gleidsonlm.businesscard.security.SslIntegrityCheckFailHandler
 import com.gleidsonlm.businesscard.security.SslNonSslConnectionHandler
+import com.gleidsonlm.businesscard.security.SslServerCertificatePinningFailedHandler
 import com.gleidsonlm.businesscard.security.UnauthorizedAIAssistantDetectedHandler
 import com.gleidsonlm.businesscard.security.UnknownSourcesEnabledHandler
+import com.gleidsonlm.businesscard.security.VulnerableUriDetectedHandler
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -163,6 +174,40 @@ class BusinessCardApplication : Application() {
     @Inject
     lateinit var runtimeBundleValidationViolationHandler: RuntimeBundleValidationViolationHandler
 
+    // New threat event handlers from issue #60
+    @Inject
+    lateinit var sslServerCertificatePinningFailedHandler: SslServerCertificatePinningFailedHandler
+
+    @Inject
+    lateinit var vulnerableUriDetectedHandler: VulnerableUriDetectedHandler
+
+    @Inject
+    lateinit var faceIDBypassDetectedHandler: FaceIDBypassDetectedHandler
+
+    @Inject
+    lateinit var deepFakeAppsDetectedHandler: DeepFakeAppsDetectedHandler
+
+    @Inject
+    lateinit var activePhoneCallDetectedHandler: ActivePhoneCallDetectedHandler
+
+    @Inject
+    lateinit var blockedScreenCaptureEventHandler: BlockedScreenCaptureEventHandler
+
+    @Inject
+    lateinit var clickBotDetectedVirtualFingerHandler: ClickBotDetectedVirtualFingerHandler
+
+    @Inject
+    lateinit var illegalDisplayEventHandler: IllegalDisplayEventHandler
+
+    @Inject
+    lateinit var overlayDetectedHandler: OverlayDetectedHandler
+
+    @Inject
+    lateinit var blockedKeyboardEventHandler: BlockedKeyboardEventHandler
+
+    @Inject
+    lateinit var rogueMDMChangeDetectedHandler: RogueMDMChangeDetectedHandler
+
     /**
      * Called when the application is starting, before any other application objects have been created.
      *
@@ -215,6 +260,19 @@ class BusinessCardApplication : Application() {
         threatEventReceiver.addHandler("CodeInjectionDetected", codeInjectionDetectedHandler::handleCodeInjectionDetectedEvent)
         threatEventReceiver.addHandler("OatIntegrityBadCommandLine", oatIntegrityBadCommandLineHandler::handleOatIntegrityBadCommandLineEvent)
         threatEventReceiver.addHandler("RuntimeBundleValidationViolation", runtimeBundleValidationViolationHandler::handleRuntimeBundleValidationViolationEvent)
+
+        // Register new threat event handlers from issue #60
+        threatEventReceiver.addHandler("SslServerCertificatePinningFailed", sslServerCertificatePinningFailedHandler::handleSslServerCertificatePinningFailedEvent)
+        threatEventReceiver.addHandler("VulnerableUriDetected", vulnerableUriDetectedHandler::handleVulnerableUriDetectedEvent)
+        threatEventReceiver.addHandler("FaceIDBypassDetected", faceIDBypassDetectedHandler::handleFaceIDBypassDetectedEvent)
+        threatEventReceiver.addHandler("DeepFakeAppsDetected", deepFakeAppsDetectedHandler::handleDeepFakeAppsDetectedEvent)
+        threatEventReceiver.addHandler("ActivePhoneCallDetected", activePhoneCallDetectedHandler::handleActivePhoneCallDetectedEvent)
+        threatEventReceiver.addHandler("BlockedScreenCaptureEvent", blockedScreenCaptureEventHandler::handleBlockedScreenCaptureEventEvent)
+        threatEventReceiver.addHandler("ClickBotDetectedVirtualFinger", clickBotDetectedVirtualFingerHandler::handleClickBotDetectedVirtualFingerEvent)
+        threatEventReceiver.addHandler("IllegalDisplayEvent", illegalDisplayEventHandler::handleIllegalDisplayEventEvent)
+        threatEventReceiver.addHandler("OverlayDetected", overlayDetectedHandler::handleOverlayDetectedEvent)
+        threatEventReceiver.addHandler("BlockedKeyboardEvent", blockedKeyboardEventHandler::handleBlockedKeyboardEventEvent)
+        threatEventReceiver.addHandler("RogueMDMChangeDetected", rogueMDMChangeDetectedHandler::handleRogueMDMChangeDetectedEvent)
 
         threatEventReceiver.register()
     }
