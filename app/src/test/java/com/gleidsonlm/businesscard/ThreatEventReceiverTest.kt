@@ -106,7 +106,7 @@ class ThreatEventReceiverTest {
     }
 
     @Test
-    fun `onEvent with non-bot threat does not call bot defense handler`() {
+    fun `onEvent with non-bot threat does not automatically navigate to activity`() {
         // Given
         val intent = createNonBotThreatIntent()
 
@@ -115,8 +115,10 @@ class ThreatEventReceiverTest {
 
         // Then
         verify(exactly = 0) { botDefenseHandler.handleBotDetectionEvent(any(), any()) }
-        // Should call startActivity for ThreatEventActivity
-        verify { mockContext.startActivity(any()) }
+        // Should NOT automatically start activity - events are saved for list view
+        verify(exactly = 0) { mockContext.startActivity(any()) }
+        // Should save the event to repository for list display
+        verify { threatEventRepository.saveEvent(any()) }
     }
 
     @Test
@@ -141,7 +143,7 @@ class ThreatEventReceiverTest {
     }
 
     @Test
-    fun `bot detection callback onDetectionComplete with WARN_USER starts activity`() {
+    fun `bot detection callback onDetectionComplete with MONITOR does not start activity`() {
         // Given
         val intent = createMobileBotDefenseCheckIntent()
         val callbackSlot = slot<BotDetectionCallback>()
@@ -150,7 +152,48 @@ class ThreatEventReceiverTest {
             botDefenseHandler.handleBotDetectionEvent(any(), capture(callbackSlot)) 
         } answers {
             // Simulate immediate callback execution
-            callbackSlot.captured.onDetectionComplete(BotResponseAction.WARN_USER)
+            callbackSlot.captured.onDetectionComplete(BotResponseAction.MONITOR)
+        }
+
+        // When
+        threatEventReceiver.onEvent(intent)
+
+        // Then
+        // Should not start ThreatEventActivity for MONITOR action - event saved to list
+        verify(exactly = 0) { mockContext.startActivity(any()) }
+    }
+
+    @Test
+    fun `bot detection callback onDetectionComplete with SECURITY_MEASURES starts activity`() {
+        // Given
+        val intent = createMobileBotDefenseCheckIntent()
+        val callbackSlot = slot<BotDetectionCallback>()
+        
+        every { 
+            botDefenseHandler.handleBotDetectionEvent(any(), capture(callbackSlot)) 
+        } answers {
+            // Simulate immediate callback execution
+            callbackSlot.captured.onDetectionComplete(BotResponseAction.SECURITY_MEASURES)
+        }
+
+        // When
+        threatEventReceiver.onEvent(intent)
+
+        // Then
+        verify { mockContext.startActivity(any()) }
+    }
+
+    @Test
+    fun `bot detection callback onDetectionComplete with APP_PROTECTION starts activity`() {
+        // Given
+        val intent = createMobileBotDefenseCheckIntent()
+        val callbackSlot = slot<BotDetectionCallback>()
+        
+        every { 
+            botDefenseHandler.handleBotDetectionEvent(any(), capture(callbackSlot)) 
+        } answers {
+            // Simulate immediate callback execution
+            callbackSlot.captured.onDetectionComplete(BotResponseAction.APP_PROTECTION)
         }
 
         // When
@@ -242,11 +285,10 @@ class ThreatEventReceiverTest {
     }
 
     @Test
-    fun `bot detection callback onError starts activity with error information`() {
+    fun `bot detection callback onError does not start activity - saves to list`() {
         // Given
         val intent = createMobileBotDefenseCheckIntent()
         val callbackSlot = slot<BotDetectionCallback>()
-        val activityIntentSlot = slot<Intent>()
         val testException = RuntimeException("Test bot detection error")
         
         every { 
@@ -254,36 +296,18 @@ class ThreatEventReceiverTest {
         } answers {
             callbackSlot.captured.onError(testException)
         }
-        
-        every { mockContext.startActivity(capture(activityIntentSlot)) } returns Unit
 
         // When
         threatEventReceiver.onEvent(intent)
 
         // Then
-        verify { mockContext.startActivity(any()) }
-        
-        val capturedIntent = activityIntentSlot.captured
-        val threatData = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            capturedIntent.getParcelableExtra(
-                ThreatEventActivity.EXTRA_THREAT_EVENT_DATA,
-                ThreatEventData::class.java
-            )
-        } else {
-            @Suppress("DEPRECATION")
-            capturedIntent.getParcelableExtra<ThreatEventData>(
-                ThreatEventActivity.EXTRA_THREAT_EVENT_DATA
-            )
-        }
-        
-        assertNotNull(threatData)
-        assertTrue("Should contain error message", 
-            threatData?.message?.contains("error") == true)
-        assertEquals("Test bot detection error", threatData?.internalError)
+        // Should NOT start activity for errors - just save to list for review
+        verify(exactly = 0) { mockContext.startActivity(any()) }
+        verify { threatEventRepository.saveEvent(any()) }
     }
 
     @Test
-    fun `onEvent without bot defense handler falls back to threat event activity`() {
+    fun `onEvent without bot defense handler saves to list only`() {
         // Given
         val receiverWithoutHandler = ThreatEventReceiver(mockContext, threatEventRepository)
         val intent = createMobileBotDefenseCheckIntent()
@@ -292,8 +316,9 @@ class ThreatEventReceiverTest {
         receiverWithoutHandler.onEvent(intent)
 
         // Then
-        // Should start ThreatEventActivity as fallback
-        verify { mockContext.startActivity(any()) }
+        // Should NOT start ThreatEventActivity - just save to list
+        verify(exactly = 0) { mockContext.startActivity(any()) }
+        verify { threatEventRepository.saveEvent(any()) }
     }
 
     @Test
@@ -322,7 +347,7 @@ class ThreatEventReceiverTest {
     }
 
     @Test
-    fun `onEvent handles DetectUnlockedBootloader threat event`() {
+    fun `onEvent handles DetectUnlockedBootloader threat event without auto-navigation`() {
         // Given
         val intent = Intent("DetectUnlockedBootloader").apply {
             putExtra("defaultMessage", "Unlocked bootloader detected")
@@ -337,11 +362,13 @@ class ThreatEventReceiverTest {
 
         // Then
         verify { handlerFunction.invoke(any()) }
-        verify { mockContext.startActivity(any()) }
+        // Should NOT automatically start activity - events saved to list
+        verify(exactly = 0) { mockContext.startActivity(any()) }
+        verify { threatEventRepository.saveEvent(any()) }
     }
 
     @Test
-    fun `onEvent handles FridaDetected threat event`() {
+    fun `onEvent handles FridaDetected threat event without auto-navigation`() {
         // Given
         val intent = Intent("FridaDetected").apply {
             putExtra("defaultMessage", "Frida instrumentation detected")
@@ -356,11 +383,13 @@ class ThreatEventReceiverTest {
 
         // Then
         verify { handlerFunction.invoke(any()) }
-        verify { mockContext.startActivity(any()) }
+        // Should NOT automatically start activity - events saved to list
+        verify(exactly = 0) { mockContext.startActivity(any()) }
+        verify { threatEventRepository.saveEvent(any()) }
     }
 
     @Test
-    fun `onEvent handles MalwareInjectionDetected threat event`() {
+    fun `onEvent handles MalwareInjectionDetected threat event without auto-navigation`() {
         // Given
         val intent = Intent("MalwareInjectionDetected").apply {
             putExtra("defaultMessage", "Malware injection detected")
@@ -375,6 +404,8 @@ class ThreatEventReceiverTest {
 
         // Then
         verify { handlerFunction.invoke(any()) }
-        verify { mockContext.startActivity(any()) }
+        // Should NOT automatically start activity - events saved to list
+        verify(exactly = 0) { mockContext.startActivity(any()) }
+        verify { threatEventRepository.saveEvent(any()) }
     }
 }

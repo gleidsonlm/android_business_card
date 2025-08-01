@@ -220,7 +220,9 @@ class ThreatEventReceiver(
             "MobileBotDefenseCheck" -> handleBotDefenseCheck(threatEventData)
             else -> {
                 threatHandlers[action]?.invoke(threatEventData)
-                routeToThreatEventActivity(threatEventData, action)
+                // Note: Removed automatic navigation to ThreatEventActivity
+                // Events will be displayed in the list screen and users can tap to view details
+                Log.i(TAG, "Threat event processed and saved: $action")
             }
         }
     }
@@ -236,15 +238,21 @@ class ThreatEventReceiver(
             callback = object : com.gleidsonlm.businesscard.security.BotDetectionCallback {
                 override fun onDetectionComplete(action: com.gleidsonlm.businesscard.security.BotResponseAction) {
                     Log.i(TAG, "Bot detection completed with action: $action")
-                    // Optionally route to ThreatEventActivity for user display
-                    if (action != com.gleidsonlm.businesscard.security.BotResponseAction.LOG_ONLY) {
-                        routeToThreatEventActivity(threatEventData, "MobileBotDefenseCheck")
+                    // Only show activity for actions that require immediate user attention
+                    when (action) {
+                        com.gleidsonlm.businesscard.security.BotResponseAction.SECURITY_MEASURES,
+                        com.gleidsonlm.businesscard.security.BotResponseAction.APP_PROTECTION -> {
+                            routeToThreatEventActivity(threatEventData, "MobileBotDefenseCheck")
+                        }
+                        else -> {
+                            Log.i(TAG, "Bot detection event saved to list for user review: $action")
+                        }
                     }
                 }
 
                 override fun onUserNotificationRequired(message: String) {
                     Log.i(TAG, "User notification required: $message")
-                    // Create enhanced threat event data with user message
+                    // Create enhanced threat event data with user message and show immediately
                     val enhancedData = threatEventData.copy(
                         message = message,
                         defaultMessage = message
@@ -272,13 +280,13 @@ class ThreatEventReceiver(
                         message = "Bot detection error: ${exception.message}",
                         internalError = exception.message
                     )
-                    routeToThreatEventActivity(errorData, "MobileBotDefenseCheck")
+                    // For errors, just log and save to list - don't interrupt user
+                    Log.i(TAG, "Bot detection error saved to list for review")
                 }
             }
         ) ?: run {
-            // Fallback if bot defense handler is not available
-            Log.w(TAG, "BotDefenseHandler not available, routing to ThreatEventActivity")
-            routeToThreatEventActivity(threatEventData, "MobileBotDefenseCheck")
+            // Fallback if bot defense handler is not available - save to list only
+            Log.w(TAG, "BotDefenseHandler not available, event saved to list")
         }
     }
 
