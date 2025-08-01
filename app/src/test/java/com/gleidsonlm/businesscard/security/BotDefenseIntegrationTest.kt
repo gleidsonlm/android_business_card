@@ -138,8 +138,9 @@ class BotDefenseIntegrationTest {
         // When - Process the threat event
         threatEventReceiver.onEvent(intent)
 
-        // Then - Should route to ThreatEventActivity normally
-        verify { mockContext.startActivity(any()) }
+        // Then - Should save to repository but NOT automatically start activity
+        // Events are displayed in the list screen for user review
+        verify(exactly = 0) { mockContext.startActivity(any()) }
     }
 
     @Test
@@ -192,7 +193,8 @@ class BotDefenseIntegrationTest {
         // When - Process the threat event
         receiverWithoutHandler.onEvent(intent)
 
-        // Then - Should fallback to normal threat event activity
-        verify { mockContext.startActivity(any()) }
+        // Then - Should save to repository but NOT automatically start activity
+        // Events are saved to list for user review when no handler is set
+        verify(exactly = 0) { mockContext.startActivity(any()) }
     }
 }
