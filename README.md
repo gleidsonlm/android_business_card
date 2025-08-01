@@ -188,9 +188,14 @@ Each threat event is handled by a dedicated handler class that follows these pri
 
 ## Permissions Required
 
-The application requires the `android.permission.REQUEST_INSTALL_PACKAGES` permission for the following reason:
+The application requires the following permissions:
 
+### `android.permission.REQUEST_INSTALL_PACKAGES`
 *   **Threat Event Functionality**: This permission is necessary for the proper functioning of the threat-event screen. Certain threat events may require the ability to initiate package installations or updates as a response or mitigation step. Without this permission, the threat-event screen may not load correctly or some of its features related to package management might be disabled. Users will be prompted to grant this permission if it's not already available.
+
+### `android.permission.READ_PHONE_STATE`
+*   **SIM Swap Detection**: This permission is required for the upcoming Appdome SIM swap detection feature. It allows the app to monitor SIM state changes as part of enhanced security against SIM swap attacks. This helps protect users from account takeover attempts where attackers try to transfer the victim's phone number to a SIM card under their control. The permission is requested at runtime following Android's permission best practices.
+*   **Reference**: [Appdome Detect SIM swap documentation](https://www.appdome.com/how-to/account-takeover-prevention/account-protection/detect-sim-card-swapping-in-android-ios/)
 
 ## 🔮 Future Enhancements (Post-Refactoring)
 

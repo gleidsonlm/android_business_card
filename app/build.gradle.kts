@@ -18,7 +18,7 @@ android {
         minSdk = 31
         targetSdk = 36
         versionCode = 1753976534
-        versionName = "Enhanced Security - Additional Appdome Threat-Events Implementation"
+        versionName = "August 1, 2025"
     }
 
     buildTypes {

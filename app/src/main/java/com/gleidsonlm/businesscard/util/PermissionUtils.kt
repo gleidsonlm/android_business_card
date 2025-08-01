@@ -8,13 +8,14 @@ import android.content.pm.PackageManager // PackageManager import might still be
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-// ActivityCompat is not used in the updated code, so it can be removed.
-// import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 object PermissionUtils {
 
     // Made public by removing private modifier
     const val REQUEST_CODE_INSTALL_PACKAGES = 1001
+    const val REQUEST_CODE_READ_PHONE_STATE = 1002
 
     /**
      * Checks if the app has the permission to request package installs.
@@ -55,5 +56,50 @@ object PermissionUtils {
         }
         // For pre-O versions, no runtime request is typically made for REQUEST_INSTALL_PACKAGES.
         // If the permission is in the manifest, it's considered granted.
+    }
+
+    /**
+     * Checks if the app has the READ_PHONE_STATE permission.
+     * This permission is required for Appdome SIM swap detection capability.
+     *
+     * @param context The context to use for checking the permission.
+     * @return `true` if the permission is granted, `false` otherwise.
+     */
+    fun hasReadPhoneStatePermission(context: Context): Boolean {
+        return ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.READ_PHONE_STATE
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    /**
+     * Requests the READ_PHONE_STATE permission from the user.
+     * This permission is required for Appdome SIM swap detection capability to monitor
+     * SIM state changes as part of enhanced security against SIM swap attacks.
+     *
+     * Reference: https://www.appdome.com/how-to/account-takeover-prevention/account-protection/detect-sim-card-swapping-in-android-ios/
+     *
+     * @param activity The activity that is requesting the permission.
+     */
+    fun requestReadPhoneStatePermission(activity: Activity) {
+        ActivityCompat.requestPermissions(
+            activity,
+            arrayOf(Manifest.permission.READ_PHONE_STATE),
+            REQUEST_CODE_READ_PHONE_STATE
+        )
+    }
+
+    /**
+     * Checks if the user has denied the permission and selected "Don't ask again".
+     *
+     * @param activity The activity to check.
+     * @return `true` if the permission was permanently denied, `false` otherwise.
+     */
+    fun isReadPhoneStatePermissionPermanentlyDenied(activity: Activity): Boolean {
+        return !ActivityCompat.shouldShowRequestPermissionRationale(
+            activity,
+            Manifest.permission.READ_PHONE_STATE
+        ) && !hasReadPhoneStatePermission(activity)
+            && hasRequestedReadPhoneStatePermission(activity)
     }
 }

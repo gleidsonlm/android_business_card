@@ -7,6 +7,10 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <!-- Required for Appdome SIM swap detection capability. This permission allows the app to monitor 
+         SIM state changes as part of enhanced security against SIM swap attacks. 
+         See: https://www.appdome.com/how-to/account-takeover-prevention/account-protection/detect-sim-card-swapping-in-android-ios/ -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <application
