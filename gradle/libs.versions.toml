@@ -5,6 +5,7 @@ core = "3.5.3"
 coreVersion = "1.7.0"
 ezVcardVersion = "0.12.1"
 gson = "2.13.1"
+hiltNavigationCompose = "1.2.0"
 kotlin = "2.2.0"
 ksp = "2.2.0-2.0.2"
 hilt = "2.57"
@@ -28,6 +29,7 @@ runner = "1.7.0"
 androidx-arch-core-testing = { group = "androidx.arch.core", name = "core-testing", version.ref = "androidxArchCoreTesting" }
 androidx-core = { module = "androidx.test:core", version.ref = "coreVersion" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-rules = { module = "androidx.test:rules", version.ref = "coreVersion" }
 androidx-runner = { module = "androidx.test:runner", version.ref = "runner" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
