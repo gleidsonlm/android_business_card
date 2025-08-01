@@ -10,6 +10,7 @@ import com.gleidsonlm.businesscard.security.BotDefenseHandler
 import com.gleidsonlm.businesscard.security.BotDetectionCallback
 import com.gleidsonlm.businesscard.security.BotResponseAction
 import io.mockk.MockKAnnotations
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
@@ -118,7 +119,7 @@ class ThreatEventReceiverTest {
         // Should NOT automatically start activity - events are saved for list view
         verify(exactly = 0) { mockContext.startActivity(any()) }
         // Should save the event to repository for list display
-        verify { threatEventRepository.saveEvent(any()) }
+        coVerify { threatEventRepository.saveEvent(any()) }
     }
 
     @Test
@@ -303,7 +304,7 @@ class ThreatEventReceiverTest {
         // Then
         // Should NOT start activity for errors - just save to list for review
         verify(exactly = 0) { mockContext.startActivity(any()) }
-        verify { threatEventRepository.saveEvent(any()) }
+        coVerify { threatEventRepository.saveEvent(any()) }
     }
 
     @Test
@@ -318,7 +319,7 @@ class ThreatEventReceiverTest {
         // Then
         // Should NOT start ThreatEventActivity - just save to list
         verify(exactly = 0) { mockContext.startActivity(any()) }
-        verify { threatEventRepository.saveEvent(any()) }
+        coVerify { threatEventRepository.saveEvent(any()) }
     }
 
     @Test
@@ -364,7 +365,7 @@ class ThreatEventReceiverTest {
         verify { handlerFunction.invoke(any()) }
         // Should NOT automatically start activity - events saved to list
         verify(exactly = 0) { mockContext.startActivity(any()) }
-        verify { threatEventRepository.saveEvent(any()) }
+        coVerify { threatEventRepository.saveEvent(any()) }
     }
 
     @Test
@@ -385,7 +386,7 @@ class ThreatEventReceiverTest {
         verify { handlerFunction.invoke(any()) }
         // Should NOT automatically start activity - events saved to list
         verify(exactly = 0) { mockContext.startActivity(any()) }
-        verify { threatEventRepository.saveEvent(any()) }
+        coVerify { threatEventRepository.saveEvent(any()) }
     }
 
     @Test
@@ -406,6 +407,6 @@ class ThreatEventReceiverTest {
         verify { handlerFunction.invoke(any()) }
         // Should NOT automatically start activity - events saved to list
         verify(exactly = 0) { mockContext.startActivity(any()) }
-        verify { threatEventRepository.saveEvent(any()) }
+        coVerify { threatEventRepository.saveEvent(any()) }
     }
 }

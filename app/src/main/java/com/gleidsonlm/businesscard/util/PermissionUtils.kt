@@ -17,6 +17,9 @@ object PermissionUtils {
     const val REQUEST_CODE_INSTALL_PACKAGES = 1001
     const val REQUEST_CODE_READ_PHONE_STATE = 1002
 
+    // Track which permissions have been requested to determine if they're permanently denied
+    private val requestedPermissions = mutableSetOf<String>()
+
     /**
      * Checks if the app has the permission to request package installs.
      *
@@ -82,11 +85,25 @@ object PermissionUtils {
      * @param activity The activity that is requesting the permission.
      */
     fun requestReadPhoneStatePermission(activity: Activity) {
+        // Mark permission as requested for permanent denial detection
+        requestedPermissions.add(Manifest.permission.READ_PHONE_STATE)
+        
         ActivityCompat.requestPermissions(
             activity,
             arrayOf(Manifest.permission.READ_PHONE_STATE),
             REQUEST_CODE_READ_PHONE_STATE
         )
+    }
+
+    /**
+     * Checks if the READ_PHONE_STATE permission has been requested before.
+     * This is used to determine if a permission denial is permanent (user selected "Don't ask again").
+     *
+     * @param activity The activity to check (parameter kept for consistency with other permission methods).
+     * @return `true` if the permission has been requested before, `false` otherwise.
+     */
+    fun hasRequestedReadPhoneStatePermission(activity: Activity): Boolean {
+        return requestedPermissions.contains(Manifest.permission.READ_PHONE_STATE)
     }
 
     /**
