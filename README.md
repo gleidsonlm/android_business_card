@@ -113,6 +113,11 @@ The application now implements comprehensive Appdome threat event handling with 
 *   `SslNonSslConnection`: Detects non-SSL connections which may indicate security vulnerabilities.
 *   `SslIncompatibleVersion`: Detects incompatible SSL/TLS versions which may indicate security vulnerabilities.
 *   `SslIntegrityCheckFail`: Detects SSL integrity check failures which may indicate SSL pinning bypass attempts.
+*   `SslIncompatibleCipher`: Detects incompatible SSL/TLS cipher suites to enforce secure connections.
+*   `SslInvalidCertificateChain`: Detects invalid TLS certificate chains to prevent MITM attacks.
+*   `SslInvalidMinRSASignature`: Detects cases where minimum RSA signature strength is not met.
+*   `SslInvalidMinECCSignature`: Detects ECC signatures that do not meet the required strength.
+*   `SslInvalidMinDigest`: Detects insecure digest algorithms and enforces SHA-256 or stronger.
 
 #### Network Security Threats
 *   `NetworkProxyConfigured`: Detects network proxy configurations which may indicate man-in-the-middle attacks.
@@ -123,6 +128,7 @@ The application now implements comprehensive Appdome threat event handling with 
 *   `ClickBotDetectedByPermissions`: Detects mobile auto-clicker applications through permission analysis.
 
 #### Fraud Prevention
+*   `BannedManufacturer`: Detects banned device manufacturers to ensure security compliance.
 *   `KeyInjectionDetected`: Detects keystroke injection attacks which may indicate fraudulent input.
 *   `ActiveADBDetected`: Detects active Android Debug Bridge connections which may indicate debugging attacks.
 *   `BlockSecondSpace`: Detects secondary space applications which may indicate privacy bypass attempts.
@@ -216,7 +222,7 @@ The application requires the following permissions:
 
 This application is integrated with Appdome Threat-Events to provide comprehensive runtime threat detection and response. The implementation covers all major threat categories including SSL/TLS security, network security, bot detection, fraud prevention, and anti-cheat mechanisms.
 
-**Total Coverage**: 40+ threat event types across all major security categories.
+**Total Coverage**: 46+ threat event types across all major security categories.
 
 Key threat events include SSL certificate validation failures, network proxy detection, mobile bot defense, keystroke injection detection, virtual environment detection, and gaming/modding prevention.
 

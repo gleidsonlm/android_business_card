@@ -114,6 +114,14 @@ class ThreatEventReceiver(
         registerReceiverWithFlags(IntentFilter("OverlayDetected"))
         registerReceiverWithFlags(IntentFilter("BlockedKeyboardEvent"))
         registerReceiverWithFlags(IntentFilter("RogueMDMChangeDetected"))
+        
+        // Register for new security compliance threat events from issue #68
+        registerReceiverWithFlags(IntentFilter("BannedManufacturer"))
+        registerReceiverWithFlags(IntentFilter("SslIncompatibleCipher"))
+        registerReceiverWithFlags(IntentFilter("SslInvalidCertificateChain"))
+        registerReceiverWithFlags(IntentFilter("SslInvalidMinRSASignature"))
+        registerReceiverWithFlags(IntentFilter("SslInvalidMinECCSignature"))
+        registerReceiverWithFlags(IntentFilter("SslInvalidMinDigest"))
     }
 
     /**

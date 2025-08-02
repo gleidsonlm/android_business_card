@@ -34,6 +34,14 @@ class AdditionalThreatHandlersTest {
     private lateinit var overlayDetectedHandler: OverlayDetectedHandler
     private lateinit var blockedKeyboardEventHandler: BlockedKeyboardEventHandler
     private lateinit var rogueMDMChangeDetectedHandler: RogueMDMChangeDetectedHandler
+    
+    // New security compliance threat event handlers from issue #68
+    private lateinit var bannedManufacturerHandler: BannedManufacturerHandler
+    private lateinit var sslIncompatibleCipherHandler: SslIncompatibleCipherHandler
+    private lateinit var sslInvalidCertificateChainHandler: SslInvalidCertificateChainHandler
+    private lateinit var sslInvalidMinRSASignatureHandler: SslInvalidMinRSASignatureHandler
+    private lateinit var sslInvalidMinECCSignatureHandler: SslInvalidMinECCSignatureHandler
+    private lateinit var sslInvalidMinDigestHandler: SslInvalidMinDigestHandler
 
     @Before
     fun setup() {
@@ -54,6 +62,14 @@ class AdditionalThreatHandlersTest {
         overlayDetectedHandler = OverlayDetectedHandler()
         blockedKeyboardEventHandler = BlockedKeyboardEventHandler()
         rogueMDMChangeDetectedHandler = RogueMDMChangeDetectedHandler()
+        
+        // Initialize new security compliance threat event handlers from issue #68
+        bannedManufacturerHandler = BannedManufacturerHandler()
+        sslIncompatibleCipherHandler = SslIncompatibleCipherHandler()
+        sslInvalidCertificateChainHandler = SslInvalidCertificateChainHandler()
+        sslInvalidMinRSASignatureHandler = SslInvalidMinRSASignatureHandler()
+        sslInvalidMinECCSignatureHandler = SslInvalidMinECCSignatureHandler()
+        sslInvalidMinDigestHandler = SslInvalidMinDigestHandler()
     }
 
     private fun createThreatEventData(threatCode: String = "TEST_THREAT"): ThreatEventData {
@@ -259,6 +275,72 @@ class AdditionalThreatHandlersTest {
     }
 
     @Test
+    fun `BannedManufacturerHandler handles threat event`() {
+        // Given
+        val threatEventData = createThreatEventData("BANNED_MANUFACTURER_001")
+
+        // When - Should not throw exception
+        bannedManufacturerHandler.handleBannedManufacturerEvent(threatEventData)
+
+        // Then - Test passes if no exception thrown
+    }
+
+    @Test
+    fun `SslIncompatibleCipherHandler handles threat event`() {
+        // Given
+        val threatEventData = createThreatEventData("SSL_CIPHER_001")
+
+        // When - Should not throw exception
+        sslIncompatibleCipherHandler.handleSslIncompatibleCipherEvent(threatEventData)
+
+        // Then - Test passes if no exception thrown
+    }
+
+    @Test
+    fun `SslInvalidCertificateChainHandler handles threat event`() {
+        // Given
+        val threatEventData = createThreatEventData("SSL_CERT_CHAIN_001")
+
+        // When - Should not throw exception
+        sslInvalidCertificateChainHandler.handleSslInvalidCertificateChainEvent(threatEventData)
+
+        // Then - Test passes if no exception thrown
+    }
+
+    @Test
+    fun `SslInvalidMinRSASignatureHandler handles threat event`() {
+        // Given
+        val threatEventData = createThreatEventData("SSL_RSA_SIG_001")
+
+        // When - Should not throw exception
+        sslInvalidMinRSASignatureHandler.handleSslInvalidMinRSASignatureEvent(threatEventData)
+
+        // Then - Test passes if no exception thrown
+    }
+
+    @Test
+    fun `SslInvalidMinECCSignatureHandler handles threat event`() {
+        // Given
+        val threatEventData = createThreatEventData("SSL_ECC_SIG_001")
+
+        // When - Should not throw exception
+        sslInvalidMinECCSignatureHandler.handleSslInvalidMinECCSignatureEvent(threatEventData)
+
+        // Then - Test passes if no exception thrown
+    }
+
+    @Test
+    fun `SslInvalidMinDigestHandler handles threat event`() {
+        // Given
+        val threatEventData = createThreatEventData("SSL_DIGEST_001")
+
+        // When - Should not throw exception
+        sslInvalidMinDigestHandler.handleSslInvalidMinDigestEvent(threatEventData)
+
+        // Then - Test passes if no exception thrown
+    }
+
+    @Test
     fun `handlers work with null device ID and threat code`() {
         // Given
         val threatEventData = createThreatEventData("").copy(
@@ -284,6 +366,14 @@ class AdditionalThreatHandlersTest {
         overlayDetectedHandler.handleOverlayDetectedEvent(threatEventData)
         blockedKeyboardEventHandler.handleBlockedKeyboardEventEvent(threatEventData)
         rogueMDMChangeDetectedHandler.handleRogueMDMChangeDetectedEvent(threatEventData)
+        
+        // Test new security compliance handlers from issue #68 with null values
+        bannedManufacturerHandler.handleBannedManufacturerEvent(threatEventData)
+        sslIncompatibleCipherHandler.handleSslIncompatibleCipherEvent(threatEventData)
+        sslInvalidCertificateChainHandler.handleSslInvalidCertificateChainEvent(threatEventData)
+        sslInvalidMinRSASignatureHandler.handleSslInvalidMinRSASignatureEvent(threatEventData)
+        sslInvalidMinECCSignatureHandler.handleSslInvalidMinECCSignatureEvent(threatEventData)
+        sslInvalidMinDigestHandler.handleSslInvalidMinDigestEvent(threatEventData)
 
         // Then - Test passes if no exception thrown
     }

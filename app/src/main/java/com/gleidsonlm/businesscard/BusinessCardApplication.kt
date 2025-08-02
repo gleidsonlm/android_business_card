@@ -6,6 +6,7 @@ import com.gleidsonlm.businesscard.security.ActiveADBDetectedHandler
 import com.gleidsonlm.businesscard.security.ActivePhoneCallDetectedHandler
 import com.gleidsonlm.businesscard.security.AppIntegrityErrorHandler
 import com.gleidsonlm.businesscard.security.AppIsDebuggableHandler
+import com.gleidsonlm.businesscard.security.BannedManufacturerHandler
 import com.gleidsonlm.businesscard.security.BlockSecondSpaceHandler
 import com.gleidsonlm.businesscard.security.BlockedKeyboardEventHandler
 import com.gleidsonlm.businesscard.security.BlockedScreenCaptureEventHandler
@@ -41,8 +42,13 @@ import com.gleidsonlm.businesscard.security.RuntimeBundleValidationViolationHand
 import com.gleidsonlm.businesscard.security.SeccompDetectedHandler
 import com.gleidsonlm.businesscard.security.SpeedHackDetectedHandler
 import com.gleidsonlm.businesscard.security.SslCertificateValidationFailedHandler
+import com.gleidsonlm.businesscard.security.SslIncompatibleCipherHandler
 import com.gleidsonlm.businesscard.security.SslIncompatibleVersionHandler
 import com.gleidsonlm.businesscard.security.SslIntegrityCheckFailHandler
+import com.gleidsonlm.businesscard.security.SslInvalidCertificateChainHandler
+import com.gleidsonlm.businesscard.security.SslInvalidMinDigestHandler
+import com.gleidsonlm.businesscard.security.SslInvalidMinECCSignatureHandler
+import com.gleidsonlm.businesscard.security.SslInvalidMinRSASignatureHandler
 import com.gleidsonlm.businesscard.security.SslNonSslConnectionHandler
 import com.gleidsonlm.businesscard.security.SslServerCertificatePinningFailedHandler
 import com.gleidsonlm.businesscard.security.UnauthorizedAIAssistantDetectedHandler
@@ -208,6 +214,25 @@ class BusinessCardApplication : Application() {
     @Inject
     lateinit var rogueMDMChangeDetectedHandler: RogueMDMChangeDetectedHandler
 
+    // New security compliance threat event handlers from issue #68
+    @Inject
+    lateinit var bannedManufacturerHandler: BannedManufacturerHandler
+
+    @Inject
+    lateinit var sslIncompatibleCipherHandler: SslIncompatibleCipherHandler
+
+    @Inject
+    lateinit var sslInvalidCertificateChainHandler: SslInvalidCertificateChainHandler
+
+    @Inject
+    lateinit var sslInvalidMinRSASignatureHandler: SslInvalidMinRSASignatureHandler
+
+    @Inject
+    lateinit var sslInvalidMinECCSignatureHandler: SslInvalidMinECCSignatureHandler
+
+    @Inject
+    lateinit var sslInvalidMinDigestHandler: SslInvalidMinDigestHandler
+
     /**
      * Called when the application is starting, before any other application objects have been created.
      *
@@ -273,6 +298,14 @@ class BusinessCardApplication : Application() {
         threatEventReceiver.addHandler("OverlayDetected", overlayDetectedHandler::handleOverlayDetectedEvent)
         threatEventReceiver.addHandler("BlockedKeyboardEvent", blockedKeyboardEventHandler::handleBlockedKeyboardEventEvent)
         threatEventReceiver.addHandler("RogueMDMChangeDetected", rogueMDMChangeDetectedHandler::handleRogueMDMChangeDetectedEvent)
+
+        // Register new security compliance threat event handlers from issue #68
+        threatEventReceiver.addHandler("BannedManufacturer", bannedManufacturerHandler::handleBannedManufacturerEvent)
+        threatEventReceiver.addHandler("SslIncompatibleCipher", sslIncompatibleCipherHandler::handleSslIncompatibleCipherEvent)
+        threatEventReceiver.addHandler("SslInvalidCertificateChain", sslInvalidCertificateChainHandler::handleSslInvalidCertificateChainEvent)
+        threatEventReceiver.addHandler("SslInvalidMinRSASignature", sslInvalidMinRSASignatureHandler::handleSslInvalidMinRSASignatureEvent)
+        threatEventReceiver.addHandler("SslInvalidMinECCSignature", sslInvalidMinECCSignatureHandler::handleSslInvalidMinECCSignatureEvent)
+        threatEventReceiver.addHandler("SslInvalidMinDigest", sslInvalidMinDigestHandler::handleSslInvalidMinDigestEvent)
 
         threatEventReceiver.register()
     }
