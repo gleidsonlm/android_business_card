@@ -10,12 +10,14 @@ import android.os.Build
 import android.provider.Settings
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 
 object PermissionUtils {
 
     // Made public by removing private modifier
     const val REQUEST_CODE_INSTALL_PACKAGES = 1001
     const val REQUEST_CODE_READ_PHONE_STATE = 1002
+    const val REQUEST_CODE_ACCESS_COARSE_LOCATION = 1003
 
     // Track which permissions have been requested to determine if they're permanently denied
     private val requestedPermissions = mutableSetOf<String>()
@@ -27,16 +29,7 @@ object PermissionUtils {
      * @return `true` if the permission is granted or not required to be explicitly requested at runtime, `false` otherwise.
      */
     fun hasInstallPackagesPermission(context: Context): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.packageManager.canRequestPackageInstalls()
-        } else {
-            // For versions prior to Android O, declaring the permission in the manifest
-            // is generally sufficient. There isn't a runtime request mechanism like for other
-            // dangerous permissions. Since we ensure it's in the manifest,
-            // we can assume it's available.
-            // A more thorough check could involve inspecting PackageInfo.requestedPermissions.
-            true
-        }
+        return context.packageManager.canRequestPackageInstalls()
     }
 
     /**
@@ -47,18 +40,14 @@ object PermissionUtils {
      * @param activity The activity that is requesting the permission.
      */
     fun requestInstallPackagesPermission(activity: Activity) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (!activity.packageManager.canRequestPackageInstalls()) {
-                // Intent to navigate to the settings page for the app to allow package installs.
-                // This is the standard way to request this permission on Android O+.
-                val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
-                    data = Uri.parse("package:${activity.packageName}")
-                }
-                activity.startActivityForResult(intent, REQUEST_CODE_INSTALL_PACKAGES)
+        if (!activity.packageManager.canRequestPackageInstalls()) {
+            // Intent to navigate to the settings page for the app to allow package installs.
+            // This is the standard way to request this permission on Android O+.
+            val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
+                data = "package:${activity.packageName}".toUri()
             }
+            activity.startActivityForResult(intent, REQUEST_CODE_INSTALL_PACKAGES)
         }
-        // For pre-O versions, no runtime request is typically made for REQUEST_INSTALL_PACKAGES.
-        // If the permission is in the manifest, it's considered granted.
     }
 
     /**
@@ -118,5 +107,65 @@ object PermissionUtils {
             Manifest.permission.READ_PHONE_STATE
         ) && !hasReadPhoneStatePermission(activity)
             && hasRequestedReadPhoneStatePermission(activity)
+    }
+
+    /**
+     * Checks if the app has the ACCESS_COARSE_LOCATION permission.
+     * This permission is required for Appdome geo-compliance threat detection features.
+     *
+     * @param context The context to use for checking the permission.
+     * @return `true` if the permission is granted, `false` otherwise.
+     */
+    fun hasLocationPermission(context: Context): Boolean {
+        return ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    /**
+     * Requests the ACCESS_COARSE_LOCATION permission from the user.
+     * This permission is required for Appdome geo-compliance threat detection features
+     * including location spoofing detection, mock location detection, teleportation detection,
+     * and geo-fencing enforcement.
+     *
+     * Reference: https://www.appdome.com/how-to/mobile-fraud-prevention-detection/geo-compliance/
+     *
+     * @param activity The activity that is requesting the permission.
+     */
+    fun requestLocationPermission(activity: Activity) {
+        // Mark permission as requested for permanent denial detection
+        requestedPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION)
+        
+        ActivityCompat.requestPermissions(
+            activity,
+            arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
+            REQUEST_CODE_ACCESS_COARSE_LOCATION
+        )
+    }
+
+    /**
+     * Checks if the ACCESS_COARSE_LOCATION permission has been requested before.
+     * This is used to determine if a permission denial is permanent (user selected "Don't ask again").
+     *
+     * @param activity The activity to check (parameter kept for consistency with other permission methods).
+     * @return `true` if the permission has been requested before, `false` otherwise.
+     */
+    fun hasRequestedLocationPermission(activity: Activity): Boolean {
+        return requestedPermissions.contains(Manifest.permission.ACCESS_COARSE_LOCATION)
+    }
+
+    /**
+     * Checks if the user has denied the location permission and selected "Don't ask again".
+     *
+     * @param activity The activity to check.
+     * @return `true` if the permission was permanently denied, `false` otherwise.
+     */
+    fun isLocationPermissionPermanentlyDenied(activity: Activity): Boolean {
+        return !ActivityCompat.shouldShowRequestPermissionRationale(
+            activity,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) && !hasLocationPermission(activity)
+            && hasRequestedLocationPermission(activity)
     }
 }

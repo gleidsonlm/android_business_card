@@ -1,6 +1,7 @@
 package com.gleidsonlm.businesscard.data.repository
 
 import android.content.Context
+import androidx.core.content.edit
 import com.gleidsonlm.businesscard.model.ThreatEventData
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -54,7 +55,9 @@ class ThreatEventRepositoryImpl @Inject constructor(
     }
     
     override suspend fun clearAllEvents() {
-        sharedPreferences.edit().remove(KEY_EVENTS).apply()
+        sharedPreferences.edit {
+            remove(KEY_EVENTS)
+        }
         _eventsFlow.value = emptyList()
     }
     
@@ -74,7 +77,9 @@ class ThreatEventRepositoryImpl @Inject constructor(
     
     private fun saveEventsToStorage(events: List<ThreatEventData>) {
         val eventsJson = gson.toJson(events)
-        sharedPreferences.edit().putString(KEY_EVENTS, eventsJson).apply()
+        sharedPreferences.edit {
+            putString(KEY_EVENTS, eventsJson)
+        }
     }
     
     companion object {

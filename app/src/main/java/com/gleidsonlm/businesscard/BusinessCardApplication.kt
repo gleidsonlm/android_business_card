@@ -29,7 +29,11 @@ import com.gleidsonlm.businesscard.security.EmulatorFoundHandler
 import com.gleidsonlm.businesscard.security.FaceIDBypassDetectedHandler
 import com.gleidsonlm.businesscard.security.FridaCustomDetectedHandler
 import com.gleidsonlm.businesscard.security.FridaDetectedHandler
+import com.gleidsonlm.businesscard.security.FraudulentLocationDetectedHandler
 import com.gleidsonlm.businesscard.security.GameGuardianDetectedHandler
+import com.gleidsonlm.businesscard.security.GeoFencingUnauthorizedLocationHandler
+import com.gleidsonlm.businesscard.security.GeoLocationMockByAppDetectedHandler
+import com.gleidsonlm.businesscard.security.GeoLocationSpoofingDetectedHandler
 import com.gleidsonlm.businesscard.security.GoogleEmulatorHandler
 import com.gleidsonlm.businesscard.security.HookFrameworkDetectedHandler
 import com.gleidsonlm.businesscard.security.IllegalAccessibilityServiceEventHandler
@@ -40,6 +44,7 @@ import com.gleidsonlm.businesscard.security.KeyInjectionDetectedHandler
 import com.gleidsonlm.businesscard.security.MagiskManagerDetectedHandler
 import com.gleidsonlm.businesscard.security.MalwareInjectionDetectedHandler
 import com.gleidsonlm.businesscard.security.NetworkProxyConfiguredHandler
+import com.gleidsonlm.businesscard.security.NoSimPresentHandler
 import com.gleidsonlm.businesscard.security.NotInstalledFromOfficialStoreHandler
 import com.gleidsonlm.businesscard.security.OatIntegrityBadCommandLineHandler
 import com.gleidsonlm.businesscard.security.OsRemountDetectedHandler
@@ -61,10 +66,12 @@ import com.gleidsonlm.businesscard.security.SslInvalidMinRSASignatureHandler
 import com.gleidsonlm.businesscard.security.SslNonSslConnectionHandler
 import com.gleidsonlm.businesscard.security.SslServerCertificatePinningFailedHandler
 import com.gleidsonlm.businesscard.security.StalkerSpywareDetectedHandler
+import com.gleidsonlm.businesscard.security.TeleportationDetectedHandler
 import com.gleidsonlm.businesscard.security.UACPresentedHandler
 import com.gleidsonlm.businesscard.security.UnauthorizedAIAssistantDetectedHandler
 import com.gleidsonlm.businesscard.security.UnknownSourcesEnabledHandler
 import com.gleidsonlm.businesscard.security.VulnerableUriDetectedHandler
+import com.gleidsonlm.businesscard.security.ActiveVpnDetectedHandler
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -278,6 +285,28 @@ class BusinessCardApplication : Application() {
     @Inject
     lateinit var stalkerSpywareDetectedHandler: StalkerSpywareDetectedHandler
 
+    // New geo-compliance threat event handlers from issue #72
+    @Inject
+    lateinit var geoLocationSpoofingDetectedHandler: GeoLocationSpoofingDetectedHandler
+
+    @Inject
+    lateinit var geoLocationMockByAppDetectedHandler: GeoLocationMockByAppDetectedHandler
+
+    @Inject
+    lateinit var activeVpnDetectedHandler: ActiveVpnDetectedHandler
+
+    @Inject
+    lateinit var noSimPresentHandler: NoSimPresentHandler
+
+    @Inject
+    lateinit var teleportationDetectedHandler: TeleportationDetectedHandler
+
+    @Inject
+    lateinit var fraudulentLocationDetectedHandler: FraudulentLocationDetectedHandler
+
+    @Inject
+    lateinit var geoFencingUnauthorizedLocationHandler: GeoFencingUnauthorizedLocationHandler
+
     /**
      * Called when the application is starting, before any other application objects have been created.
      *
@@ -364,6 +393,15 @@ class BusinessCardApplication : Application() {
         threatEventReceiver.addHandler("CloakAndDaggerCapableAppDetected", cloakAndDaggerCapableAppDetectedHandler::handleCloakAndDaggerCapableAppDetectedEvent)
         threatEventReceiver.addHandler("AbusiveAccessibilityServiceDetected", abusiveAccessibilityServiceDetectedHandler::handleAbusiveAccessibilityServiceDetectedEvent)
         threatEventReceiver.addHandler("StalkerSpywareDetected", stalkerSpywareDetectedHandler::handleStalkerSpywareDetectedEvent)
+
+        // Register new geo-compliance threat event handlers from issue #72
+        threatEventReceiver.addHandler("GeoLocationSpoofingDetected", geoLocationSpoofingDetectedHandler::handleGeoLocationSpoofingDetectedEvent)
+        threatEventReceiver.addHandler("GeoLocationMockByAppDetected", geoLocationMockByAppDetectedHandler::handleGeoLocationMockByAppDetectedEvent)
+        threatEventReceiver.addHandler("ActiveVpnDetected", activeVpnDetectedHandler::handleActiveVpnDetectedEvent)
+        threatEventReceiver.addHandler("NoSimPresent", noSimPresentHandler::handleNoSimPresentEvent)
+        threatEventReceiver.addHandler("TeleportationDetected", teleportationDetectedHandler::handleTeleportationDetectedEvent)
+        threatEventReceiver.addHandler("FraudulentLocationDetected", fraudulentLocationDetectedHandler::handleFraudulentLocationDetectedEvent)
+        threatEventReceiver.addHandler("GeoFencingUnauthorizedLocation", geoFencingUnauthorizedLocationHandler::handleGeoFencingUnauthorizedLocationEvent)
 
         threatEventReceiver.register()
     }

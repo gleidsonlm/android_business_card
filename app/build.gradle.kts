@@ -2,8 +2,6 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.google.gms.google.services)
-    alias(libs.plugins.google.firebase.crashlytics)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.hilt.plugin)
     alias(libs.plugins.kotlin.parcelize)
@@ -17,7 +15,7 @@ android {
         applicationId = "com.gleidsonlm.businesscard"
         minSdk = 31
         targetSdk = 36
-        versionCode = 1754321445
+        versionCode = 1754346425
         versionName = "August 4, 2025"
     }
 
@@ -48,6 +46,13 @@ android {
             isIncludeAndroidResources = true
         }
     }
+    
+    lint {
+        // Disable SelectedPhotoAccess warning - app already uses modern photo picker
+        disable += "SelectedPhotoAccess"
+        // Disable IconXmlAndPng warning - it's common to have both adaptive and fallback icons
+        disable += "IconXmlAndPng"
+    }
 }
 
 dependencies {
@@ -68,7 +73,6 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.firebase.crashlytics)
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
     ksp(libs.hilt.android.compiler)

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.util.Log
+import androidx.core.content.ContextCompat
 import com.gleidsonlm.businesscard.data.repository.ThreatEventRepository
 import com.gleidsonlm.businesscard.model.ThreatEventData
 import com.gleidsonlm.businesscard.security.BotDefenseHandler
@@ -135,6 +136,15 @@ class ThreatEventReceiver(
         registerReceiverWithFlags(IntentFilter("CloakAndDaggerCapableAppDetected"))
         registerReceiverWithFlags(IntentFilter("AbusiveAccessibilityServiceDetected"))
         registerReceiverWithFlags(IntentFilter("StalkerSpywareDetected"))
+        
+        // Register for geo-compliance threat events from issue #72
+        registerReceiverWithFlags(IntentFilter("GeoLocationSpoofingDetected"))
+        registerReceiverWithFlags(IntentFilter("GeoLocationMockByAppDetected"))
+        registerReceiverWithFlags(IntentFilter("ActiveVpnDetected"))
+        registerReceiverWithFlags(IntentFilter("NoSimPresent"))
+        registerReceiverWithFlags(IntentFilter("TeleportationDetected"))
+        registerReceiverWithFlags(IntentFilter("FraudulentLocationDetected"))
+        registerReceiverWithFlags(IntentFilter("GeoFencingUnauthorizedLocation"))
     }
 
     /**
@@ -158,15 +168,13 @@ class ThreatEventReceiver(
         val action = intentFilter.getAction(0) // Get the first action, assuming one action per filter for logging
         Log.i(TAG, "Attempting to register receiver for action: ${action ?: "Unknown Action"}")
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                applicationContext.registerReceiver(
-                    this.receiver,
-                    intentFilter,
-                    Context.RECEIVER_NOT_EXPORTED
-                )
-            } else {
-                applicationContext.registerReceiver(this.receiver, intentFilter)
-            }
+            // Use ContextCompat for better compatibility with RECEIVER_NOT_EXPORTED flag
+            ContextCompat.registerReceiver(
+                applicationContext,
+                this.receiver,
+                intentFilter,
+                ContextCompat.RECEIVER_NOT_EXPORTED
+            )
             Log.i(TAG, "Successfully registered receiver for action: ${action ?: "Unknown Action"}")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to register receiver for action: ${action ?: "Unknown Action"}", e)
