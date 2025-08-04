@@ -108,6 +108,23 @@ The application now implements comprehensive Appdome threat event handling with 
 *   **Event Management:** Refresh the list or clear all events using the action buttons in the toolbar.
 *   **Dynamic Updates:** New threat events automatically appear in the list as they are detected.
 
+#### Account Takeover Prevention & Social Engineering
+*   `IllegalAccessibilityServiceEvent`: Detects and blocks suspicious accessibility services used for social engineering attacks.
+*   `SimStateInfo`: Detects SIM card swapping attempts that may indicate account takeover.
+*   `ActiveDebuggerThreatDetected`: Detects active debuggers or memory editing tools used for attacks.
+*   `BlockedClipboardEvent`: Blocks clipboard actions and notifies when copy/paste attacks are prevented.
+*   `UACPresented`: Presents user accessibility service consent events for transparency.
+*   `AbusiveAccessibilityServiceDetected`: Detects abusive accessibility services used by remote access trojans.
+
+#### Trojan & Malware Detection
+*   `BlockedATSModification`: Detects and blocks ATS modifications commonly used by banking trojans.
+*   `CloakAndDaggerCapableAppDetected`: Detects apps capable of Cloak & Dagger UI redressing attacks.
+*   `StalkerSpywareDetected`: Detects stalker spyware used for unauthorized surveillance.
+
+#### Advanced Threat Intelligence
+*   `ConditionalEnforcementEvent`: Uses conditional enforcement for sophisticated threat response policies.
+*   `DeepSeekDetected`: Detects advanced AI-driven attack techniques and evasion methods.
+
 #### SSL/TLS Security Threats
 *   `SslCertificateValidationFailed`: Detects SSL certificate validation failures indicating potential MITM attacks.
 *   `SslNonSslConnection`: Detects non-SSL connections which may indicate security vulnerabilities.
@@ -222,8 +239,8 @@ The application requires the following permissions:
 
 This application is integrated with Appdome Threat-Events to provide comprehensive runtime threat detection and response. The implementation covers all major threat categories including SSL/TLS security, network security, bot detection, fraud prevention, and anti-cheat mechanisms.
 
-**Total Coverage**: 46+ threat event types across all major security categories.
+**Total Coverage**: 57+ threat event types across all major security categories.
 
-Key threat events include SSL certificate validation failures, network proxy detection, mobile bot defense, keystroke injection detection, virtual environment detection, and gaming/modding prevention.
+Key threat events include SSL certificate validation failures, network proxy detection, mobile bot defense, keystroke injection detection, virtual environment detection, gaming/modding prevention, accessibility service monitoring, SIM swap detection, clipboard protection, deepfake detection, and advanced AI-driven threat detection.
 
 When any threat is detected, the application saves it to the events list. Users can view all threat events by tapping the warning icon on the main screen, and then tap individual event cards to view detailed threat information and comprehensive metadata about the specific security concern.
