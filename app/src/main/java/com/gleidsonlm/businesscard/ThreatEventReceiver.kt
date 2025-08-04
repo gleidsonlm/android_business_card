@@ -135,6 +135,15 @@ class ThreatEventReceiver(
         registerReceiverWithFlags(IntentFilter("CloakAndDaggerCapableAppDetected"))
         registerReceiverWithFlags(IntentFilter("AbusiveAccessibilityServiceDetected"))
         registerReceiverWithFlags(IntentFilter("StalkerSpywareDetected"))
+        
+        // Register for geo-compliance threat events from issue #72
+        registerReceiverWithFlags(IntentFilter("GeoLocationSpoofingDetected"))
+        registerReceiverWithFlags(IntentFilter("GeoLocationMockByAppDetected"))
+        registerReceiverWithFlags(IntentFilter("ActiveVpnDetected"))
+        registerReceiverWithFlags(IntentFilter("NoSimPresent"))
+        registerReceiverWithFlags(IntentFilter("TeleportationDetected"))
+        registerReceiverWithFlags(IntentFilter("FraudulentLocationDetected"))
+        registerReceiverWithFlags(IntentFilter("GeoFencingUnauthorizedLocation"))
     }
 
     /**

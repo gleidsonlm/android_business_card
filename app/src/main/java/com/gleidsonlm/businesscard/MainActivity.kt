@@ -75,6 +75,11 @@ class MainActivity : ComponentActivity() {
             PermissionUtils.requestReadPhoneStatePermission(this)
         }
         
+        // Request ACCESS_COARSE_LOCATION permission for Appdome geo-compliance features
+        if (!PermissionUtils.hasLocationPermission(this)) {
+            PermissionUtils.requestLocationPermission(this)
+        }
+        
         setContent {
             var showInputScreen by remember { mutableStateOf(true) }
             var showThreatEventsScreen by remember { mutableStateOf(false) }

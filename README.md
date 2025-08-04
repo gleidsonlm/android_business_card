@@ -96,6 +96,27 @@ The application is configured to handle the following Appdome Threat-Events:
 *   `AppIntegrityError`: Detects app integrity errors (tampering, repackaging, etc).
 *   `EmulatorFound`: Detects if the app is running in an emulator environment.
 
+### Geo-Compliance Threat Events
+
+The application now includes comprehensive geo-compliance threat detection to protect against location-based fraud and ensure geographic security policies:
+
+*   `GeoLocationSpoofingDetected`: Detects if the device's location is being spoofed or faked.
+*   `GeoLocationMockByAppDetected`: Detects if a mock location app is installed or used.
+*   `ActiveVpnDetected`: Detects if the device is using an active VPN connection.
+*   `NoSimPresent`: Detects if the device does not have a SIM card present.
+*   `TeleportationDetected`: Detects if device location changes suddenly or unrealistically (teleportation).
+*   `FraudulentLocationDetected`: Detects if the device location is desynchronized or fraudulent.
+*   `GeoFencingUnauthorizedLocation`: Detects and restricts access if the device is outside authorized geofenced locations.
+
+References:
+- [Detect Fake Location](https://www.appdome.com/how-to/mobile-fraud-prevention-detection/geo-compliance/detect-fake-location-in-android-apps/)
+- [Detect Fake GPS App](https://www.appdome.com/how-to/mobile-fraud-prevention-detection/geo-compliance/detect-fake-gps-app-on-android/)
+- [VPN Detection](https://www.appdome.com/how-to/mobile-fraud-prevention-detection/geo-compliance/vpn-detection/)
+- [Missing SIM Card Detection](https://www.appdome.com/how-to/mobile-fraud-prevention-detection/geo-compliance/check-for-missing-sim-cards-on-android-ios-devices/)
+- [Teleportation Detection](https://www.appdome.com/how-to/mobile-fraud-prevention-detection/geo-compliance/detect-teleportation/)
+- [Geo Desync Detection](https://www.appdome.com/how-to/mobile-fraud-prevention-detection/geo-compliance/detect-geo-desync/)
+- [Geo-Fencing Implementation](https://www.appdome.com/how-to/mobile-fraud-prevention-detection/geo-compliance/implement-geo-fencing-in-android-apps-using-ai/)
+
 ### Comprehensive Appdome Threat Event Coverage
 
 The application now implements comprehensive Appdome threat event handling with support for all major threat categories:
@@ -219,6 +240,10 @@ The application requires the following permissions:
 *   **SIM Swap Detection**: This permission is required for the upcoming Appdome SIM swap detection feature. It allows the app to monitor SIM state changes as part of enhanced security against SIM swap attacks. This helps protect users from account takeover attempts where attackers try to transfer the victim's phone number to a SIM card under their control. The permission is requested at runtime following Android's permission best practices.
 *   **Reference**: [Appdome Detect SIM swap documentation](https://www.appdome.com/how-to/account-takeover-prevention/account-protection/detect-sim-card-swapping-in-android-ios/)
 
+### `android.permission.ACCESS_COARSE_LOCATION`
+*   **Geo-Compliance Security**: This permission is required for Appdome geo-compliance threat detection features. It allows the app to access device location for geo-compliance security checks including location spoofing detection, mock location detection, teleportation detection, and geo-fencing enforcement. This helps protect against location-based fraud attempts and ensures geo-compliance security policies are enforced.
+*   **Reference**: [Appdome Geo-Compliance Documentation](https://www.appdome.com/how-to/mobile-fraud-prevention-detection/geo-compliance/)
+
 ## 🔮 Future Enhancements (Post-Refactoring)
 
 *   **Complete MVVM Refactoring:** Fully implement ViewModels and Repository. Hilt DI is already integrated.
@@ -239,7 +264,7 @@ The application requires the following permissions:
 
 This application is integrated with Appdome Threat-Events to provide comprehensive runtime threat detection and response. The implementation covers all major threat categories including SSL/TLS security, network security, bot detection, fraud prevention, and anti-cheat mechanisms.
 
-**Total Coverage**: 57+ threat event types across all major security categories.
+**Total Coverage**: 64+ threat event types across all major security categories including geo-compliance.
 
 Key threat events include SSL certificate validation failures, network proxy detection, mobile bot defense, keystroke injection detection, virtual environment detection, gaming/modding prevention, accessibility service monitoring, SIM swap detection, clipboard protection, deepfake detection, and advanced AI-driven threat detection.
 

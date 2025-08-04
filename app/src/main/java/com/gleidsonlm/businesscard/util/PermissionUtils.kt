@@ -16,6 +16,7 @@ object PermissionUtils {
     // Made public by removing private modifier
     const val REQUEST_CODE_INSTALL_PACKAGES = 1001
     const val REQUEST_CODE_READ_PHONE_STATE = 1002
+    const val REQUEST_CODE_ACCESS_COARSE_LOCATION = 1003
 
     // Track which permissions have been requested to determine if they're permanently denied
     private val requestedPermissions = mutableSetOf<String>()
@@ -118,5 +119,65 @@ object PermissionUtils {
             Manifest.permission.READ_PHONE_STATE
         ) && !hasReadPhoneStatePermission(activity)
             && hasRequestedReadPhoneStatePermission(activity)
+    }
+
+    /**
+     * Checks if the app has the ACCESS_COARSE_LOCATION permission.
+     * This permission is required for Appdome geo-compliance threat detection features.
+     *
+     * @param context The context to use for checking the permission.
+     * @return `true` if the permission is granted, `false` otherwise.
+     */
+    fun hasLocationPermission(context: Context): Boolean {
+        return ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    /**
+     * Requests the ACCESS_COARSE_LOCATION permission from the user.
+     * This permission is required for Appdome geo-compliance threat detection features
+     * including location spoofing detection, mock location detection, teleportation detection,
+     * and geo-fencing enforcement.
+     *
+     * Reference: https://www.appdome.com/how-to/mobile-fraud-prevention-detection/geo-compliance/
+     *
+     * @param activity The activity that is requesting the permission.
+     */
+    fun requestLocationPermission(activity: Activity) {
+        // Mark permission as requested for permanent denial detection
+        requestedPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION)
+        
+        ActivityCompat.requestPermissions(
+            activity,
+            arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
+            REQUEST_CODE_ACCESS_COARSE_LOCATION
+        )
+    }
+
+    /**
+     * Checks if the ACCESS_COARSE_LOCATION permission has been requested before.
+     * This is used to determine if a permission denial is permanent (user selected "Don't ask again").
+     *
+     * @param activity The activity to check (parameter kept for consistency with other permission methods).
+     * @return `true` if the permission has been requested before, `false` otherwise.
+     */
+    fun hasRequestedLocationPermission(activity: Activity): Boolean {
+        return requestedPermissions.contains(Manifest.permission.ACCESS_COARSE_LOCATION)
+    }
+
+    /**
+     * Checks if the user has denied the location permission and selected "Don't ask again".
+     *
+     * @param activity The activity to check.
+     * @return `true` if the permission was permanently denied, `false` otherwise.
+     */
+    fun isLocationPermissionPermanentlyDenied(activity: Activity): Boolean {
+        return !ActivityCompat.shouldShowRequestPermissionRationale(
+            activity,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) && !hasLocationPermission(activity)
+            && hasRequestedLocationPermission(activity)
     }
 }
