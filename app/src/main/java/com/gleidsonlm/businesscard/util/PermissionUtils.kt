@@ -10,6 +10,7 @@ import android.os.Build
 import android.provider.Settings
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 
 object PermissionUtils {
 
@@ -28,16 +29,7 @@ object PermissionUtils {
      * @return `true` if the permission is granted or not required to be explicitly requested at runtime, `false` otherwise.
      */
     fun hasInstallPackagesPermission(context: Context): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.packageManager.canRequestPackageInstalls()
-        } else {
-            // For versions prior to Android O, declaring the permission in the manifest
-            // is generally sufficient. There isn't a runtime request mechanism like for other
-            // dangerous permissions. Since we ensure it's in the manifest,
-            // we can assume it's available.
-            // A more thorough check could involve inspecting PackageInfo.requestedPermissions.
-            true
-        }
+        return context.packageManager.canRequestPackageInstalls()
     }
 
     /**
@@ -48,18 +40,14 @@ object PermissionUtils {
      * @param activity The activity that is requesting the permission.
      */
     fun requestInstallPackagesPermission(activity: Activity) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (!activity.packageManager.canRequestPackageInstalls()) {
-                // Intent to navigate to the settings page for the app to allow package installs.
-                // This is the standard way to request this permission on Android O+.
-                val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
-                    data = Uri.parse("package:${activity.packageName}")
-                }
-                activity.startActivityForResult(intent, REQUEST_CODE_INSTALL_PACKAGES)
+        if (!activity.packageManager.canRequestPackageInstalls()) {
+            // Intent to navigate to the settings page for the app to allow package installs.
+            // This is the standard way to request this permission on Android O+.
+            val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
+                data = "package:${activity.packageName}".toUri()
             }
+            activity.startActivityForResult(intent, REQUEST_CODE_INSTALL_PACKAGES)
         }
-        // For pre-O versions, no runtime request is typically made for REQUEST_INSTALL_PACKAGES.
-        // If the permission is in the manifest, it's considered granted.
     }
 
     /**

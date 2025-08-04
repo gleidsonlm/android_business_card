@@ -48,6 +48,11 @@ android {
             isIncludeAndroidResources = true
         }
     }
+    
+    lint {
+        // Disable SelectedPhotoAccess warning - app already uses modern photo picker
+        disable += "SelectedPhotoAccess"
+    }
 }
 
 dependencies {

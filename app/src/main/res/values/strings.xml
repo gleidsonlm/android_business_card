@@ -19,7 +19,7 @@
     <string name="permission_denied_message">The app needs permission to install packages to display threat event details. Please grant the permission in settings.</string>
     <string name="permission_denied_settings_button">Open Settings</string>
     <string name="dialog_cancel_button">Cancel</string>
-    <string name="checking_permissions_message">Checking permissions...</string>
+    <string name="checking_permissions_message">Checking permissions…</string>
     <string name="permission_required_message">Permission required to proceed. Please grant the permission in settings.</string>
     <!-- Bot Defense related strings -->
     <string name="bot_defense_low_severity">Potential automated activity detected. Monitoring enabled.</string>

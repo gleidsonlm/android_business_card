@@ -18,6 +18,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable // Added Composable import
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.net.toUri
 import androidx.compose.runtime.remember // Keep for remember in Composable context
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
@@ -168,10 +169,11 @@ class ThreatEventActivity : ComponentActivity() {
 
     /**
      * Checks if the current Android version is Oreo (API 26) or above.
-     * @return True if Android version is O or higher, false otherwise.
+     * Since minSdkVersion is 31, this is always true.
+     * @return True (always true for this app).
      */
     private fun isAndroidOAndAbove(): Boolean {
-        return android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O
+        return true
     }
 
     /**
@@ -180,18 +182,14 @@ class ThreatEventActivity : ComponentActivity() {
      * that used the deprecated startActivityForResult.
      */
     private fun requestInstallPackagesPermissionWithLauncher() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (!packageManager.canRequestPackageInstalls()) {
-                // Intent to navigate to the settings page for the app to allow package installs.
-                // This is the standard way to request this permission on Android O+.
-                val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
-                    data = Uri.parse("package:$packageName")
-                }
-                installPackagesPermissionLauncher.launch(intent)
+        if (!packageManager.canRequestPackageInstalls()) {
+            // Intent to navigate to the settings page for the app to allow package installs.
+            // This is the standard way to request this permission on Android O+.
+            val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
+                data = "package:$packageName".toUri()
             }
+            installPackagesPermissionLauncher.launch(intent)
         }
-        // For pre-O versions, no runtime request is typically made for REQUEST_INSTALL_PACKAGES.
-        // If the permission is in the manifest, it's considered granted.
     }
 
     /**
@@ -215,13 +213,13 @@ class ThreatEventActivity : ComponentActivity() {
                     // Intent to take user directly to "Install unknown apps" settings for this app
                     val intent = if (isAndroidOAndAbove()) {
                         Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
-                            data = Uri.parse("package:${context.packageName}")
+                            data = "package:${context.packageName}".toUri()
                             flags = Intent.FLAG_ACTIVITY_NEW_TASK
                         }
                     } else {
                         // For pre-O, this specific setting screen doesn't exist. Take to general app details.
                         Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                            data = Uri.parse("package:${context.packageName}")
+                            data = "package:${context.packageName}".toUri()
                             flags = Intent.FLAG_ACTIVITY_NEW_TASK
                         }
                     }

@@ -1,6 +1,7 @@
 package com.gleidsonlm.businesscard.data.repository
 
 import android.content.Context
+import androidx.core.content.edit
 import com.gleidsonlm.businesscard.ui.UserData
 import com.google.gson.Gson
 import javax.inject.Inject
@@ -16,10 +17,10 @@ class UserRepositoryImpl @Inject constructor(private val context: Context) : Use
 
     override suspend fun saveUserData(userData: UserData) {
         val sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
         val jsonUserData = gson.toJson(userData)
-        editor.putString(USER_DATA_KEY, jsonUserData)
-        editor.apply() // apply() is asynchronous, consider commit() if immediate consistency is critical (though apply is generally preferred)
+        sharedPreferences.edit {
+            putString(USER_DATA_KEY, jsonUserData)
+        }
     }
 
     override suspend fun loadUserData(): UserData? {
