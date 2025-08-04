@@ -2,21 +2,28 @@ package com.gleidsonlm.businesscard
 
 import android.app.Application
 import com.gleidsonlm.businesscard.data.repository.ThreatEventRepository
+import com.gleidsonlm.businesscard.security.AbusiveAccessibilityServiceDetectedHandler
 import com.gleidsonlm.businesscard.security.ActiveADBDetectedHandler
+import com.gleidsonlm.businesscard.security.ActiveDebuggerThreatDetectedHandler
 import com.gleidsonlm.businesscard.security.ActivePhoneCallDetectedHandler
 import com.gleidsonlm.businesscard.security.AppIntegrityErrorHandler
 import com.gleidsonlm.businesscard.security.AppIsDebuggableHandler
 import com.gleidsonlm.businesscard.security.BannedManufacturerHandler
 import com.gleidsonlm.businesscard.security.BlockSecondSpaceHandler
+import com.gleidsonlm.businesscard.security.BlockedATSModificationHandler
+import com.gleidsonlm.businesscard.security.BlockedClipboardEventHandler
 import com.gleidsonlm.businesscard.security.BlockedKeyboardEventHandler
 import com.gleidsonlm.businesscard.security.BlockedScreenCaptureEventHandler
 import com.gleidsonlm.businesscard.security.BotDefenseHandler
 import com.gleidsonlm.businesscard.security.ClickBotDetectedByPermissionsHandler
 import com.gleidsonlm.businesscard.security.ClickBotDetectedHandler
 import com.gleidsonlm.businesscard.security.ClickBotDetectedVirtualFingerHandler
+import com.gleidsonlm.businesscard.security.CloakAndDaggerCapableAppDetectedHandler
 import com.gleidsonlm.businesscard.security.CodeInjectionDetectedHandler
+import com.gleidsonlm.businesscard.security.ConditionalEnforcementEventHandler
 import com.gleidsonlm.businesscard.security.CorelliumFileFoundHandler
 import com.gleidsonlm.businesscard.security.DeepFakeAppsDetectedHandler
+import com.gleidsonlm.businesscard.security.DeepSeekDetectedHandler
 import com.gleidsonlm.businesscard.security.DetectUnlockedBootloaderHandler
 import com.gleidsonlm.businesscard.security.EmulatorFoundHandler
 import com.gleidsonlm.businesscard.security.FaceIDBypassDetectedHandler
@@ -25,6 +32,7 @@ import com.gleidsonlm.businesscard.security.FridaDetectedHandler
 import com.gleidsonlm.businesscard.security.GameGuardianDetectedHandler
 import com.gleidsonlm.businesscard.security.GoogleEmulatorHandler
 import com.gleidsonlm.businesscard.security.HookFrameworkDetectedHandler
+import com.gleidsonlm.businesscard.security.IllegalAccessibilityServiceEventHandler
 import com.gleidsonlm.businesscard.security.IllegalDisplayEventHandler
 import com.gleidsonlm.businesscard.security.InjectedShellCodeDetectedHandler
 import com.gleidsonlm.businesscard.security.KernelSUDetectedHandler
@@ -40,6 +48,7 @@ import com.gleidsonlm.businesscard.security.RogueMDMChangeDetectedHandler
 import com.gleidsonlm.businesscard.security.RunningInVirtualSpaceHandler
 import com.gleidsonlm.businesscard.security.RuntimeBundleValidationViolationHandler
 import com.gleidsonlm.businesscard.security.SeccompDetectedHandler
+import com.gleidsonlm.businesscard.security.SimStateInfoHandler
 import com.gleidsonlm.businesscard.security.SpeedHackDetectedHandler
 import com.gleidsonlm.businesscard.security.SslCertificateValidationFailedHandler
 import com.gleidsonlm.businesscard.security.SslIncompatibleCipherHandler
@@ -51,6 +60,8 @@ import com.gleidsonlm.businesscard.security.SslInvalidMinECCSignatureHandler
 import com.gleidsonlm.businesscard.security.SslInvalidMinRSASignatureHandler
 import com.gleidsonlm.businesscard.security.SslNonSslConnectionHandler
 import com.gleidsonlm.businesscard.security.SslServerCertificatePinningFailedHandler
+import com.gleidsonlm.businesscard.security.StalkerSpywareDetectedHandler
+import com.gleidsonlm.businesscard.security.UACPresentedHandler
 import com.gleidsonlm.businesscard.security.UnauthorizedAIAssistantDetectedHandler
 import com.gleidsonlm.businesscard.security.UnknownSourcesEnabledHandler
 import com.gleidsonlm.businesscard.security.VulnerableUriDetectedHandler
@@ -233,6 +244,40 @@ class BusinessCardApplication : Application() {
     @Inject
     lateinit var sslInvalidMinDigestHandler: SslInvalidMinDigestHandler
 
+    // New Appdome threat event handlers from issue #70
+    @Inject
+    lateinit var illegalAccessibilityServiceEventHandler: IllegalAccessibilityServiceEventHandler
+
+    @Inject
+    lateinit var simStateInfoHandler: SimStateInfoHandler
+
+    @Inject
+    lateinit var activeDebuggerThreatDetectedHandler: ActiveDebuggerThreatDetectedHandler
+
+    @Inject
+    lateinit var blockedClipboardEventHandler: BlockedClipboardEventHandler
+
+    @Inject
+    lateinit var conditionalEnforcementEventHandler: ConditionalEnforcementEventHandler
+
+    @Inject
+    lateinit var deepSeekDetectedHandler: DeepSeekDetectedHandler
+
+    @Inject
+    lateinit var blockedATSModificationHandler: BlockedATSModificationHandler
+
+    @Inject
+    lateinit var uacPresentedHandler: UACPresentedHandler
+
+    @Inject
+    lateinit var cloakAndDaggerCapableAppDetectedHandler: CloakAndDaggerCapableAppDetectedHandler
+
+    @Inject
+    lateinit var abusiveAccessibilityServiceDetectedHandler: AbusiveAccessibilityServiceDetectedHandler
+
+    @Inject
+    lateinit var stalkerSpywareDetectedHandler: StalkerSpywareDetectedHandler
+
     /**
      * Called when the application is starting, before any other application objects have been created.
      *
@@ -306,6 +351,19 @@ class BusinessCardApplication : Application() {
         threatEventReceiver.addHandler("SslInvalidMinRSASignature", sslInvalidMinRSASignatureHandler::handleSslInvalidMinRSASignatureEvent)
         threatEventReceiver.addHandler("SslInvalidMinECCSignature", sslInvalidMinECCSignatureHandler::handleSslInvalidMinECCSignatureEvent)
         threatEventReceiver.addHandler("SslInvalidMinDigest", sslInvalidMinDigestHandler::handleSslInvalidMinDigestEvent)
+
+        // Register new Appdome threat event handlers from issue #70
+        threatEventReceiver.addHandler("IllegalAccessibilityServiceEvent", illegalAccessibilityServiceEventHandler::handleIllegalAccessibilityServiceEventEvent)
+        threatEventReceiver.addHandler("SimStateInfo", simStateInfoHandler::handleSimStateInfoEvent)
+        threatEventReceiver.addHandler("ActiveDebuggerThreatDetected", activeDebuggerThreatDetectedHandler::handleActiveDebuggerThreatDetectedEvent)
+        threatEventReceiver.addHandler("BlockedClipboardEvent", blockedClipboardEventHandler::handleBlockedClipboardEventEvent)
+        threatEventReceiver.addHandler("ConditionalEnforcementEvent", conditionalEnforcementEventHandler::handleConditionalEnforcementEventEvent)
+        threatEventReceiver.addHandler("DeepSeekDetected", deepSeekDetectedHandler::handleDeepSeekDetectedEvent)
+        threatEventReceiver.addHandler("BlockedATSModification", blockedATSModificationHandler::handleBlockedATSModificationEvent)
+        threatEventReceiver.addHandler("UACPresented", uacPresentedHandler::handleUACPresentedEvent)
+        threatEventReceiver.addHandler("CloakAndDaggerCapableAppDetected", cloakAndDaggerCapableAppDetectedHandler::handleCloakAndDaggerCapableAppDetectedEvent)
+        threatEventReceiver.addHandler("AbusiveAccessibilityServiceDetected", abusiveAccessibilityServiceDetectedHandler::handleAbusiveAccessibilityServiceDetectedEvent)
+        threatEventReceiver.addHandler("StalkerSpywareDetected", stalkerSpywareDetectedHandler::handleStalkerSpywareDetectedEvent)
 
         threatEventReceiver.register()
     }

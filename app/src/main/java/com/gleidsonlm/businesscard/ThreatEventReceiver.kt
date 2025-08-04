@@ -122,6 +122,19 @@ class ThreatEventReceiver(
         registerReceiverWithFlags(IntentFilter("SslInvalidMinRSASignature"))
         registerReceiverWithFlags(IntentFilter("SslInvalidMinECCSignature"))
         registerReceiverWithFlags(IntentFilter("SslInvalidMinDigest"))
+        
+        // Register for new Appdome threat events from issue #70
+        registerReceiverWithFlags(IntentFilter("IllegalAccessibilityServiceEvent"))
+        registerReceiverWithFlags(IntentFilter("SimStateInfo"))
+        registerReceiverWithFlags(IntentFilter("ActiveDebuggerThreatDetected"))
+        registerReceiverWithFlags(IntentFilter("BlockedClipboardEvent"))
+        registerReceiverWithFlags(IntentFilter("ConditionalEnforcementEvent"))
+        registerReceiverWithFlags(IntentFilter("DeepSeekDetected"))
+        registerReceiverWithFlags(IntentFilter("BlockedATSModification"))
+        registerReceiverWithFlags(IntentFilter("UACPresented"))
+        registerReceiverWithFlags(IntentFilter("CloakAndDaggerCapableAppDetected"))
+        registerReceiverWithFlags(IntentFilter("AbusiveAccessibilityServiceDetected"))
+        registerReceiverWithFlags(IntentFilter("StalkerSpywareDetected"))
     }
 
     /**
