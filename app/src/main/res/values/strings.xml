@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">Business Card</string>
-    <string name="full_name">Your Name</string>
-    <string name="title">Your Title</string>
     <string name="link_text_email">Email</string>
     <string name="link_text_url">Site</string>
     <string name="link_text_call">Phone</string>
@@ -21,12 +19,6 @@
     <string name="dialog_cancel_button">Cancel</string>
     <string name="checking_permissions_message">Checking permissions…</string>
     <string name="permission_required_message">Permission required to proceed. Please grant the permission in settings.</string>
-    <!-- Bot Defense related strings -->
-    <string name="bot_defense_low_severity">Potential automated activity detected. Monitoring enabled.</string>
-    <string name="bot_defense_medium_severity">Automated activity detected. Please verify you are using the app normally.</string>
-    <string name="bot_defense_high_severity">Security alert: Potential automated threat detected.</string>
-    <string name="bot_defense_critical_severity">CRITICAL: Automated threat detected. App security measures activated.</string>
-    <string name="bot_defense_error">Bot detection error occurred. Please contact support if issues persist.</string>
     <string name="threatevent_no_data">No threat event data available.</string>
     <!-- Threat Events List Screen strings -->
     <string name="threat_events_title">Threat Events</string>
