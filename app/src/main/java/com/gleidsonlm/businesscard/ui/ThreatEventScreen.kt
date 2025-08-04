@@ -49,8 +49,7 @@ fun ThreatEventScreenContent(threatEventData: ThreatEventData?) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    // Assumes R.string.threatevent_no_data will be added: "No threat event data available."
-                    text = "No threat event data available.", // stringResource(id = R.string.threatevent_no_data),
+                    text = stringResource(id = R.string.threatevent_no_data),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }

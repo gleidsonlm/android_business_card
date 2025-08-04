@@ -52,6 +52,8 @@ android {
     lint {
         // Disable SelectedPhotoAccess warning - app already uses modern photo picker
         disable += "SelectedPhotoAccess"
+        // Disable IconXmlAndPng warning - it's common to have both adaptive and fallback icons
+        disable += "IconXmlAndPng"
     }
 }
 
