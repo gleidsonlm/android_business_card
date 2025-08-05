@@ -10,6 +10,8 @@ import androidx.core.content.ContextCompat
 import com.gleidsonlm.businesscard.data.repository.ThreatEventRepository
 import com.gleidsonlm.businesscard.model.ThreatEventData
 import com.gleidsonlm.businesscard.security.BotDefenseHandler
+import com.gleidsonlm.businesscard.security.MobileBotDefenseRateLimitReachedHandler
+import com.gleidsonlm.businesscard.security.UpdateMBDMapHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,7 +23,9 @@ import java.util.UUID
  * This receiver is responsible for registering to specific threat event broadcasts,
  * extracting threat data from the received intents, saving them to the repository,
  * and launching the [ThreatEventActivity] to display the information. It also handles 
- * MobileBotDefenseCheck events through the [BotDefenseHandler].
+ * MobileBotDefenseCheck events through the [BotDefenseHandler], MobileBotDefenseRateLimitReached
+ * events through the [MobileBotDefenseRateLimitReachedHandler], and UpdateMBDMap events 
+ * through the [UpdateMBDMapHandler].
  *
  * @property applicationContext The context of the application.
  * @property threatEventRepository The repository for storing threat events.
@@ -35,10 +39,20 @@ class ThreatEventReceiver(
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     private var botDefenseHandler: BotDefenseHandler? = null
+    private var mobileBotDefenseRateLimitReachedHandler: MobileBotDefenseRateLimitReachedHandler? = null
+    private var updateMBDMapHandler: UpdateMBDMapHandler? = null
     private val threatHandlers = mutableMapOf<String, (ThreatEventData) -> Unit>()
 
     fun setBotDefenseHandler(handler: BotDefenseHandler) {
         this.botDefenseHandler = handler
+    }
+
+    fun setMobileBotDefenseRateLimitReachedHandler(handler: MobileBotDefenseRateLimitReachedHandler) {
+        this.mobileBotDefenseRateLimitReachedHandler = handler
+    }
+
+    fun setUpdateMBDMapHandler(handler: UpdateMBDMapHandler) {
+        this.updateMBDMapHandler = handler
     }
 
     fun addHandler(action: String, handler: (ThreatEventData) -> Unit) {
@@ -56,7 +70,8 @@ class ThreatEventReceiver(
      *
      * This method should be called, for example, in the `onCreate` method of the Application class.
      * It registers for events like "RootedDevice", "DeveloperOptionsEnabled", "DebuggerThreatDetected",
-     * "MobileBotDefenseCheck", and the new Anti-Malware threat events.
+     * "MobileBotDefenseCheck", "MobileBotDefenseRateLimitReached", "UpdateMBDMap", and the new 
+     * Anti-Malware threat events.
      */
     fun register() {
         // Register for existing threat events
@@ -145,6 +160,10 @@ class ThreatEventReceiver(
         registerReceiverWithFlags(IntentFilter("TeleportationDetected"))
         registerReceiverWithFlags(IntentFilter("FraudulentLocationDetected"))
         registerReceiverWithFlags(IntentFilter("GeoFencingUnauthorizedLocation"))
+        
+        // Register for new Appdome threat events from issue #74
+        registerReceiverWithFlags(IntentFilter("MobileBotDefenseRateLimitReached"))
+        registerReceiverWithFlags(IntentFilter("UpdateMBDMap"))
     }
 
     /**
@@ -247,6 +266,8 @@ class ThreatEventReceiver(
 
         when (action) {
             "MobileBotDefenseCheck" -> handleBotDefenseCheck(threatEventData)
+            "MobileBotDefenseRateLimitReached" -> handleMobileBotDefenseRateLimitReached(threatEventData)
+            "UpdateMBDMap" -> handleUpdateMBDMap(threatEventData)
             else -> {
                 threatHandlers[action]?.invoke(threatEventData)
                 // Note: Removed automatic navigation to ThreatEventActivity
@@ -330,5 +351,27 @@ class ThreatEventReceiver(
         }
         applicationContext.startActivity(activityIntent)
         Log.i(TAG, "Started ThreatEventActivity with data for action: $action")
+    }
+
+    /**
+     * Handles MobileBotDefenseRateLimitReached events using the MobileBotDefenseRateLimitReachedHandler.
+     */
+    private fun handleMobileBotDefenseRateLimitReached(threatEventData: ThreatEventData) {
+        Log.i(TAG, "Handling MobileBotDefenseRateLimitReached event")
+        
+        mobileBotDefenseRateLimitReachedHandler?.handleRateLimitReachedEvent(threatEventData) ?: run {
+            Log.w(TAG, "MobileBotDefenseRateLimitReachedHandler not available, event saved to list only")
+        }
+    }
+
+    /**
+     * Handles UpdateMBDMap events using the UpdateMBDMapHandler.
+     */
+    private fun handleUpdateMBDMap(threatEventData: ThreatEventData) {
+        Log.i(TAG, "Handling UpdateMBDMap event")
+        
+        updateMBDMapHandler?.handleMBDMapUpdateEvent(threatEventData) ?: run {
+            Log.w(TAG, "UpdateMBDMapHandler not available, event saved to list only")
+        }
     }
 }
