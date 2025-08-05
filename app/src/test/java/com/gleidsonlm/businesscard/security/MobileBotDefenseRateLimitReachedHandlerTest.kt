@@ -24,12 +24,47 @@ class MobileBotDefenseRateLimitReachedHandlerTest {
         handler = MobileBotDefenseRateLimitReachedHandler()
     }
 
+    private fun createBaseThreatEventData() = ThreatEventData(
+        id = "test-id",
+        eventType = "MobileBotDefenseRateLimitReached",
+        receivedTimestamp = System.currentTimeMillis(),
+        internalError = null,
+        defaultMessage = null,
+        timeStamp = null,
+        deviceID = null,
+        deviceModel = null,
+        osVersion = null,
+        kernelInfo = null,
+        deviceManufacturer = null,
+        fusedAppToken = null,
+        carrierPlmn = null,
+        deviceBrand = null,
+        deviceBoard = null,
+        buildHost = null,
+        buildUser = null,
+        sdkVersion = null,
+        message = null,
+        failSafeEnforce = null,
+        externalID = null,
+        reasonCode = null,
+        buildDate = null,
+        devicePlatform = null,
+        carrierName = null,
+        updatedOSVersion = null,
+        timeZone = null,
+        deviceFaceDown = null,
+        locationLong = null,
+        locationLat = null,
+        locationState = null,
+        wifiSsid = null,
+        wifiSsidPermissionStatus = null,
+        threatCode = null
+    )
+
     @Test
     fun `handleRateLimitReachedEvent logs basic event data`() {
         // Given
-        val threatEventData = ThreatEventData(
-            id = "test-id",
-            eventType = "MobileBotDefenseRateLimitReached",
+        val threatEventData = createBaseThreatEventData().copy(
             deviceModel = "Test Device",
             threatCode = "RATE_LIMIT_001",
             timeStamp = "2025-01-01T00:00:00Z",
@@ -46,9 +81,7 @@ class MobileBotDefenseRateLimitReachedHandlerTest {
     @Test
     fun `handleRateLimitReachedEvent handles rapid request pattern`() {
         // Given
-        val threatEventData = ThreatEventData(
-            id = "test-id",
-            eventType = "MobileBotDefenseRateLimitReached",
+        val threatEventData = createBaseThreatEventData().copy(
             threatCode = "RAPID_REQUEST_DETECTED",
             reasonCode = "REQUEST_FREQUENCY",
             deviceModel = "Test Device"
@@ -63,9 +96,7 @@ class MobileBotDefenseRateLimitReachedHandlerTest {
     @Test
     fun `handleRateLimitReachedEvent handles burst activity pattern`() {
         // Given
-        val threatEventData = ThreatEventData(
-            id = "test-id",
-            eventType = "MobileBotDefenseRateLimitReached",
+        val threatEventData = createBaseThreatEventData().copy(
             threatCode = "BURST_ACTIVITY_HIGH",
             reasonCode = "CONNECTION_LIMIT",
             deviceModel = "Test Device"
@@ -80,9 +111,7 @@ class MobileBotDefenseRateLimitReachedHandlerTest {
     @Test
     fun `handleRateLimitReachedEvent handles automated behavior pattern`() {
         // Given
-        val threatEventData = ThreatEventData(
-            id = "test-id",
-            eventType = "MobileBotDefenseRateLimitReached",
+        val threatEventData = createBaseThreatEventData().copy(
             threatCode = "AUTOMATED_BEHAVIOR_DETECTED",
             reasonCode = "API_RATE_EXCEEDED",
             deviceModel = "Test Device"
@@ -97,9 +126,7 @@ class MobileBotDefenseRateLimitReachedHandlerTest {
     @Test
     fun `handleRateLimitReachedEvent handles development build characteristics`() {
         // Given
-        val threatEventData = ThreatEventData(
-            id = "test-id",
-            eventType = "MobileBotDefenseRateLimitReached",
+        val threatEventData = createBaseThreatEventData().copy(
             deviceManufacturer = "Google",
             osVersion = "14",
             buildHost = "build-server.test.com",
@@ -115,11 +142,7 @@ class MobileBotDefenseRateLimitReachedHandlerTest {
     @Test
     fun `handleRateLimitReachedEvent handles minimal data`() {
         // Given
-        val threatEventData = ThreatEventData(
-            id = "test-id",
-            eventType = "MobileBotDefenseRateLimitReached"
-            // Minimal data - all other fields null
-        )
+        val threatEventData = createBaseThreatEventData()
 
         // When
         handler.handleRateLimitReachedEvent(threatEventData)
@@ -130,9 +153,7 @@ class MobileBotDefenseRateLimitReachedHandlerTest {
     @Test
     fun `handleRateLimitReachedEvent analyzes device characteristics`() {
         // Given
-        val threatEventData = ThreatEventData(
-            id = "test-id",
-            eventType = "MobileBotDefenseRateLimitReached",
+        val threatEventData = createBaseThreatEventData().copy(
             deviceManufacturer = "Samsung",
             osVersion = "13",
             buildHost = "normal-host",
@@ -149,9 +170,7 @@ class MobileBotDefenseRateLimitReachedHandlerTest {
     @Test
     fun `handleRateLimitReachedEvent handles all context patterns`() {
         // Given
-        val threatEventData = ThreatEventData(
-            id = "test-id",
-            eventType = "MobileBotDefenseRateLimitReached",
+        val threatEventData = createBaseThreatEventData().copy(
             threatCode = "RAPID_REQUEST_BURST_ACTIVITY_AUTOMATED_BEHAVIOR",
             reasonCode = "API_RATE_EXCEEDED_CONNECTION_LIMIT_REQUEST_FREQUENCY",
             deviceModel = "Test Device",
