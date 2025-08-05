@@ -33,4 +33,10 @@
     <string name="clear_events_cancel">Cancel</string>
     <string name="dismiss">Dismiss</string>
     <string name="back">Back</string>
+    
+    <!-- New threat event strings for issue #74 -->
+    <string name="mobile_bot_defense_rate_limit_reached_title">Rate Limit Enforced</string>
+    <string name="mobile_bot_defense_rate_limit_reached_message">Automated activity detected and rate limiting applied for security.</string>
+    <string name="update_mbd_map_title">Threat Intelligence Updated</string>
+    <string name="update_mbd_map_message">Mobile endpoint threat detection database has been updated.</string>
 </resources>

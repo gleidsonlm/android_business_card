@@ -43,6 +43,7 @@ import com.gleidsonlm.businesscard.security.KernelSUDetectedHandler
 import com.gleidsonlm.businesscard.security.KeyInjectionDetectedHandler
 import com.gleidsonlm.businesscard.security.MagiskManagerDetectedHandler
 import com.gleidsonlm.businesscard.security.MalwareInjectionDetectedHandler
+import com.gleidsonlm.businesscard.security.MobileBotDefenseRateLimitReachedHandler
 import com.gleidsonlm.businesscard.security.NetworkProxyConfiguredHandler
 import com.gleidsonlm.businesscard.security.NoSimPresentHandler
 import com.gleidsonlm.businesscard.security.NotInstalledFromOfficialStoreHandler
@@ -70,6 +71,7 @@ import com.gleidsonlm.businesscard.security.TeleportationDetectedHandler
 import com.gleidsonlm.businesscard.security.UACPresentedHandler
 import com.gleidsonlm.businesscard.security.UnauthorizedAIAssistantDetectedHandler
 import com.gleidsonlm.businesscard.security.UnknownSourcesEnabledHandler
+import com.gleidsonlm.businesscard.security.UpdateMBDMapHandler
 import com.gleidsonlm.businesscard.security.VulnerableUriDetectedHandler
 import com.gleidsonlm.businesscard.security.ActiveVpnDetectedHandler
 import dagger.hilt.android.HiltAndroidApp
@@ -307,6 +309,13 @@ class BusinessCardApplication : Application() {
     @Inject
     lateinit var geoFencingUnauthorizedLocationHandler: GeoFencingUnauthorizedLocationHandler
 
+    // New Appdome threat event handlers from issue #74
+    @Inject
+    lateinit var mobileBotDefenseRateLimitReachedHandler: MobileBotDefenseRateLimitReachedHandler
+
+    @Inject
+    lateinit var updateMBDMapHandler: UpdateMBDMapHandler
+
     /**
      * Called when the application is starting, before any other application objects have been created.
      *
@@ -319,6 +328,8 @@ class BusinessCardApplication : Application() {
         threatEventReceiver = ThreatEventReceiver(this, threatEventRepository)
 
         threatEventReceiver.setBotDefenseHandler(botDefenseHandler)
+        threatEventReceiver.setMobileBotDefenseRateLimitReachedHandler(mobileBotDefenseRateLimitReachedHandler)
+        threatEventReceiver.setUpdateMBDMapHandler(updateMBDMapHandler)
 
         // Register existing threat event handlers
         threatEventReceiver.addHandler("UnknownSourcesEnabled", unknownSourcesEnabledHandler::handleUnknownSourcesEnabledEvent)

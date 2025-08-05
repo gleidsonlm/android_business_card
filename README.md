@@ -162,6 +162,7 @@ The application now implements comprehensive Appdome threat event handling with 
 
 #### Bot and Automation Detection
 *   `MobileBotDefenseCheck`: Advanced bot detection with configurable response actions.
+*   `MobileBotDefenseRateLimitReached`: Triggered when rate limits are reached as part of mobile bot defense to prevent automated attacks.
 *   `ClickBotDetected`: Detects mobile auto-clicker applications which may indicate fraudulent activity.
 *   `ClickBotDetectedByPermissions`: Detects mobile auto-clicker applications through permission analysis.
 
@@ -262,10 +263,24 @@ The application requires the following permissions:
 
 ## Appdome Threat-Events Integration
 
-This application is integrated with Appdome Threat-Events to provide comprehensive runtime threat detection and response. The implementation covers all major threat categories including SSL/TLS security, network security, bot detection, fraud prevention, and anti-cheat mechanisms.
+This application is integrated with Appdome Threat-Events to provide comprehensive runtime threat detection and response. The implementation covers all major threat categories including SSL/TLS security, network security, bot detection, fraud prevention, anti-cheat mechanisms, and mobile endpoint detection.
 
-**Total Coverage**: 64+ threat event types across all major security categories including geo-compliance.
+**Total Coverage**: 66+ threat event types across all major security categories including geo-compliance and mobile endpoint detection.
 
-Key threat events include SSL certificate validation failures, network proxy detection, mobile bot defense, keystroke injection detection, virtual environment detection, gaming/modding prevention, accessibility service monitoring, SIM swap detection, clipboard protection, deepfake detection, and advanced AI-driven threat detection.
+Key threat events include SSL certificate validation failures, network proxy detection, mobile bot defense with rate limiting, mobile endpoint detection map updates, keystroke injection detection, virtual environment detection, gaming/modding prevention, accessibility service monitoring, SIM swap detection, clipboard protection, deepfake detection, and advanced AI-driven threat detection.
+
+### New Threat Events (Issue #74)
+
+#### MobileBotDefenseRateLimitReached
+*   **Purpose**: Triggered when rate limits are reached as part of mobile bot defense
+*   **Detection**: Identifies when the Appdome bot defense system enforces rate limiting against automated attacks
+*   **Response**: Logs the event with detailed context analysis including request patterns, device characteristics, and threat severity
+*   **Reference**: [Rate Limit Connections Anti-Bot Defense](https://www.appdome.com/how-to/mobile-bot-detection/api-bot-defense/rate-limit-connections-anti-bot-defense/)
+
+#### UpdateMBDMap
+*   **Purpose**: Used to update the threat map for mobile endpoint detection and response
+*   **Detection**: Receives updates from Appdome's Mobile Endpoint Detection and Response (MEDR) system
+*   **Response**: Processes threat intelligence updates, analyzes new threat patterns, and assesses security posture
+*   **Reference**: [Use Threat-EKG with Mobile EDR](https://www.appdome.com/how-to/mobile-edr/mobile-endpoint-detection-response/use-threat-ekg-with-mobile-edr/)
 
 When any threat is detected, the application saves it to the events list. Users can view all threat events by tapping the warning icon on the main screen, and then tap individual event cards to view detailed threat information and comprehensive metadata about the specific security concern.
