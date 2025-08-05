@@ -31,7 +31,7 @@ class BotDefenseHandler @Inject constructor(
     private val scope = CoroutineScope(dispatcher)
 
     /**
-     * Handles the MobileBotDefenseCheck threat event.
+     * Handles the MobileBotDefenseCheck threat event with protection against native library crashes.
      *
      * @param threatEventData The comprehensive threat event data from Appdome
      * @param callback Optional callback for handling the response
@@ -41,57 +41,97 @@ class BotDefenseHandler @Inject constructor(
         callback: BotDetectionCallback? = null
     ) {
         scope.launch {
-            try {
-                Log.i(TAG, "Processing MobileBotDefenseCheck threat event")
-                
-                val botDetectionResult = analyzeTheatEvent(threatEventData)
-                
-                when (botDetectionResult.severity) {
-                    BotThreatSeverity.LOW -> handleLowSeverityThreat(threatEventData, callback)
-                    BotThreatSeverity.MEDIUM -> handleMediumSeverityThreat(threatEventData, callback)
-                    BotThreatSeverity.HIGH -> handleHighSeverityThreat(threatEventData, callback)
-                    BotThreatSeverity.CRITICAL -> handleCriticalSeverityThreat(threatEventData, callback)
+            // Validate threat event data before processing to prevent native crashes
+            val validationParams = mapOf(
+                "eventType" to threatEventData.eventType,
+                "deviceID" to threatEventData.deviceID,
+                "fusedAppToken" to threatEventData.fusedAppToken,
+                "threatCode" to threatEventData.threatCode
+            )
+            
+            if (!NativeLibraryProtection.validateNativeParameters(validationParams)) {
+                Log.w(TAG, "Invalid threat event parameters detected, using safe processing")
+            }
+            
+            NativeLibraryProtection.safeNativeOperation(
+                operation = "Bot detection analysis for event ${threatEventData.eventType}",
+                fallback = {
+                    Log.e(TAG, "Bot detection analysis failed due to native library error")
+                    callback?.onError(RuntimeException("Native library error during bot detection"))
                 }
-                
-                // Log security event for monitoring
-                logSecurityEvent(threatEventData, botDetectionResult)
-                
-            } catch (exception: Exception) {
-                Log.e(TAG, "Error handling bot detection event", exception)
-                callback?.onError(exception)
+            ) {
+                try {
+                    Log.i(TAG, "Processing MobileBotDefenseCheck threat event")
+                    
+                    val botDetectionResult = analyzeTheatEvent(threatEventData)
+                    
+                    when (botDetectionResult.severity) {
+                        BotThreatSeverity.LOW -> handleLowSeverityThreat(threatEventData, callback)
+                        BotThreatSeverity.MEDIUM -> handleMediumSeverityThreat(threatEventData, callback)
+                        BotThreatSeverity.HIGH -> handleHighSeverityThreat(threatEventData, callback)
+                        BotThreatSeverity.CRITICAL -> handleCriticalSeverityThreat(threatEventData, callback)
+                    }
+                    
+                    // Log security event for monitoring
+                    logSecurityEvent(threatEventData, botDetectionResult)
+                    
+                } catch (exception: Exception) {
+                    Log.e(TAG, "Error handling bot detection event", exception)
+                    callback?.onError(exception)
+                }
             }
         }
     }
 
     /**
-     * Analyzes the threat event data to determine bot activity patterns.
+     * Analyzes the threat event data to determine bot activity patterns with safe processing.
      */
     private fun analyzeTheatEvent(threatEventData: ThreatEventData): BotDetectionResult {
-        val indicators = mutableListOf<String>()
-        var severity = BotThreatSeverity.LOW
-
-        // Analyze threat code if available
-        threatEventData.threatCode?.let { threatCode ->
-            indicators.add("Threat Code: $threatCode")
-            // Severity based on threat code patterns
-            severity = when {
-                threatCode.contains("BOT_CRITICAL", ignoreCase = true) -> BotThreatSeverity.CRITICAL
-                threatCode.contains("BOT_HIGH", ignoreCase = true) -> BotThreatSeverity.HIGH
-                threatCode.contains("BOT_MEDIUM", ignoreCase = true) -> BotThreatSeverity.MEDIUM
-                else -> BotThreatSeverity.LOW
+        return NativeLibraryProtection.safeNativeOperation(
+            operation = "Bot threat analysis",
+            fallback = {
+                Log.w(TAG, "Bot analysis failed, returning safe default result")
+                BotDetectionResult(
+                    isBot = false,
+                    severity = BotThreatSeverity.LOW,
+                    indicators = listOf("Analysis failed - safe mode"),
+                    timestamp = System.currentTimeMillis()
+                )
             }
-        }
+        ) {
+            val indicators = mutableListOf<String>()
+            var severity = BotThreatSeverity.LOW
 
-        // Analyze device characteristics for bot patterns
-        analyzeDeviceCharacteristics(threatEventData, indicators)
+            // Safely analyze threat code if available
+            threatEventData.threatCode?.let { threatCode ->
+                if (threatCode.isNotBlank()) {
+                    indicators.add("Threat Code: $threatCode")
+                    // Severity based on threat code patterns
+                    severity = when {
+                        threatCode.contains("BOT_CRITICAL", ignoreCase = true) -> BotThreatSeverity.CRITICAL
+                        threatCode.contains("BOT_HIGH", ignoreCase = true) -> BotThreatSeverity.HIGH
+                        threatCode.contains("BOT_MEDIUM", ignoreCase = true) -> BotThreatSeverity.MEDIUM
+                        else -> BotThreatSeverity.LOW
+                    }
+                }
+            }
 
-        // Analyze timing patterns
-        analyzeTimingPatterns(threatEventData, indicators)
+            // Analyze device characteristics for bot patterns
+            analyzeDeviceCharacteristics(threatEventData, indicators)
 
-        return BotDetectionResult(
-            isBot = indicators.isNotEmpty(),
-            severity = severity,
-            indicators = indicators,
+            // Analyze timing patterns
+            analyzeTimingPatterns(threatEventData, indicators)
+
+            BotDetectionResult(
+                isBot = indicators.isNotEmpty(),
+                severity = severity,
+                indicators = indicators,
+                timestamp = System.currentTimeMillis()
+            )
+        } ?: BotDetectionResult(
+            isBot = false,
+            severity = BotThreatSeverity.LOW,
+            indicators = listOf("Analysis failed - default fallback"),
             timestamp = System.currentTimeMillis()
         )
     }
@@ -100,28 +140,32 @@ class BotDefenseHandler @Inject constructor(
         threatEventData: ThreatEventData,
         indicators: MutableList<String>
     ) {
-        // Check for suspicious device model patterns
-        threatEventData.deviceModel?.let { model ->
-            if (model.contains("emulator", ignoreCase = true) ||
-                model.contains("simulator", ignoreCase = true) ||
-                model.contains("generic", ignoreCase = true)) {
-                indicators.add("Suspicious device model: $model")
+        try {
+            // Check for suspicious device model patterns with null safety
+            threatEventData.deviceModel?.takeIf { it.isNotBlank() }?.let { model ->
+                if (model.contains("emulator", ignoreCase = true) ||
+                    model.contains("simulator", ignoreCase = true) ||
+                    model.contains("generic", ignoreCase = true)) {
+                    indicators.add("Suspicious device model: $model")
+                }
             }
-        }
 
-        // Check build characteristics
-        threatEventData.buildHost?.let { buildHost ->
-            if (buildHost.contains("build", ignoreCase = true) ||
-                buildHost.contains("test", ignoreCase = true)) {
-                indicators.add("Development build host: $buildHost")
+            // Check build characteristics with null safety
+            threatEventData.buildHost?.takeIf { it.isNotBlank() }?.let { buildHost ->
+                if (buildHost.contains("build", ignoreCase = true) ||
+                    buildHost.contains("test", ignoreCase = true)) {
+                    indicators.add("Development build host: $buildHost")
+                }
             }
-        }
 
-        // Check for debugging indicators
-        threatEventData.buildUser?.let { buildUser ->
-            if (buildUser == "android-build" || buildUser.contains("test")) {
-                indicators.add("Development build user: $buildUser")
+            // Check for debugging indicators with null safety
+            threatEventData.buildUser?.takeIf { it.isNotBlank() }?.let { buildUser ->
+                if (buildUser == "android-build" || buildUser.contains("test")) {
+                    indicators.add("Development build user: $buildUser")
+                }
             }
+        } catch (e: Exception) {
+            Log.w(TAG, "Error analyzing device characteristics, skipping", e)
         }
     }
 
@@ -129,11 +173,16 @@ class BotDefenseHandler @Inject constructor(
         threatEventData: ThreatEventData,
         indicators: MutableList<String>
     ) {
-        // This could be expanded to analyze timing patterns
-        // For now, we check if timestamp indicates automated behavior
-        threatEventData.timeStamp?.let { timestamp ->
-            // Pattern analysis could be implemented here
-            // For example, checking for regular intervals in multiple events
+        try {
+            // This could be expanded to analyze timing patterns
+            // For now, we check if timestamp indicates automated behavior
+            threatEventData.timeStamp?.takeIf { it.isNotBlank() }?.let { timestamp ->
+                // Pattern analysis could be implemented here
+                // For example, checking for regular intervals in multiple events
+                Log.d(TAG, "Analyzing timing pattern for timestamp: $timestamp")
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Error analyzing timing patterns, skipping", e)
         }
     }
 
