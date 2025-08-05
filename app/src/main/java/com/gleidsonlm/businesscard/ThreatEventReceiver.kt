@@ -23,12 +23,13 @@ import java.util.UUID
 /**
  * A [BroadcastReceiver] that listens for Appdome threat events.
  *
- * This receiver is responsible for registering to specific threat event broadcasts,
- * extracting threat data from the received intents, saving them to the repository,
- * and launching the [ThreatEventActivity] to display the information. It also handles 
- * MobileBotDefenseCheck events through the [BotDefenseHandler], MobileBotDefenseRateLimitReached
- * events through the [MobileBotDefenseRateLimitReachedHandler], and UpdateMBDMap events 
- * through the [UpdateMBDMapHandler].
+ * DETECTION-ONLY MODE: This receiver operates in detection-only mode, meaning all threat
+ * events are logged and saved to the repository but NO enforcement actions are taken.
+ * This ensures the app continues running normally regardless of threats detected.
+ * 
+ * The receiver registers to specific threat event broadcasts, extracts threat data from 
+ * the received intents, and saves them to the repository for review in the threat event 
+ * list screen. No automatic enforcement or app termination occurs.
  *
  * @property applicationContext The context of the application.
  * @property threatEventRepository The repository for storing threat events.
@@ -261,14 +262,12 @@ class ThreatEventReceiver(
     }
 
     /**
-     * Handles the received threat event intent with protection against native library crashes.
+     * Handles the received threat event intent in detection-only mode.
      *
      * This method is called when a registered threat event is broadcast. It extracts
      * all relevant threat metadata from the intent, populates a [ThreatEventData] object,
-     * saves it to the repository, and then either handles it with the [BotDefenseHandler] 
-     * for MobileBotDefenseCheck events or starts the [ThreatEventActivity] to display 
-     * the details of other threats. Includes protection against RSA_size null pointer
-     * crashes in Appdome's libloader.so.
+     * and saves it to the repository for review. NO enforcement actions are taken - the
+     * app continues running normally regardless of the threat detected.
      *
      * @param intent The intent containing the threat event data.
      */
@@ -341,31 +340,43 @@ class ThreatEventReceiver(
             }
         }
 
+        // DETECTION-ONLY MODE: All threat events are logged and saved but NO enforcement actions are taken
+        // This ensures the app continues running normally regardless of threats detected
         when (action) {
-            "MobileBotDefenseCheck" -> handleBotDefenseCheck(threatEventData)
-            "MobileBotDefenseRateLimitReached" -> handleMobileBotDefenseRateLimitReached(threatEventData)
-            "UpdateMBDMap" -> handleUpdateMBDMap(threatEventData)
-            "ConditionalEnforcementEvent" -> handleConditionalEnforcementEvent(threatEventData)
+            "MobileBotDefenseCheck" -> {
+                Log.i(TAG, "MobileBotDefenseCheck detected - detection-only mode, no enforcement")
+                // Event already saved to repository, no additional processing needed
+            }
+            "MobileBotDefenseRateLimitReached" -> {
+                Log.i(TAG, "MobileBotDefenseRateLimitReached detected - detection-only mode, no enforcement") 
+                // Event already saved to repository, no additional processing needed
+            }
+            "UpdateMBDMap" -> {
+                Log.i(TAG, "UpdateMBDMap detected - detection-only mode, no enforcement")
+                // Event already saved to repository, no additional processing needed
+            }
+            "ConditionalEnforcementEvent" -> {
+                Log.i(TAG, "ConditionalEnforcementEvent detected - detection-only mode, no enforcement")
+                // Event already saved to repository, no additional processing needed
+                // NOTE: Not calling handleConditionalEnforcementEvent to prevent any enforcement logic
+            }
             else -> {
-                // Apply protection to custom threat handlers as well
-                NativeLibraryProtection.safeNativeOperation(
-                    operation = "Custom threat handler for $action",
-                    fallback = {
-                        Log.w(TAG, "Custom threat handler failed for $action, event saved to list")
-                    }
-                ) {
-                    threatHandlers[action]?.invoke(threatEventData)
-                }
-                // Note: Removed automatic navigation to ThreatEventActivity
-                // Events will be displayed in the list screen and users can tap to view details
-                Log.i(TAG, "Threat event processed and saved: $action")
+                Log.i(TAG, "Threat event detected: $action - detection-only mode, no enforcement")
+                // Event already saved to repository, no additional processing needed
+                // NOTE: Not calling custom threat handlers to prevent any enforcement behavior
             }
         }
+        
+        Log.i(TAG, "Threat event $action processed in detection-only mode - app continues normally")
     }
 
     /**
      * Handles MobileBotDefenseCheck events using the BotDefenseHandler with native library protection.
+     * 
+     * @deprecated This method is not used in detection-only mode. All threat events are logged
+     * and saved to the repository without enforcement actions.
      */
+    @Deprecated("Not used in detection-only mode")
     private fun handleBotDefenseCheck(threatEventData: ThreatEventData) {
         Log.i(TAG, "Handling MobileBotDefenseCheck event")
         
@@ -449,7 +460,11 @@ class ThreatEventReceiver(
 
     /**
      * Handles MobileBotDefenseRateLimitReached events using the MobileBotDefenseRateLimitReachedHandler with protection.
+     * 
+     * @deprecated This method is not used in detection-only mode. All threat events are logged
+     * and saved to the repository without enforcement actions.
      */
+    @Deprecated("Not used in detection-only mode")
     private fun handleMobileBotDefenseRateLimitReached(threatEventData: ThreatEventData) {
         Log.i(TAG, "Handling MobileBotDefenseRateLimitReached event")
         
@@ -462,7 +477,11 @@ class ThreatEventReceiver(
 
     /**
      * Handles UpdateMBDMap events using the UpdateMBDMapHandler with protection.
+     * 
+     * @deprecated This method is not used in detection-only mode. All threat events are logged
+     * and saved to the repository without enforcement actions.
      */
+    @Deprecated("Not used in detection-only mode")
     private fun handleUpdateMBDMap(threatEventData: ThreatEventData) {
         Log.i(TAG, "Handling UpdateMBDMap event")
         
@@ -476,9 +495,10 @@ class ThreatEventReceiver(
     /**
      * Handles ConditionalEnforcementEvent with proper enforcement decision logic.
      * 
-     * This method ensures that Conditional Enforcement events do NOT automatically
-     * enforce (terminate) the app unless explicitly required by Appdome's logic.
+     * @deprecated This method is not used in detection-only mode. All threat events are logged
+     * and saved to the repository without enforcement actions.
      */
+    @Deprecated("Not used in detection-only mode")
     private fun handleConditionalEnforcementEvent(threatEventData: ThreatEventData) {
         Log.i(TAG, "Handling ConditionalEnforcementEvent - analyzing enforcement decision")
         
