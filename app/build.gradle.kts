@@ -15,8 +15,8 @@ android {
         applicationId = "com.gleidsonlm.businesscard"
         minSdk = 31
         targetSdk = 36
-        versionCode = 1754346426
-        versionName = "January 16, 2025"
+        versionCode = 1754356181
+        versionName = "August 4, 2025"
     }
 
     buildTypes {
