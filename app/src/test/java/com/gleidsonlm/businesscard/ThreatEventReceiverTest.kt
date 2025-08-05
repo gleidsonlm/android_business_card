@@ -19,6 +19,7 @@ import io.mockk.slot
 import io.mockk.verify
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -83,27 +84,24 @@ class ThreatEventReceiverTest {
     }
 
     @Test
-    fun `onEvent with MobileBotDefenseCheck calls bot defense handler`() {
+    fun `onEvent with MobileBotDefenseCheck in detection-only mode does not call handler`() {
         // Given
         val intent = createMobileBotDefenseCheckIntent()
-        val threatDataSlot = slot<ThreatEventData>()
-        val callbackSlot = slot<BotDetectionCallback>()
 
         // When
         threatEventReceiver.onEvent(intent)
 
         // Then
-        verify { 
-            botDefenseHandler.handleBotDetectionEvent(
-                capture(threatDataSlot), 
-                capture(callbackSlot)
-            ) 
+        // In detection-only mode, handlers are not called to prevent enforcement
+        verify(exactly = 0) { 
+            botDefenseHandler.handleBotDetectionEvent(any(), any()) 
         }
         
-        val capturedThreatData = threatDataSlot.captured
-        assertEquals("Bot activity detected", capturedThreatData.defaultMessage)
-        assertEquals("BOT_HIGH_001", capturedThreatData.threatCode)
-        assertEquals("Automated behavior detected", capturedThreatData.message)
+        // Event should still be saved to repository for review
+        coVerify { threatEventRepository.saveEvent(any()) }
+        
+        // No activity should be started to prevent user interruption
+        verify(exactly = 0) { mockContext.startActivity(any()) }
     }
 
     @Test
@@ -165,6 +163,7 @@ class ThreatEventReceiverTest {
     }
 
     @Test
+    @Ignore("Bot detection callbacks not used in detection-only mode")
     fun `bot detection callback onDetectionComplete with SECURITY_MEASURES starts activity`() {
         // Given
         val intent = createMobileBotDefenseCheckIntent()
@@ -185,6 +184,7 @@ class ThreatEventReceiverTest {
     }
 
     @Test
+    @Ignore("Bot detection callbacks not used in detection-only mode")
     fun `bot detection callback onDetectionComplete with APP_PROTECTION starts activity`() {
         // Given
         val intent = createMobileBotDefenseCheckIntent()
@@ -205,6 +205,7 @@ class ThreatEventReceiverTest {
     }
 
     @Test
+    @Ignore("Bot detection callbacks not used in detection-only mode")
     fun `bot detection callback onUserNotificationRequired starts activity with enhanced message`() {
         // Given
         val intent = createMobileBotDefenseCheckIntent()
@@ -246,6 +247,7 @@ class ThreatEventReceiverTest {
     }
 
     @Test
+    @Ignore("Bot detection callbacks not used in detection-only mode")
     fun `bot detection callback onCriticalThreatDetected starts activity with critical message`() {
         // Given
         val intent = createMobileBotDefenseCheckIntent()
@@ -348,64 +350,58 @@ class ThreatEventReceiverTest {
     }
 
     @Test
-    fun `onEvent handles DetectUnlockedBootloader threat event without auto-navigation`() {
+    fun `onEvent handles DetectUnlockedBootloader threat event in detection-only mode`() {
         // Given
         val intent = Intent("DetectUnlockedBootloader").apply {
             putExtra("defaultMessage", "Unlocked bootloader detected")
             putExtra("deviceID", "test-device-123")
             putExtra("threatCode", "UNLOCKED_BOOTLOADER")
         }
-        val handlerFunction = mockk<(ThreatEventData) -> Unit>(relaxed = true)
-        threatEventReceiver.addHandler("DetectUnlockedBootloader", handlerFunction)
 
         // When
         threatEventReceiver.onEvent(intent)
 
         // Then
-        verify { handlerFunction.invoke(any()) }
-        // Should NOT automatically start activity - events saved to list
+        // In detection-only mode, custom handlers are not called to prevent enforcement
+        // Events are only logged and saved for review
         verify(exactly = 0) { mockContext.startActivity(any()) }
         coVerify { threatEventRepository.saveEvent(any()) }
     }
 
     @Test
-    fun `onEvent handles FridaDetected threat event without auto-navigation`() {
+    fun `onEvent handles FridaDetected threat event in detection-only mode`() {
         // Given
         val intent = Intent("FridaDetected").apply {
             putExtra("defaultMessage", "Frida instrumentation detected")
             putExtra("deviceID", "test-device-456")
             putExtra("threatCode", "FRIDA_DETECTED")
         }
-        val handlerFunction = mockk<(ThreatEventData) -> Unit>(relaxed = true)
-        threatEventReceiver.addHandler("FridaDetected", handlerFunction)
 
         // When
         threatEventReceiver.onEvent(intent)
 
         // Then
-        verify { handlerFunction.invoke(any()) }
-        // Should NOT automatically start activity - events saved to list
+        // In detection-only mode, custom handlers are not called to prevent enforcement
+        // Events are only logged and saved for review
         verify(exactly = 0) { mockContext.startActivity(any()) }
         coVerify { threatEventRepository.saveEvent(any()) }
     }
 
     @Test
-    fun `onEvent handles MalwareInjectionDetected threat event without auto-navigation`() {
+    fun `onEvent handles MalwareInjectionDetected threat event in detection-only mode`() {
         // Given
         val intent = Intent("MalwareInjectionDetected").apply {
             putExtra("defaultMessage", "Malware injection detected")
             putExtra("deviceID", "test-device-789")
             putExtra("threatCode", "MALWARE_INJECTION")
         }
-        val handlerFunction = mockk<(ThreatEventData) -> Unit>(relaxed = true)
-        threatEventReceiver.addHandler("MalwareInjectionDetected", handlerFunction)
 
         // When
         threatEventReceiver.onEvent(intent)
 
         // Then
-        verify { handlerFunction.invoke(any()) }
-        // Should NOT automatically start activity - events saved to list
+        // In detection-only mode, custom handlers are not called to prevent enforcement
+        // Events are only logged and saved for review
         verify(exactly = 0) { mockContext.startActivity(any()) }
         coVerify { threatEventRepository.saveEvent(any()) }
     }

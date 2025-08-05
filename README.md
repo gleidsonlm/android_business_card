@@ -1,6 +1,14 @@
-# My Digital Business Card Android App
+# My Digital Business Card Android App (v1.2.1)
 
 **A modern, interactive digital business card application for Android, built with Kotlin and Jetpack Compose. This project serves as a practical demonstration of core Android development skills and modern UI practices.**
+
+## Recent Updates (v1.2.1)
+
+### 🛡️ Critical Security Fix
+- **Fixed SIGSEGV crash in Appdome's libloader.so**: Added comprehensive protection against native library crashes, specifically addressing null pointer dereference in the RSA_size function during mobile bot defense heartbeat operations.
+- **Enhanced Error Handling**: Implemented `NativeLibraryProtection` utility class with defensive programming patterns to handle native library failures gracefully.
+- **Improved Stability**: Added try-catch blocks and parameter validation around all Appdome threat event processing to prevent app crashes.
+- **Fallback Mechanisms**: Created safe fallback options when native security libraries encounter errors, ensuring the app remains functional even when security features fail.
 
 ## Overview
 

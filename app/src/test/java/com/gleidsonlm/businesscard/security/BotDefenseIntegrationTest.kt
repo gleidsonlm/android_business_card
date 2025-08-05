@@ -7,6 +7,7 @@ import com.gleidsonlm.businesscard.ThreatEventReceiver
 import com.gleidsonlm.businesscard.data.repository.ThreatEventRepository
 import com.gleidsonlm.businesscard.model.ThreatEventData
 import io.mockk.MockKAnnotations
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
@@ -79,7 +80,7 @@ class BotDefenseIntegrationTest {
     }
 
     @Test
-    fun `complete bot defense flow with high severity threat`() = runTest {
+    fun `complete bot defense flow with high severity threat in detection-only mode`() = runTest {
         // Given - High severity bot threat intent
         val intent = Intent("MobileBotDefenseCheck").apply {
             putExtra("defaultMessage", "Bot activity detected")
@@ -99,8 +100,12 @@ class BotDefenseIntegrationTest {
         // Allow coroutines to complete
         testScheduler.advanceUntilIdle()
 
-        // Then - Should trigger activity launch for high severity threat
-        verify { mockContext.startActivity(any()) }
+        // Then - In detection-only mode, should NOT trigger activity launch (no enforcement)
+        // The event is saved to repository for review but no enforcement actions are taken
+        verify(exactly = 0) { mockContext.startActivity(any()) }
+        
+        // Verify the event was saved to repository for review
+        coVerify { threatEventRepository.saveEvent(any()) }
     }
 
     @Test

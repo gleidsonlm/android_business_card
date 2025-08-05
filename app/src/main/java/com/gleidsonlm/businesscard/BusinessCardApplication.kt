@@ -44,6 +44,7 @@ import com.gleidsonlm.businesscard.security.KeyInjectionDetectedHandler
 import com.gleidsonlm.businesscard.security.MagiskManagerDetectedHandler
 import com.gleidsonlm.businesscard.security.MalwareInjectionDetectedHandler
 import com.gleidsonlm.businesscard.security.MobileBotDefenseRateLimitReachedHandler
+import com.gleidsonlm.businesscard.security.NativeLibraryProtection
 import com.gleidsonlm.businesscard.security.NetworkProxyConfiguredHandler
 import com.gleidsonlm.businesscard.security.NoSimPresentHandler
 import com.gleidsonlm.businesscard.security.NotInstalledFromOfficialStoreHandler
@@ -319,17 +320,22 @@ class BusinessCardApplication : Application() {
     /**
      * Called when the application is starting, before any other application objects have been created.
      *
-     * This method initializes the [ThreatEventReceiver], configures it with the [BotDefenseHandler],
-     * and registers all threat event handlers including Anti-Malware, SSL/TLS security,
-     * fraud prevention, and anti-cheat handlers.
+     * This method initializes native library protection against crashes, the [ThreatEventReceiver], 
+     * configures it with the [BotDefenseHandler], and registers all threat event handlers including 
+     * Anti-Malware, SSL/TLS security, fraud prevention, and anti-cheat handlers.
      */
     override fun onCreate() {
         super.onCreate()
+        
+        // Initialize native library protection first to prevent crashes during startup
+        NativeLibraryProtection.initialize()
+        
         threatEventReceiver = ThreatEventReceiver(this, threatEventRepository)
 
         threatEventReceiver.setBotDefenseHandler(botDefenseHandler)
         threatEventReceiver.setMobileBotDefenseRateLimitReachedHandler(mobileBotDefenseRateLimitReachedHandler)
         threatEventReceiver.setUpdateMBDMapHandler(updateMBDMapHandler)
+        threatEventReceiver.setConditionalEnforcementEventHandler(conditionalEnforcementEventHandler)
 
         // Register existing threat event handlers
         threatEventReceiver.addHandler("UnknownSourcesEnabled", unknownSourcesEnabledHandler::handleUnknownSourcesEnabledEvent)
@@ -397,7 +403,7 @@ class BusinessCardApplication : Application() {
         threatEventReceiver.addHandler("SimStateInfo", simStateInfoHandler::handleSimStateInfoEvent)
         threatEventReceiver.addHandler("ActiveDebuggerThreatDetected", activeDebuggerThreatDetectedHandler::handleActiveDebuggerThreatDetectedEvent)
         threatEventReceiver.addHandler("BlockedClipboardEvent", blockedClipboardEventHandler::handleBlockedClipboardEventEvent)
-        threatEventReceiver.addHandler("ConditionalEnforcementEvent", conditionalEnforcementEventHandler::handleConditionalEnforcementEventEvent)
+        // ConditionalEnforcementEvent is handled specially in ThreatEventReceiver to respect enforcement decisions
         threatEventReceiver.addHandler("DeepSeekDetected", deepSeekDetectedHandler::handleDeepSeekDetectedEvent)
         threatEventReceiver.addHandler("BlockedATSModification", blockedATSModificationHandler::handleBlockedATSModificationEvent)
         threatEventReceiver.addHandler("UACPresented", uacPresentedHandler::handleUACPresentedEvent)
