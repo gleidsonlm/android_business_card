@@ -1,18 +1,35 @@
 package com.gleidsonlm.businesscard.security
 
 import android.util.Log
+import io.mockk.clearAllMocks
+import io.mockk.every
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 
 /**
  * Demonstration test showing how NativeLibraryProtection prevents crashes
  * similar to the SIGSEGV in libloader.so RSA_size function.
  */
-@RunWith(RobolectricTestRunner::class)
-@Config(sdk = [28])
 class CrashProtectionDemonstrationTest {
+
+    @Before
+    fun setUp() {
+        // Mock Android Log to avoid Robolectric dependency
+        mockkStatic(Log::class)
+        every { Log.d(any<String>(), any<String>()) } returns 0
+        every { Log.w(any<String>(), any<String>()) } returns 0
+        every { Log.e(any<String>(), any<String>(), any<Throwable>()) } returns 0
+        every { Log.i(any<String>(), any<String>()) } returns 0
+    }
+
+    @After
+    fun tearDown() {
+        unmockkStatic(Log::class)
+        clearAllMocks()
+    }
 
     @Test
     fun `demonstrate RSA_size crash protection - app continues running`() {
@@ -27,7 +44,7 @@ class CrashProtectionDemonstrationTest {
         val result = NativeLibraryProtection.safeNativeOperation(
             operation = "Mobile Bot Defense Heartbeat (simulated)",
             fallback = {
-                Log.w("Demo", "RSA_size crash detected - app continues safely")
+                // Log.w call is mocked, just return fallback
                 "SAFE_FALLBACK"
             }
         ) {

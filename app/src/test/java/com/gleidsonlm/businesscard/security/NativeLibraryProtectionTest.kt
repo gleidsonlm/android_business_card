@@ -1,31 +1,36 @@
 package com.gleidsonlm.businesscard.security
 
+import android.util.Log
+import io.mockk.clearAllMocks
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
+import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
-import java.io.ByteArrayOutputStream
-import java.io.PrintStream
 
 /**
  * Unit tests for NativeLibraryProtection to ensure proper error handling
  * and crash prevention for Appdome's libloader.so RSA_size function failures.
  */
-@RunWith(RobolectricTestRunner::class)
-@Config(sdk = [28])
 class NativeLibraryProtectionTest {
-
-    private lateinit var originalOut: PrintStream
-    private lateinit var testOut: ByteArrayOutputStream
 
     @Before
     fun setUp() {
-        // Capture system output for testing
-        originalOut = System.out
-        testOut = ByteArrayOutputStream()
-        System.setOut(PrintStream(testOut))
+        // Mock Android Log to avoid Robolectric dependency
+        mockkStatic(Log::class)
+        every { Log.d(any<String>(), any<String>()) } returns 0
+        every { Log.w(any<String>(), any<String>()) } returns 0
+        every { Log.e(any<String>(), any<String>(), any<Throwable>()) } returns 0
+        every { Log.i(any<String>(), any<String>()) } returns 0
+    }
+
+    @After
+    fun tearDown() {
+        unmockkStatic(Log::class)
+        clearAllMocks()
     }
 
     @Test
