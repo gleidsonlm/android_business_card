@@ -335,6 +335,7 @@ class BusinessCardApplication : Application() {
         threatEventReceiver.setBotDefenseHandler(botDefenseHandler)
         threatEventReceiver.setMobileBotDefenseRateLimitReachedHandler(mobileBotDefenseRateLimitReachedHandler)
         threatEventReceiver.setUpdateMBDMapHandler(updateMBDMapHandler)
+        threatEventReceiver.setConditionalEnforcementEventHandler(conditionalEnforcementEventHandler)
 
         // Register existing threat event handlers
         threatEventReceiver.addHandler("UnknownSourcesEnabled", unknownSourcesEnabledHandler::handleUnknownSourcesEnabledEvent)
@@ -402,7 +403,7 @@ class BusinessCardApplication : Application() {
         threatEventReceiver.addHandler("SimStateInfo", simStateInfoHandler::handleSimStateInfoEvent)
         threatEventReceiver.addHandler("ActiveDebuggerThreatDetected", activeDebuggerThreatDetectedHandler::handleActiveDebuggerThreatDetectedEvent)
         threatEventReceiver.addHandler("BlockedClipboardEvent", blockedClipboardEventHandler::handleBlockedClipboardEventEvent)
-        threatEventReceiver.addHandler("ConditionalEnforcementEvent", conditionalEnforcementEventHandler::handleConditionalEnforcementEventEvent)
+        // ConditionalEnforcementEvent is handled specially in ThreatEventReceiver to respect enforcement decisions
         threatEventReceiver.addHandler("DeepSeekDetected", deepSeekDetectedHandler::handleDeepSeekDetectedEvent)
         threatEventReceiver.addHandler("BlockedATSModification", blockedATSModificationHandler::handleBlockedATSModificationEvent)
         threatEventReceiver.addHandler("UACPresented", uacPresentedHandler::handleUACPresentedEvent)

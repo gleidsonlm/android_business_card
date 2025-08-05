@@ -10,6 +10,8 @@ import androidx.core.content.ContextCompat
 import com.gleidsonlm.businesscard.data.repository.ThreatEventRepository
 import com.gleidsonlm.businesscard.model.ThreatEventData
 import com.gleidsonlm.businesscard.security.BotDefenseHandler
+import com.gleidsonlm.businesscard.security.ConditionalEnforcementEventHandler
+import com.gleidsonlm.businesscard.security.ConditionalEnforcementResult
 import com.gleidsonlm.businesscard.security.MobileBotDefenseRateLimitReachedHandler
 import com.gleidsonlm.businesscard.security.NativeLibraryProtection
 import com.gleidsonlm.businesscard.security.UpdateMBDMapHandler
@@ -42,6 +44,7 @@ class ThreatEventReceiver(
     private var botDefenseHandler: BotDefenseHandler? = null
     private var mobileBotDefenseRateLimitReachedHandler: MobileBotDefenseRateLimitReachedHandler? = null
     private var updateMBDMapHandler: UpdateMBDMapHandler? = null
+    private var conditionalEnforcementEventHandler: ConditionalEnforcementEventHandler? = null
     private val threatHandlers = mutableMapOf<String, (ThreatEventData) -> Unit>()
 
     fun setBotDefenseHandler(handler: BotDefenseHandler) {
@@ -54,6 +57,10 @@ class ThreatEventReceiver(
 
     fun setUpdateMBDMapHandler(handler: UpdateMBDMapHandler) {
         this.updateMBDMapHandler = handler
+    }
+
+    fun setConditionalEnforcementEventHandler(handler: ConditionalEnforcementEventHandler) {
+        this.conditionalEnforcementEventHandler = handler
     }
 
     fun addHandler(action: String, handler: (ThreatEventData) -> Unit) {
@@ -338,6 +345,7 @@ class ThreatEventReceiver(
             "MobileBotDefenseCheck" -> handleBotDefenseCheck(threatEventData)
             "MobileBotDefenseRateLimitReached" -> handleMobileBotDefenseRateLimitReached(threatEventData)
             "UpdateMBDMap" -> handleUpdateMBDMap(threatEventData)
+            "ConditionalEnforcementEvent" -> handleConditionalEnforcementEvent(threatEventData)
             else -> {
                 // Apply protection to custom threat handlers as well
                 NativeLibraryProtection.safeNativeOperation(
@@ -461,6 +469,42 @@ class ThreatEventReceiver(
         NativeLibraryProtection.safeBotDefenseOperation("UpdateMBDMap processing") {
             updateMBDMapHandler?.handleMBDMapUpdateEvent(threatEventData) ?: run {
                 Log.w(TAG, "UpdateMBDMapHandler not available")
+            }
+        }
+    }
+
+    /**
+     * Handles ConditionalEnforcementEvent with proper enforcement decision logic.
+     * 
+     * This method ensures that Conditional Enforcement events do NOT automatically
+     * enforce (terminate) the app unless explicitly required by Appdome's logic.
+     */
+    private fun handleConditionalEnforcementEvent(threatEventData: ThreatEventData) {
+        Log.i(TAG, "Handling ConditionalEnforcementEvent - analyzing enforcement decision")
+        
+        NativeLibraryProtection.safeNativeOperation(
+            operation = "ConditionalEnforcementEvent processing",
+            fallback = {
+                Log.w(TAG, "ConditionalEnforcementEvent processing failed, event saved to list only")
+            }
+        ) {
+            val enforcementResult = conditionalEnforcementEventHandler?.handleConditionalEnforcementEventEvent(threatEventData)
+                ?: ConditionalEnforcementResult.LOG_ONLY
+            
+            when (enforcementResult) {
+                ConditionalEnforcementResult.LOG_ONLY -> {
+                    Log.i(TAG, "ConditionalEnforcementEvent logged only - app continues normally")
+                    // Event is already saved to repository, no user interruption needed
+                }
+                ConditionalEnforcementResult.ENFORCE_WITH_NOTIFICATION -> {
+                    Log.w(TAG, "ConditionalEnforcementEvent requires user notification")
+                    // Only show to user when enforcement is actually required
+                    val enforcementData = threatEventData.copy(
+                        message = threatEventData.message ?: "Security policy enforcement required",
+                        defaultMessage = "Conditional enforcement has determined that security measures are needed"
+                    )
+                    routeToThreatEventActivity(enforcementData, "ConditionalEnforcementEvent")
+                }
             }
         }
     }
