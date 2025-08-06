@@ -4,6 +4,7 @@ coilCompose = "2.7.0"
 core = "3.5.3"
 coreVersion = "1.7.0"
 ezVcardVersion = "0.12.1"
+firebaseBom = "34.0.0"
 gson = "2.13.1"
 hiltNavigationCompose = "1.2.0"
 kotlin = "2.2.0"
@@ -34,6 +35,9 @@ androidx-rules = { module = "androidx.test:rules", version.ref = "coreVersion" }
 androidx-runner = { module = "androidx.test:runner", version.ref = "runner" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 core = { module = "com.google.zxing:core", version.ref = "core" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics", version.ref = "firebaseCrashlytics" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 googlecode-ez-vcard = { module = "com.googlecode.ez-vcard:ez-vcard", version.ref = "ezVcardVersion" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -53,7 +57,6 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
-firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics", version.ref = "firebaseCrashlytics" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
