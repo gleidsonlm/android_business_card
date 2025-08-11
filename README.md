@@ -79,10 +79,16 @@ This project demonstrates an ability to integrate various components, manage app
 
 ## 🛠️ Setup & Installation
 
+### Prerequisites
+- Java 17 or higher (required for Firebase Crashlytics Gradle plugin compatibility)
+- Android Studio (latest stable version recommended)
+
+### Installation Steps
 1.  Clone the repository: `git clone <repository-url>`
 2.  Open the project in Android Studio (latest stable version recommended).
-3.  Let Android Studio sync Gradle dependencies.
-4.  Build and run the app on an Android emulator or a physical device.
+3.  Ensure you have Java 17 or higher configured in Android Studio.
+4.  Let Android Studio sync Gradle dependencies.
+5.  Build and run the app on an Android emulator or a physical device.
 
 ## 🧪 Testing
 

@@ -31,6 +31,7 @@ steps:
     tasks: 'clean :app:bundle'
     publishJUnitResults: false
     javaHomeOption: 'JDKVersion'
+    jdkVersionOption: '1.17'
     gradleOptions: '-Xmx4096m'
     workingDirectory: '$(buildDir)'
 
