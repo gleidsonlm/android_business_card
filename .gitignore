@@ -9,9 +9,10 @@
 .externalNativeBuild
 .cxx
 local.properties
-app/google-services.json
 app/appdome
 app/build
+baselineprofile/build
 app/release
 app/keystore.jks
+app/libs
 .run
