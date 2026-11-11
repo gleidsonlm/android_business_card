@@ -326,6 +326,8 @@ class BusinessCardApplication : Application() {
      */
     override fun onCreate() {
         super.onCreate()
+        // TODO: Add your framework initialization code here.
+        // For example: YourFramework.initialize(this)
         
         // Initialize native library protection first to prevent crashes during startup
         NativeLibraryProtection.initialize()
