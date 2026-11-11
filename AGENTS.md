@@ -19,7 +19,6 @@ When assisting with this project, please adhere to the following best practices:
     *   Always use `read_files()` to get the latest version of a file before attempting to modify it. This prevents working with stale information.
     *   Utilize `ls()` and `grep()` for exploration and to locate relevant code sections or files.
     *   If you encounter compilation errors or test failures after a change, attempt to diagnose and fix them. Clearly communicate the error and your proposed solution.
-    *   **Testing with Firebase:** Before running tests, ensure a placeholder `google-services.json` file exists at `app/google-services.json` to prevent build failures. A minimal file can be created with a command like `echo '{"project_info": {"project_id": "example"}}' > app/google-services.json`.
 
 4.  **Understanding `AGENTS.md`:**
 

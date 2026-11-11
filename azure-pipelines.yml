@@ -11,18 +11,6 @@ variables:
 
 steps:
 
-# Download google-services.json securely
-- task: DownloadSecureFile@1
-  name: DownloadGoogleServices
-  inputs:
-    secureFile: 'google-services.json'
-
-# Copy google-services.json to app directory
-- script: |
-    cp $(DownloadGoogleServices.secureFilePath) $(appDir)/google-services.json
-  displayName: 'Copy google-services.json to app directory'
-
-
 # Build the Android App Bundle (AAB)
 - task: Gradle@4 
   displayName: 'Assemble Android App Bundle (Debug)'

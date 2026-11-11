@@ -80,7 +80,7 @@ This project demonstrates an ability to integrate various components, manage app
 ## 🛠️ Setup & Installation
 
 ### Prerequisites
-- Java 17 or higher (required for Firebase Crashlytics Gradle plugin compatibility)
+- Java 17 or higher
 - Android Studio (latest stable version recommended)
 
 ### Installation Steps
