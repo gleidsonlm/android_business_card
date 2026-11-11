@@ -1,17 +1,15 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.hilt.plugin)
     alias(libs.plugins.kotlin.parcelize)
-    alias(libs.plugins.google.gms.google.services)
-    alias(libs.plugins.google.firebase.crashlytics)
+    alias(libs.plugins.baselineprofile)
 }
 
 android {
     namespace = "com.gleidsonlm.businesscard"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.gleidsonlm.businesscard"
@@ -23,8 +21,8 @@ android {
 
     buildTypes {
         release {
-            isShrinkResources = false
-            isMinifyEnabled = false
+            isShrinkResources = true
+            isMinifyEnabled = true
             isDebuggable = false
         }
     }
@@ -59,6 +57,7 @@ android {
 
 dependencies {
 
+    implementation(files("libs/Appdome_com.playdigital.devicebinding_c49e7748.aar"))
     implementation(libs.gson)
     implementation(libs.googlecode.ez.vcard)
     implementation("com.journeyapps:zxing-android-embedded:4.3.0") {
@@ -73,13 +72,12 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.analytics)
-    implementation(libs.firebase.crashlytics)
+    baselineProfile(project(":baselineprofile"))
     ksp(libs.hilt.android.compiler)
     testImplementation(libs.junit)
     testImplementation(libs.androidx.arch.core.testing)
@@ -90,12 +88,33 @@ dependencies {
     testImplementation(libs.androidx.core)
     testImplementation(libs.androidx.rules)
     testImplementation(libs.androidx.runner)
-    testImplementation(libs.ui.test.junit4)
-    testImplementation(libs.ui.test.manifest)
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.androidx.ui.test.junit4)
+    testImplementation(libs.androidx.ui.test.manifest)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+tasks.register<Zip>("exportBaselineProfileForAppdome") {
+    group = "appdome"
+    description = "Exports and zips the baseline profile for Appdome fusion."
+    
+    archiveFileName.set("baseline_profile.zip")
+    destinationDirectory.set(layout.buildDirectory.dir("outputs/appdome"))
+
+    // Use the merged profile from the build directory as the primary source
+    val mergedProfile = layout.buildDirectory.file("intermediates/merged_art_profile/release/mergeReleaseArtProfile/baseline-prof.txt")
+    
+    from(mergedProfile) {
+        rename { "baseline_profile.txt" }
+    }
+    
+    // Fallback: If the profile has been copied to src/main
+    from(layout.projectDirectory.file("src/main/baseline-prof.txt")) {
+        rename { "baseline_profile.txt" }
+    }
 }
