@@ -13,10 +13,10 @@ android {
 
     defaultConfig {
         applicationId = "com.gleidsonlm.businesscard"
-        minSdk = 31
-        targetSdk = 36
+        minSdk = 34
+        targetSdk = 37
         versionCode = 1754478577
-        versionName = "August 6, 2025 - Java 17"
+        versionName = "November 11, 2026"
     }
 
     buildTypes {
