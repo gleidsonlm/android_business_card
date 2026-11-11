@@ -30,9 +30,9 @@ android {
     testOptions {
         managedDevices {
             allDevices {
-                create<com.android.build.api.dsl.ManagedVirtualDevice>("pixel6Api31") {
+                create<com.android.build.api.dsl.ManagedVirtualDevice>("pixel6Api34") {
                     device = "Pixel 6"
-                    apiLevel = 31
+                    apiLevel = 34
                     systemImageSource = "aosp"
                 }
             }
@@ -50,6 +50,6 @@ dependencies {
 
 baselineProfile {
     // Generate the baseline profile during the 'release' build.
-    managedDevices += "pixel6Api31"
+    managedDevices += "pixel6Api34"
     useConnectedDevices = false
 }
