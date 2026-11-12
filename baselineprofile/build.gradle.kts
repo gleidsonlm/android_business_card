@@ -1,5 +1,7 @@
 plugins {
     alias(libs.plugins.android.test)
+    // Required while android.builtInKotlin=false, otherwise the .kt sources are never compiled.
+    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.baselineprofile)
 }
 
