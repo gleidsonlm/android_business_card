@@ -12,7 +12,7 @@ import org.robolectric.annotation.Config
  * Tests the integration of Appdome geo-compliance threat detection.
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [31])
+@Config(sdk = [34])
 class GeoComplianceThreatHandlersTest {
 
     private lateinit var geoLocationSpoofingDetectedHandler: GeoLocationSpoofingDetectedHandler
