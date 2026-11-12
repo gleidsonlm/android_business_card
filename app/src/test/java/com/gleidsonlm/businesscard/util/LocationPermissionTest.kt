@@ -17,7 +17,7 @@ import org.junit.Assert.*
  * Tests the integration of location permissions for geo-compliance features.
  */
 @RunWith(AndroidJUnit4::class)
-@Config(sdk = [31])
+@Config(sdk = [34])
 class LocationPermissionTest {
 
     @Test

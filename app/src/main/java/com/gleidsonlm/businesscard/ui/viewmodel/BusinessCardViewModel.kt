@@ -9,6 +9,7 @@ import com.gleidsonlm.businesscard.data.repository.UserRepository
 import com.gleidsonlm.businesscard.ui.UserData
 import com.gleidsonlm.businesscard.util.VCardHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +17,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class BusinessCardViewModel @Inject constructor(private val userRepository: UserRepository) : ViewModel() {
+class BusinessCardViewModel internal constructor(
+    private val userRepository: UserRepository,
+    private val qrDispatcher: CoroutineDispatcher
+) : ViewModel() {
+
+    @Inject
+    constructor(userRepository: UserRepository) : this(userRepository, Dispatchers.Default)
 
     private val _currentData = MutableStateFlow<UserData?>(null)
     val currentData: StateFlow<UserData?> = _currentData
@@ -35,7 +42,7 @@ class BusinessCardViewModel @Inject constructor(private val userRepository: User
     }
 
     fun generateQrCode(userData: UserData) {
-        viewModelScope.launch(Dispatchers.Default) {
+        viewModelScope.launch(qrDispatcher) {
             Log.d("BusinessCardViewModel", "Generating QR Code for: ${userData.fullName}")
             try {
                 val vCardString = VCardHelper.generateVCardString(userData)

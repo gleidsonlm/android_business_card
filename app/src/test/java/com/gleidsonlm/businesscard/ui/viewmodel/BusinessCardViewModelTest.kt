@@ -51,7 +51,7 @@ class BusinessCardViewModelTest {
         mockkObject(VCardHelper)
         
         userRepository = mockk()
-        viewModel = BusinessCardViewModel(userRepository)
+        viewModel = BusinessCardViewModel(userRepository, testDispatcher)
     }
 
     @After
