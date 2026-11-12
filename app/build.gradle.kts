@@ -79,6 +79,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.profileinstaller)
     baselineProfile(project(":baselineprofile"))
     ksp(libs.hilt.android.compiler)
     testImplementation(libs.junit)
@@ -99,6 +100,11 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+baselineProfile {
+    // Use the startup profile to lay out DEX classes (R8) so cold start touches fewer pages.
+    dexLayoutOptimization = true
 }
 
 tasks.register<Zip>("exportBaselineProfileForAppdome") {
