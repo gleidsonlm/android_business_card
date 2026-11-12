@@ -6,6 +6,17 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+/**
+ * Generates the Baseline Profile by exercising the app's main user journeys:
+ *
+ * 1. Cold start into the first-run input form.
+ * 2. Fill in and save the card (ViewModel + repository + vCard/QR generation).
+ * 3. Business card screen with QR code.
+ * 4. Threat events list (and the detail screen when an event exists).
+ * 5. Edit the card and save again.
+ *
+ * Run on a Pixel 6 / Android 14 device with `./gradlew :app:generateBaselineProfile`.
+ */
 @RunWith(AndroidJUnit4::class)
 class BaselineProfileGenerator {
 
@@ -14,15 +25,16 @@ class BaselineProfileGenerator {
 
     @Test
     fun generate() = baselineProfileRule.collect(
-        packageName = "com.gleidsonlm.businesscard"
+        packageName = TARGET_PACKAGE,
     ) {
-        // This block defines the user interactions that will be captured in the baseline profile.
-        // For example, starting the main activity:
-        pressHome()
-        startActivityAndWait()
+        device.resetAppState()
 
-        // You can add more interactions here to capture other hot code paths.
-        // For example:
-        // device.wait(Until.hasObject(By.text("Some Text")), 5000)
+        // Cold start -> first-run input form -> saved business card
+        startApp()
+        device.fillAndSaveCard()
+
+        // Secondary journeys from the business card screen
+        device.browseThreatEvents()
+        device.editCard()
     }
 }

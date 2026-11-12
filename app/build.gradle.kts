@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.hilt.plugin)
@@ -13,10 +14,10 @@ android {
 
     defaultConfig {
         applicationId = "com.gleidsonlm.businesscard"
-        minSdk = 31
-        targetSdk = 36
+        minSdk = 34
+        targetSdk = 37
         versionCode = 1754478577
-        versionName = "August 6, 2025 - Java 17"
+        versionName = "November 11, 2026"
     }
 
     buildTypes {
@@ -24,6 +25,7 @@ android {
             isShrinkResources = true
             isMinifyEnabled = true
             isDebuggable = false
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
@@ -77,6 +79,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.profileinstaller)
     baselineProfile(project(":baselineprofile"))
     ksp(libs.hilt.android.compiler)
     testImplementation(libs.junit)
@@ -97,6 +100,11 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+baselineProfile {
+    // Use the startup profile to lay out DEX classes (R8) so cold start touches fewer pages.
+    dexLayoutOptimization = true
 }
 
 tasks.register<Zip>("exportBaselineProfileForAppdome") {

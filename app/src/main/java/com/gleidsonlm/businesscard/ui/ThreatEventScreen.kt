@@ -11,6 +11,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -31,10 +35,15 @@ import com.gleidsonlm.businesscard.model.ThreatEventData
  * @param threatEventData The [ThreatEventData] object containing details of the threat.
  *                        If null, a "No data available" message is displayed.
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun ThreatEventScreenContent(threatEventData: ThreatEventData?) {
     Scaffold(
+        modifier = Modifier
+            // Expose testTags as resource ids: this screen lives in ThreatEventActivity,
+            // outside MainActivity's semantics root.
+            .semantics { testTagsAsResourceId = true }
+            .testTag(TestTags.THREAT_DETAIL_SCREEN),
         topBar = {
             TopAppBar(title = { Text(stringResource(id = R.string.threatevent_screen_title)) })
         }
@@ -110,6 +119,7 @@ fun ThreatEventScreenContent(threatEventData: ThreatEventData?) {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
+                        .testTag(TestTags.THREAT_DETAIL_LIST)
                         .padding(paddingValues)
                         .padding(horizontal = 8.dp, vertical = 8.dp),
                     contentPadding = PaddingValues(vertical = 8.dp)

@@ -14,6 +14,8 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
+import com.gleidsonlm.businesscard.ui.TestTags
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -108,6 +110,7 @@ private fun UserAvatarComposable(
                 model = it.avatarUri ?: R.drawable.avatar,
                 contentDescription = stringResource(R.string.cont_desc_user_avatar),
                 modifier = Modifier
+                    .testTag(TestTags.CARD_AVATAR)
                     .size(imageSize)
                     .clip(CircleShape),
                 placeholder = painterResource(id = R.drawable.avatar),
@@ -135,6 +138,7 @@ private fun QRCodeComposable(
                 bitmap = qrCodeImageBitmap,
                 contentDescription = stringResource(R.string.qr_code_content_description),
                 modifier = Modifier
+                    .testTag(TestTags.CARD_QR_CODE)
                     .fillMaxWidth(if (isPortrait) 0.7f else 1f) // QR takes 70% of width in portrait, full column width in landscape
                     .aspectRatio(1f)
                     .padding(4.dp),
@@ -170,10 +174,17 @@ private fun UserDetailsComposable(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag(TestTags.CARD_DETAILS)
         ) {
             userData?.let {
-                Text(it.fullName, style = MaterialTheme.typography.titleMedium.copy(fontSize = fullNameFontSize), maxLines = 2)
+                Text(
+                    it.fullName,
+                    style = MaterialTheme.typography.titleMedium.copy(fontSize = fullNameFontSize),
+                    maxLines = 2,
+                    modifier = Modifier.testTag(TestTags.CARD_FULL_NAME)
+                )
                 Spacer(modifier = Modifier.height(if (isPortrait) 8.dp else 4.dp))
                 Text(it.title, style = MaterialTheme.typography.bodySmall.copy(fontSize = titleFontSize), maxLines = 2)
                 Spacer(modifier = Modifier.height(if (isPortrait) 8.dp else 4.dp))

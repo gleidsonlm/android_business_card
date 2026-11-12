@@ -94,6 +94,10 @@ This project demonstrates an ability to integrate various components, manage app
 
 This project includes unit tests to ensure the reliability and correctness of its components. For detailed instructions on how to run these tests and configure your environment, please refer to the [TESTING.md](TESTING.md) file.
 
+## ⚡ Startup Performance (Baseline & Startup Profiles)
+
+The `:baselineprofile` module generates a **Baseline Profile** (AOT-compiles hot code paths on install) and a **Startup Profile** (used by R8 for DEX layout optimization, `dexLayoutOptimization = true` in `:app`). Both are committed under `app/src/release/generated/baselineProfiles/` and `androidx.profileinstaller` installs the baseline profile on sideloaded and fused builds. See [TESTING.md](TESTING.md#baseline-profile-startup-profile-and-benchmarks) to regenerate them and to run the startup benchmark.
+
 ## Appdome Threat Event Handling
 
 This feature is designed to detect and respond to specific security threats identified by the Appdome security platform integrated into the application. It provides immediate feedback to the user regarding potential security issues on their device.
