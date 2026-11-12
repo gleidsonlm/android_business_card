@@ -6,6 +6,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import com.gleidsonlm.businesscard.ui.TestTags
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -33,6 +35,7 @@ fun ThreatEventCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
+            .testTag(TestTags.THREAT_EVENT_CARD)
             .clickable { onCardClick(threatEvent) },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {

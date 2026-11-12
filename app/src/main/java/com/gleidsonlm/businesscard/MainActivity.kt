@@ -36,11 +36,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
+import com.gleidsonlm.businesscard.ui.TestTags
 import com.gleidsonlm.businesscard.ui.ThreatEventListScreen
 import com.gleidsonlm.businesscard.ui.UserData
 import com.gleidsonlm.businesscard.ui.UserInputScreen
@@ -62,6 +67,7 @@ class MainActivity : ComponentActivity() {
     private val businessCardViewModel: BusinessCardViewModel by viewModels()
     private val userInputViewModel: UserInputViewModel by viewModels()
 
+    @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -97,7 +103,13 @@ class MainActivity : ComponentActivity() {
             }
 
             BusinessCardTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        // Expose testTags as resource ids so UiAutomator (baseline/startup
+                        // profile generators, macrobenchmarks) can find elements via By.res().
+                        .semantics { testTagsAsResourceId = true }
+                ) {
                     when {
                         showThreatEventsScreen -> {
                             ThreatEventListScreen(
@@ -138,7 +150,8 @@ class MainActivity : ComponentActivity() {
                                 IconButton(
                                     onClick = {
                                         showThreatEventsScreen = true
-                                    }
+                                    },
+                                    modifier = Modifier.testTag(TestTags.BUTTON_THREAT_EVENTS)
                                 ) {
                                     Icon(
                                         imageVector = Icons.Rounded.Warning,
@@ -151,7 +164,8 @@ class MainActivity : ComponentActivity() {
                                         val currentCardData = businessCardViewModel.currentData.value
                                         userInputViewModel.loadExistingData(currentCardData)
                                         showInputScreen = true
-                                    }
+                                    },
+                                    modifier = Modifier.testTag(TestTags.BUTTON_EDIT)
                                 ) {
                                     Icon(
                                         imageVector = Icons.Rounded.Edit,
@@ -203,7 +217,8 @@ class MainActivity : ComponentActivity() {
                                             Log.w("MainActivityShare", "User data is null, cannot share vCard.")
                                             // Optionally show a Toast to the user
                                         }
-                                    }
+                                    },
+                                    modifier = Modifier.testTag(TestTags.BUTTON_SHARE)
                                 ) {
                                     Icon(
                                         imageVector = Icons.Rounded.Share,
@@ -228,6 +243,7 @@ private fun BusinessCardApp(businessCardViewModel: BusinessCardViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .testTag(TestTags.CARD_SCREEN)
             // .padding(16.dp) // Padding is now handled by BusinessCardFace's Row
     ) {
         BusinessCardFace(userData = userData, qrCodeImageBitmap = qrCodeImageBitmap)
@@ -242,20 +258,23 @@ private fun BusinessCardApp(businessCardViewModel: BusinessCardViewModel) {
             BusinessCardLink(
                 icon = Icons.Rounded.Call,
                 actualLinkText = userData?.phoneNumber?.takeIf { it.isNotBlank() } ?: stringResource(id = R.string.link_text_call),
-                actualLinkUrl = "tel:${userData?.phoneNumber?.takeIf { it.isNotBlank() } ?: ""}"
+                actualLinkUrl = "tel:${userData?.phoneNumber?.takeIf { it.isNotBlank() } ?: ""}",
+                modifier = Modifier.testTag(TestTags.CARD_LINK_PHONE)
             )
             Spacer(Modifier.height(8.dp))
             BusinessCardLink(
                 icon = Icons.Rounded.Email,
                 actualLinkText = userData?.emailAddress?.takeIf { it.isNotBlank() } ?: stringResource(id = R.string.link_text_email),
-                actualLinkUrl = "mailto:${userData?.emailAddress?.takeIf { it.isNotBlank() } ?: ""}"
+                actualLinkUrl = "mailto:${userData?.emailAddress?.takeIf { it.isNotBlank() } ?: ""}",
+                modifier = Modifier.testTag(TestTags.CARD_LINK_EMAIL)
             )
             Spacer(Modifier.height(8.dp))
             BusinessCardLink(
                 icon = Icons.Rounded.Info,
                 actualLinkText = userData?.website?.takeIf { it.isNotBlank() }
                     ?: stringResource(id = R.string.link_text_url),
-                actualLinkUrl = userData?.website?.takeIf { it.isNotBlank() } ?: "#"
+                actualLinkUrl = userData?.website?.takeIf { it.isNotBlank() } ?: "#",
+                modifier = Modifier.testTag(TestTags.CARD_LINK_WEBSITE)
             )
             Spacer(Modifier.height(16.dp))
 

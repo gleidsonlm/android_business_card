@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -49,12 +50,13 @@ fun ThreatEventListScreen(
     }
     
     Scaffold(
+        modifier = Modifier.testTag(TestTags.THREAT_LIST_SCREEN),
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.threat_events_title)) },
                 navigationIcon = {
                     onBackClick?.let {
-                        IconButton(onClick = it) {
+                        IconButton(onClick = it, modifier = Modifier.testTag(TestTags.THREAT_LIST_BACK)) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = stringResource(R.string.back)
@@ -64,7 +66,10 @@ fun ThreatEventListScreen(
                 },
                 actions = {
                     // Refresh button
-                    IconButton(onClick = { viewModel.refresh() }) {
+                    IconButton(
+                        onClick = { viewModel.refresh() },
+                        modifier = Modifier.testTag(TestTags.THREAT_LIST_REFRESH)
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
                             contentDescription = stringResource(R.string.refresh_events)
@@ -72,7 +77,10 @@ fun ThreatEventListScreen(
                     }
                     
                     // Clear all events button
-                    IconButton(onClick = { showClearDialog = true }) {
+                    IconButton(
+                        onClick = { showClearDialog = true },
+                        modifier = Modifier.testTag(TestTags.THREAT_LIST_CLEAR)
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = stringResource(R.string.clear_all_events)
@@ -103,7 +111,8 @@ fun ThreatEventListScreen(
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(32.dp),
+                            .padding(32.dp)
+                            .testTag(TestTags.THREAT_LIST_EMPTY),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
@@ -125,7 +134,9 @@ fun ThreatEventListScreen(
                 else -> {
                     // Events list
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .testTag(TestTags.THREAT_LIST_EVENTS),
                         contentPadding = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {

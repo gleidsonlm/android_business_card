@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -104,6 +105,7 @@ fun UserInputScreen(viewModel: UserInputViewModel, onSaveCompleted: () -> Unit) 
                 .fillMaxSize() // Column should also fill size to define scrollable area
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
+                .testTag(TestTags.INPUT_SCREEN)
         ) {
             Box(
                 modifier = Modifier
@@ -115,6 +117,7 @@ fun UserInputScreen(viewModel: UserInputViewModel, onSaveCompleted: () -> Unit) 
                     model = avatarUri ?: R.drawable.avatar, // Reads from ViewModel state
                     contentDescription = "Avatar Preview",
                     modifier = Modifier
+                        .testTag(TestTags.INPUT_AVATAR_PREVIEW)
                         .size(100.dp)
                         .clip(CircleShape),
                     placeholder = painterResource(id = R.drawable.avatar),
@@ -127,7 +130,9 @@ fun UserInputScreen(viewModel: UserInputViewModel, onSaveCompleted: () -> Unit) 
                     viewModel.selectImageFromGalleryClicked()
                     imagePickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(TestTags.INPUT_BUTTON_GALLERY)
             ) {
                 Text("Choose from Gallery")
             }
@@ -146,7 +151,9 @@ fun UserInputScreen(viewModel: UserInputViewModel, onSaveCompleted: () -> Unit) 
                         }
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(TestTags.INPUT_BUTTON_CAMERA)
             ) {
                 Text("Take Photo")
             }
@@ -155,7 +162,9 @@ fun UserInputScreen(viewModel: UserInputViewModel, onSaveCompleted: () -> Unit) 
                 onClick = {
                     viewModel.fetchGravatarClicked(emailAddress) // Pass current emailAddress state
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(TestTags.INPUT_BUTTON_GRAVATAR)
             ) {
                 Text("Fetch Gravatar")
             }
@@ -164,42 +173,54 @@ fun UserInputScreen(viewModel: UserInputViewModel, onSaveCompleted: () -> Unit) 
                 value = fullName,
                 onValueChange = { viewModel.onFieldChange("fullName", it) },
                 label = { Text("Full Name") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(TestTags.INPUT_FULL_NAME)
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = title,
                 onValueChange = { viewModel.onFieldChange("title", it) },
                 label = { Text("Title") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(TestTags.INPUT_TITLE)
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = phoneNumber,
                 onValueChange = { viewModel.onFieldChange("phoneNumber", it) },
                 label = { Text("Phone Number") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(TestTags.INPUT_PHONE)
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = emailAddress,
                 onValueChange = { viewModel.onFieldChange("emailAddress", it) },
                 label = { Text("Email Address") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(TestTags.INPUT_EMAIL)
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = company,
                 onValueChange = { viewModel.onFieldChange("company", it) },
                 label = { Text("Company") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(TestTags.INPUT_COMPANY)
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = website,
                 onValueChange = { viewModel.onFieldChange("website", it) },
                 label = { Text("Website") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(TestTags.INPUT_WEBSITE)
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(
@@ -207,7 +228,9 @@ fun UserInputScreen(viewModel: UserInputViewModel, onSaveCompleted: () -> Unit) 
                 viewModel.saveUserData() // Call ViewModel's save method
                 onSaveCompleted()      // Notify MainActivity
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(TestTags.INPUT_BUTTON_SAVE)
             ) {
                 Text("Save")
             }
