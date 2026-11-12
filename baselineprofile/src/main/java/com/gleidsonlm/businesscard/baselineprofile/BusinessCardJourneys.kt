@@ -3,6 +3,7 @@ package com.gleidsonlm.businesscard.baselineprofile
 import androidx.benchmark.macro.MacrobenchmarkScope
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.Direction
+import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 
 /**
@@ -47,21 +48,21 @@ private val RUNTIME_PERMISSIONS = listOf(
  * Puts the app in a known first-run state: no saved card, runtime permissions granted
  * (so the system permission dialogs requested in `MainActivity.onCreate` do not cover the UI).
  */
-fun MacrobenchmarkScope.resetAppState() {
-    device.executeShellCommand("pm clear $packageName")
-    RUNTIME_PERMISSIONS.forEach { device.executeShellCommand("pm grant $packageName $it") }
+fun UiDevice.resetAppState(packageName: String = TARGET_PACKAGE) {
+    this.executeShellCommand("pm clear $packageName")
+    RUNTIME_PERMISSIONS.forEach { this.executeShellCommand("pm grant $packageName $it") }
 }
 
 /** Waits for the element with the given test tag to appear; fails the run if it never does. */
-fun MacrobenchmarkScope.waitForTag(tag: String, timeoutMs: Long = UI_TIMEOUT_MS) {
-    check(device.wait(Until.hasObject(By.res(tag)), timeoutMs)) {
+fun UiDevice.waitForTag(tag: String, timeoutMs: Long = UI_TIMEOUT_MS) {
+    check(this.wait(Until.hasObject(By.res(tag)), timeoutMs)) {
         "Timed out after ${timeoutMs}ms waiting for test tag '$tag'"
     }
 }
 
-fun MacrobenchmarkScope.clickTag(tag: String) {
+fun UiDevice.clickTag(tag: String) {
     waitForTag(tag)
-    device.findObject(By.res(tag)).click()
+    this.findObject(By.res(tag)).click()
 }
 
 /**
@@ -70,19 +71,19 @@ fun MacrobenchmarkScope.clickTag(tag: String) {
  * Quick taps on the top-right action buttons (edge-to-edge, close to the status bar) are
  * sometimes dropped on the emulator, so a single click is not reliable for navigation.
  */
-fun MacrobenchmarkScope.clickTagUntil(tag: String, expectedTag: String, attempts: Int = 4) {
+fun UiDevice.clickTagUntil(tag: String, expectedTag: String, attempts: Int = 4) {
     repeat(attempts) {
         waitForTag(tag)
-        device.waitForIdle()
-        device.findObject(By.res(tag))?.click()
-        if (device.wait(Until.hasObject(By.res(expectedTag)), 2_000L)) return
+        this.waitForIdle()
+        this.findObject(By.res(tag))?.click()
+        if (this.wait(Until.hasObject(By.res(expectedTag)), 2_000L)) return
     }
     error("Clicking '$tag' did not show '$expectedTag' after $attempts attempts")
 }
 
-fun MacrobenchmarkScope.typeIntoTag(tag: String, value: String) {
+fun UiDevice.typeIntoTag(tag: String, value: String) {
     waitForTag(tag)
-    device.findObject(By.res(tag)).text = value
+    this.findObject(By.res(tag)).text = value
 }
 
 /**
@@ -95,7 +96,7 @@ fun MacrobenchmarkScope.startApp() {
 }
 
 /** Fills the input form and saves it, landing on the business card screen. */
-fun MacrobenchmarkScope.fillAndSaveCard() {
+fun UiDevice.fillAndSaveCard() {
     waitForTag(Tags.INPUT_SCREEN)
     typeIntoTag(Tags.INPUT_FULL_NAME, "Ada Lovelace")
     typeIntoTag(Tags.INPUT_TITLE, "Software Engineer")
@@ -109,24 +110,24 @@ fun MacrobenchmarkScope.fillAndSaveCard() {
 }
 
 /** Opens the threat events list, exercises refresh, optionally opens an event, then returns. */
-fun MacrobenchmarkScope.browseThreatEvents() {
+fun UiDevice.browseThreatEvents() {
     clickTagUntil(Tags.BUTTON_THREAT_EVENTS, Tags.THREAT_LIST_SCREEN)
     clickTag(Tags.THREAT_LIST_REFRESH)
-    device.waitForIdle()
+    this.waitForIdle()
 
     // ThreatEventActivity is not exported, so the detail screen is only reachable through a real
     // event. If the list has one (e.g. received from Appdome), open it to capture that path too.
-    device.findObject(By.res(Tags.THREAT_EVENT_CARD))?.let {
+    this.findObject(By.res(Tags.THREAT_EVENT_CARD))?.let {
         it.click()
-        device.waitForIdle()
-        device.pressBack()
+        this.waitForIdle()
+        this.pressBack()
     }
 
     clickTagUntil(Tags.THREAT_LIST_BACK, Tags.CARD_SCREEN)
 }
 
 /** Edits the existing card and saves it again (card -> input -> card). */
-fun MacrobenchmarkScope.editCard() {
+fun UiDevice.editCard() {
     clickTagUntil(Tags.BUTTON_EDIT, Tags.INPUT_SCREEN)
     typeIntoTag(Tags.INPUT_TITLE, "Principal Engineer")
     scrollToSaveAndClick()
@@ -137,10 +138,10 @@ fun MacrobenchmarkScope.editCard() {
  * Scroll the form down (never `pressBack()`, which would leave the app if the IME is hidden)
  * until Save is on screen, then click it.
  */
-private fun MacrobenchmarkScope.scrollToSaveAndClick() {
+private fun UiDevice.scrollToSaveAndClick() {
     repeat(3) {
-        if (device.hasObject(By.res(Tags.INPUT_BUTTON_SAVE))) return@repeat
-        device.findObject(By.res(Tags.INPUT_SCREEN))?.scroll(Direction.DOWN, 1f)
+        if (this.hasObject(By.res(Tags.INPUT_BUTTON_SAVE))) return@repeat
+        this.findObject(By.res(Tags.INPUT_SCREEN))?.scroll(Direction.DOWN, 1f)
     }
     clickTagUntil(Tags.INPUT_BUTTON_SAVE, Tags.CARD_SCREEN)
 }

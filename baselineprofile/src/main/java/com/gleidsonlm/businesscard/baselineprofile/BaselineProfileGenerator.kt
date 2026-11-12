@@ -27,14 +27,14 @@ class BaselineProfileGenerator {
     fun generate() = baselineProfileRule.collect(
         packageName = TARGET_PACKAGE,
     ) {
-        resetAppState()
+        device.resetAppState()
 
         // Cold start -> first-run input form -> saved business card
         startApp()
-        fillAndSaveCard()
+        device.fillAndSaveCard()
 
         // Secondary journeys from the business card screen
-        browseThreatEvents()
-        editCard()
+        device.browseThreatEvents()
+        device.editCard()
     }
 }
