@@ -25,6 +25,7 @@ android {
             isShrinkResources = true
             isMinifyEnabled = true
             isDebuggable = false
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
