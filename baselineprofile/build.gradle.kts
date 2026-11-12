@@ -52,6 +52,15 @@ dependencies {
 
 baselineProfile {
     // Generate the baseline profile during the 'release' build.
-    managedDevices += "pixel6Api34"
-    useConnectedDevices = false
+    // By default a Gradle managed Pixel 6 / API 34 emulator is used. To use a running emulator or a
+    // rooted physical Pixel 6 instead, pass -Pbaselineprofile.useConnectedDevices=true
+    val useConnected = providers.gradleProperty("baselineprofile.useConnectedDevices")
+        .map { it.toBoolean() }
+        .getOrElse(false)
+    if (useConnected) {
+        useConnectedDevices = true
+    } else {
+        managedDevices += "pixel6Api34"
+        useConnectedDevices = false
+    }
 }

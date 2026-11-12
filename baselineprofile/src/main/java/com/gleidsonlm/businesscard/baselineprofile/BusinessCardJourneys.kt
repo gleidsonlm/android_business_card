@@ -64,6 +64,22 @@ fun MacrobenchmarkScope.clickTag(tag: String) {
     device.findObject(By.res(tag)).click()
 }
 
+/**
+ * Clicks [tag] and waits for [expectedTag] to appear, retrying the click.
+ *
+ * Quick taps on the top-right action buttons (edge-to-edge, close to the status bar) are
+ * sometimes dropped on the emulator, so a single click is not reliable for navigation.
+ */
+fun MacrobenchmarkScope.clickTagUntil(tag: String, expectedTag: String, attempts: Int = 4) {
+    repeat(attempts) {
+        waitForTag(tag)
+        device.waitForIdle()
+        device.findObject(By.res(tag))?.click()
+        if (device.wait(Until.hasObject(By.res(expectedTag)), 2_000L)) return
+    }
+    error("Clicking '$tag' did not show '$expectedTag' after $attempts attempts")
+}
+
 fun MacrobenchmarkScope.typeIntoTag(tag: String, value: String) {
     waitForTag(tag)
     device.findObject(By.res(tag)).text = value
@@ -88,15 +104,13 @@ fun MacrobenchmarkScope.fillAndSaveCard() {
     typeIntoTag(Tags.INPUT_COMPANY, "Analytical Engines Ltd")
     typeIntoTag(Tags.INPUT_WEBSITE, "https://example.com")
     scrollToSaveAndClick()
-    waitForTag(Tags.CARD_SCREEN)
     // QR code is generated asynchronously after the card is shown.
     waitForTag(Tags.CARD_QR_CODE)
 }
 
 /** Opens the threat events list, exercises refresh, optionally opens an event, then returns. */
 fun MacrobenchmarkScope.browseThreatEvents() {
-    clickTag(Tags.BUTTON_THREAT_EVENTS)
-    waitForTag(Tags.THREAT_LIST_SCREEN)
+    clickTagUntil(Tags.BUTTON_THREAT_EVENTS, Tags.THREAT_LIST_SCREEN)
     clickTag(Tags.THREAT_LIST_REFRESH)
     device.waitForIdle()
 
@@ -108,17 +122,14 @@ fun MacrobenchmarkScope.browseThreatEvents() {
         device.pressBack()
     }
 
-    clickTag(Tags.THREAT_LIST_BACK)
-    waitForTag(Tags.CARD_SCREEN)
+    clickTagUntil(Tags.THREAT_LIST_BACK, Tags.CARD_SCREEN)
 }
 
 /** Edits the existing card and saves it again (card -> input -> card). */
 fun MacrobenchmarkScope.editCard() {
-    clickTag(Tags.BUTTON_EDIT)
-    waitForTag(Tags.INPUT_SCREEN)
+    clickTagUntil(Tags.BUTTON_EDIT, Tags.INPUT_SCREEN)
     typeIntoTag(Tags.INPUT_TITLE, "Principal Engineer")
     scrollToSaveAndClick()
-    waitForTag(Tags.CARD_SCREEN)
 }
 
 /**
@@ -131,5 +142,5 @@ private fun MacrobenchmarkScope.scrollToSaveAndClick() {
         if (device.hasObject(By.res(Tags.INPUT_BUTTON_SAVE))) return@repeat
         device.findObject(By.res(Tags.INPUT_SCREEN))?.scroll(Direction.DOWN, 1f)
     }
-    clickTag(Tags.INPUT_BUTTON_SAVE)
+    clickTagUntil(Tags.INPUT_BUTTON_SAVE, Tags.CARD_SCREEN)
 }
