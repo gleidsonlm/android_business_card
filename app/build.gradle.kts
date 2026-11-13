@@ -59,7 +59,6 @@ android {
 
 dependencies {
 
-    implementation(files("libs/Appdome_com.playdigital.devicebinding_c49e7748.aar"))
     implementation(libs.gson)
     implementation(libs.googlecode.ez.vcard)
     implementation("com.journeyapps:zxing-android-embedded:4.3.0") {
